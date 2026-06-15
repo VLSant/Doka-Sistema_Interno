@@ -1,27 +1,69 @@
-# Documento 05 — Estrutura Inicial do Banco de Dados v1.0
+**Status:** Versão 1.0 fechada — base inicial para implementação em Supabase/PostgreSQL.
 
-## Objetivo
+**Documento:** Estrutura Inicial do Banco de Dados.
 
-Definir a estrutura inicial do banco de dados do MVP do Doka.
+**Projeto:** Doka.
 
-## Tecnologia definida
+**Versão:** 1.0.
 
-- Supabase/PostgreSQL
-- Supabase Auth
-- Row Level Security
-- Tabelas e campos em português/snake_case
+**Data:** 12/06/2026.
 
-## Autenticação
+**Base:** PRD v1.0, Regras de Negócio v1.0, Mapa de Telas v0.1 e Especificação Final da Importação MMS v1.0.
 
-A autenticação será feita pelo Supabase Auth.
+## 1. Objetivo do documento
 
-A tabela `auth.users` será a fonte de autenticação.
+Este documento define a estrutura inicial do banco de dados do MVP do Doka.
 
-O Doka terá a tabela `usuarios` para armazenar perfil operacional, cargo/função, status e permissões internas.
+A finalidade é transformar as regras de negócio, telas e fluxos em uma base organizada de tabelas, campos, relacionamentos, índices e regras técnicas.
 
-## Campos padrão
+Este documento não é ainda o script SQL final de criação do banco. Ele é a base para gerar a modelagem final, migrations do Supabase/PostgreSQL, APIs, telas e backlog técnico.
 
-Tabelas operacionais devem conter, quando aplicável:
+## 2. Princípios da modelagem
+
+A estrutura do banco deve seguir estes princípios:
+
+- usar identificadores únicos em todas as tabelas principais;
+- manter histórico de ações relevantes;
+- não apagar registros definitivamente;
+- usar soft delete em registros operacionais;
+- preservar dados importados da MMS em raw_json;
+- separar dados importados da MMS de dados manuais do Doka;
+- permitir rastrear qual lote de importação criou ou atualizou cada registro;
+- permitir controle por perfil e posto;
+- permitir que uma assistência tenha várias partes do conjunto;
+- permitir que uma assistência tenha várias ocorrências;
+- impedir que uma ocorrência envolva mais de uma assistência;
+- permitir tarefas com múltiplos responsáveis;
+- permitir rotinas recorrentes que geram tarefas;
+- permitir custos extras vinculados obrigatoriamente a assistências.
+
+## 3. Convenções técnicas recomendadas
+
+## 3.1 Tecnologia definida
+
+Tecnologia do banco:
+
+- Supabase/PostgreSQL.
+
+Autenticação:
+
+- a autenticação será feita pelo Supabase Auth;
+- a tabela auth.users será a fonte de autenticação;
+- o Doka terá uma tabela própria de perfil operacional, chamada usuarios, vinculada ao usuário autenticado do Supabase.
+
+## 3.2 Nomenclatura
+
+Recomendação confirmada:
+
+- nomes de tabelas em português/snake_case;
+- nomes de campos em português/snake_case;
+- chaves primárias chamadas id;
+- chaves estrangeiras com sufixo _id;
+- datas de controle padronizadas como created_at, updated_at, deleted_at.
+
+## 3.3 Campos padrão
+
+Tabelas operacionais devem possuir, sempre que fizer sentido:
 
 - id;
 - created_at;
@@ -32,39 +74,61 @@ Tabelas operacionais devem conter, quando aplicável:
 - deleted_by;
 - delete_reason.
 
-## Soft delete
+## 3.4 Soft delete
 
 Registros não devem ser apagados definitivamente.
 
-Soft delete usa:
+Campos recomendados:
 
 - deleted_at;
 - deleted_by;
 - delete_reason.
 
-## Histórico
+Regra:
 
-O histórico será centralizado em `historico_auditoria`.
+- registros com deleted_at preenchido não aparecem nas listas operacionais padrão;
+- soft delete não deve ser confundido com status operacional;
+- status Arquivada não deve ser usado como substituto de exclusão lógica.
 
-Campos principais:
+## 3.5 Histórico
 
-- entidade_tipo;
-- entidade_id;
-- acao;
-- valor_anterior;
-- valor_novo;
-- metadata;
-- usuario_id;
-- import_batch_id;
-- created_at.
+Ações relevantes devem ser registradas em tabela de histórico/auditoria.
 
-## Tabelas principais
+Exemplos:
 
-### usuarios
+- criação;
+- edição;
+- mudança de status;
+- reabertura;
+- conclusão;
+- validação;
+- importação;
+- atualização por nova importação;
+- correção de erro;
+- cancelamento;
+- exclusão lógica.
 
-Perfil operacional do usuário autenticado.
+## 4. Visão geral dos grupos de tabelas
 
-Campos principais:
+A estrutura inicial será dividida em grupos:
+
+1. Acesso, usuários e postos;
+2. Cadastros base;
+3. Importação MMS;
+4. Assistências e partes do conjunto;
+5. Ocorrências;
+6. Tarefas e rotinas;
+7. Custos extras;
+8. Histórico e auditoria;
+9. Dashboard e consultas operacionais.
+
+## 5. Tabela usuarios
+
+Representa o perfil operacional do usuário dentro do Doka.
+
+A autenticação não será feita por esta tabela. A autenticação será feita pelo Supabase Auth, usando auth.users.
+
+Campos sugeridos:
 
 - id;
 - auth_user_id;
@@ -73,73 +137,192 @@ Campos principais:
 - perfil;
 - cargo_funcao_id;
 - ativo;
-- ultimo_login_em.
+- ultimo_login_em;
+- created_at;
+- created_by;
+- updated_at;
+- updated_by;
+- deleted_at;
+- deleted_by;
+- delete_reason.
 
-Perfis:
+Valores possíveis de perfil:
 
 - operador;
 - supervisao;
 - direcao_admin.
 
-### postos
+Regras:
+
+- auth_user_id deve referenciar auth.users.id;
+- usuarios guarda apenas dados operacionais e permissões internas do Doka;
+- Operador acessa dados dos postos vinculados;
+- Supervisão acessa dados dos postos/equipes sob responsabilidade;
+- Direção/Administração acessa todos os dados;
+- usuário pode estar vinculado a um ou mais postos.
+
+## 6. Tabela postos
 
 Representa os postos operacionais.
 
-Campos principais:
+Campos sugeridos:
 
 - id;
-- nome;
-- codigo;
-- descricao;
-- ativo.
+- name;
+- code;
+- description;
+- is_active;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
 
-### usuarios_postos
+Regras:
 
-Relaciona usuários a postos.
+- posto será usado como filtro central de acesso;
+- Área de Trabalho da MMS será vinculada ao posto;
+- equivalência automática de nomes de postos fica para fase futura;
+- no MVP, o valor da Área de Trabalho deverá corresponder a um posto cadastrado ou gerar tratamento/alerta.
 
-Campos principais:
+## 7. Tabela usuarios_postos
+
+Tabela de relacionamento entre usuários e postos.
+
+Campos sugeridos:
 
 - id;
 - usuario_id;
 - posto_id;
-- nivel_acesso.
+- nivel_acesso;
+- created_at;
+- created_by;
+- deleted_at;
+- deleted_by.
 
-Níveis:
+Valores possíveis de nivel_acesso:
 
 - operacional;
 - supervisao;
 - consulta.
 
-### cargos_funcoes
+Regras:
 
-Cadastro auxiliar de cargos e funções.
+- um usuário pode estar em vários postos;
+- um posto pode ter vários usuários;
+- Operador vê apenas dados dos postos vinculados;
+- Supervisão vê os postos vinculados com nível supervisão;
+- Direção/Administração ignora esse filtro para visão global.
 
-### prioridades
+## 8. Tabela cargos_funcoes
 
-Cadastro auxiliar de prioridades.
+Representa cargos ou funções internas.
 
-Sugestões:
+Campos sugeridos:
+
+- id;
+- name;
+- description;
+- is_active;
+- created_at;
+- updated_at;
+- deleted_at.
+
+Uso:
+
+- vincular usuários;
+- vincular tarefas e rotinas;
+- permitir filtros por cargo/função.
+
+## 9. Tabela prioridades
+
+Representa prioridades operacionais.
+
+Campos sugeridos:
+
+- id;
+- name;
+- level;
+- color;
+- is_active;
+- created_at;
+- updated_at;
+- deleted_at.
+
+Sugestões iniciais:
 
 - Baixa;
 - Média;
 - Alta;
 - Crítica.
 
-### tipos_ocorrencia
+Uso:
 
-Cadastro de tipos de ocorrência.
+- ocorrências;
+- tarefas;
+- rotinas.
 
-### metas_eficiencia
+## 10. Tabela tipos_ocorrencia
 
-Metas por posto e tipo de atividade.
+Representa os tipos de ocorrência do sistema.
 
-## Tabelas MMS
+Campos sugeridos:
 
-### mms_lotes_importacao
+- id;
+- name;
+- description;
+- is_active;
+- created_at;
+- updated_at;
+- deleted_at.
 
-Representa cada importação.
+Tipos iniciais:
 
-Campos principais:
+- baixa indevida;
+- retorno futuro;
+- pendência MMS;
+- reclamação;
+- adiantamento a baixar;
+- posição interna;
+- falta de montador;
+- erro operacional;
+- montador abandonou montagem;
+- cliente ausente;
+- improdutiva;
+- devolução;
+- outro.
+
+Observação:
+
+Mesmo que improdutiva e devolução não venham detalhadas pela importação MMS no MVP, elas podem existir como tipo manual de ocorrência.
+
+## 11. Tabela metas_eficiencia
+
+Representa metas ou parâmetros simples de eficiência.
+
+Campos sugeridos:
+
+- id;
+- posto_id;
+- tipo_atividade_normalizado;
+- meta_percentual;
+- vigencia_inicio;
+- vigencia_fim;
+- is_active;
+- created_at;
+- updated_at.
+
+Uso:
+
+- dashboard;
+- cálculo de eficiência;
+- alerta de eficiência abaixo da meta.
+
+## 12. Tabela mms_lotes_importacao
+
+Representa cada lote de importação MMS.
+
+Campos sugeridos:
 
 - id;
 - file_name;
@@ -151,14 +334,37 @@ Campos principais:
 - area_trabalho_original;
 - status;
 - total_rows;
+- total_assistencias;
+- total_partes;
 - total_errors;
-- total_warnings.
+- total_warnings;
+- canceled_at;
+- canceled_by;
+- cancel_reason;
+- created_at;
+- updated_at.
 
-### mms_linhas_importacao
+Status possíveis:
 
-Representa cada linha original do arquivo.
+- importado;
+- importado_com_alertas;
+- erro;
+- cancelado.
 
-Campos principais:
+Regras:
+
+- não haverá file_hash no MVP;
+- cada importação gera um lote;
+- o histórico de importação será feito por lote;
+- o lote identifica o usuário, data/hora, posto e arquivo;
+- importações do mesmo posto/data podem ocorrer várias vezes ao longo do dia;
+- novas importações atualizam registros existentes e criam histórico.
+
+## 13. Tabela mms_linhas_importacao
+
+Representa cada linha original do arquivo importado.
+
+Campos sugeridos:
 
 - id;
 - import_batch_id;
@@ -167,19 +373,41 @@ Campos principais:
 - parte_conjunto;
 - raw_json;
 - normalized_json;
-- row_status.
+- row_status;
+- error_message;
+- warning_message;
+- created_at;
+- updated_at.
 
-### mms_assistencias
+Status possíveis de row_status:
 
-Representa a assistência principal.
+- lida;
+- importada;
+- importada_com_alerta;
+- erro;
+- corrigida;
+- ignorada;
+- cancelada.
 
-Campos principais:
+Regras:
+
+- raw_json preserva a linha original;
+- normalized_json pode guardar dados tratados;
+- erros em campos obrigatórios impedem processamento da linha até correção;
+- erros em campos não obrigatórios permitem importação com marcação para correção posterior.
+
+## 14. Tabela mms_assistencias
+
+Representa o serviço principal importado da MMS.
+
+Campos sugeridos:
 
 - id;
 - numero_assistencia;
 - posto_id;
 - data_atividade;
 - cliente_nome;
+- cliente_documento;
 - cliente_contato;
 - endereco;
 - status_atividade;
@@ -187,20 +415,53 @@ Campos principais:
 - tipo_atividade_principal;
 - tipo_atividade_normalizado;
 - recurso_principal;
+- import_batch_id;
 - first_import_batch_id;
 - last_import_batch_id;
-- raw_json_resumo.
+- raw_json_resumo;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
 
-Status interno:
+Valores de status_atividade:
+
+- pendente;
+- iniciado;
+- concluido;
+- nao_concluido;
+- cancelado.
+
+Valores de status_interno:
 
 - ativo;
 - removido.
 
-### mms_partes_assistencia
+Regras:
 
-Representa as partes do conjunto.
+- Número da Assistência identifica o serviço principal;
+- uma assistência pode ter várias partes do conjunto;
+- uma assistência pode ter várias ocorrências;
+- uma assistência pode ter vários custos extras;
+- se uma assistência desaparecer em nova importação do mesmo posto/data, status_interno deve virar removido;
+- se voltar a aparecer, poderá ser reativada/atualizada;
+- registros não devem ser apagados fisicamente.
 
-Campos principais:
+Índices sugeridos:
+
+- numero_assistencia;
+- posto_id + data_atividade;
+- posto_id + data_atividade + numero_assistencia;
+- status_atividade;
+- status_interno;
+- tipo_atividade_normalizado.
+
+## 15. Tabela mms_partes_assistencia
+
+Representa as partes do conjunto de uma assistência.
+
+Campos sugeridos:
 
 - id;
 - assistencia_id;
@@ -216,156 +477,22 @@ Campos principais:
 - valor_receber_movel;
 - atendimento_critico;
 - quantidade_reagendamento;
-- raw_json.
+- comentarios_local_montagem;
+- observacao_finalizacao;
+- defeito_identificado;
+- laudo_ou_observacao;
+- import_batch_id;
+- first_import_batch_id;
+- last_import_batch_id;
+- raw_json;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
 
-### mms_erros_importacao
+Regras:
 
-Registra erros de importação.
-
-### mms_alertas_importacao
-
-Registra alertas não impeditivos.
-
-### mms_mapeamento_status
-
-Mapeia status original para status normalizado.
-
-### mms_mapeamento_tipo_atividade
-
-Mapeia tipo original para tipo normalizado.
-
-## Ocorrências
-
-### ocorrencias
-
-Campos principais:
-
-- id;
-- assistencia_id;
-- numero_assistencia;
-- posto_id;
-- tipo_ocorrencia_id;
-- prioridade_id;
-- status;
-- responsavel_id;
-- data_retorno;
-- titulo;
-- descricao;
-- origem;
-- import_batch_id.
-
-### ocorrencia_comentarios
-
-Comentários e atualizações textuais da ocorrência.
-
-## Tarefas e rotinas
-
-### tarefas
-
-Campos principais:
-
-- id;
-- titulo;
-- descricao;
-- tipo;
-- posto_id;
-- prioridade_id;
-- status;
-- due_date;
-- due_time;
-- requires_validation;
-- validated_at;
-- validated_by;
-- rotina_id.
-
-### tarefa_responsaveis
-
-Relaciona tarefas com responsáveis.
-
-### rotinas
-
-Cadastro de rotinas recorrentes.
-
-### rotina_responsaveis
-
-Responsáveis por rotina.
-
-### rotina_execucoes
-
-Execuções geradas pelas rotinas.
-
-Regra confirmada:
-
-- rotina acumulada mantém a mesma tarefa em aberto;
-- não deve gerar nova tarefa duplicada.
-
-## Deslocamentos e custos
-
-### deslocamentos
-
-Tabela separada para deslocamentos vindos da MMS ou lançados manualmente.
-
-Campos principais:
-
-- id;
-- assistencia_id;
-- parte_assistencia_id;
-- numero_assistencia;
-- posto_id;
-- origem;
-- valor_deslocamento;
-- data_deslocamento;
-- observacoes.
-
-### custos_extras
-
-Custos manuais extras vinculados a assistências.
-
-Campos principais:
-
-- id;
-- assistencia_id;
-- numero_assistencia;
-- posto_id;
-- tipo_custo;
-- descricao;
-- valor;
-- data_custo;
-- status_validacao;
-- lancado_por;
-- validado_em;
-- validado_por.
-
-Status:
-
-- pendente;
-- validado.
-
-## Views sugeridas
-
-- view_ocorrencias_dashboard;
-- view_tarefas_dashboard;
-- view_produtividade_mms;
-- view_importacoes_com_alerta.
-
-## Índices recomendados
-
-- usuarios.email;
-- usuarios.auth_user_id;
-- usuarios_postos.usuario_id;
-- usuarios_postos.posto_id;
-- mms_lotes_importacao.posto_id + operation_date;
-- mms_assistencias.numero_assistencia;
-- mms_assistencias.posto_id + data_atividade;
-- mms_assistencias.posto_id + data_atividade + numero_assistencia;
-- mms_partes_assistencia.assistencia_id;
-- ocorrencias.assistencia_id;
-- ocorrencias.posto_id + status;
-- tarefas.posto_id + status;
-- deslocamentos.assistencia_id;
-- custos_extras.assistencia_id;
-- historico_auditoria.entidade_tipo + entidade_id.
-
-## Próximo passo técnico
-
-Criar migrations SQL no Supabase seguindo esta estrutura.
+- uma assistência pode possuir múltiplas partes;
+- a chave operacional deve considerar posto, data, número da assistência e parte do conjunto;
+- partes diferentes do mesmo número de assistência não devem gerar assistências duplicadas;
