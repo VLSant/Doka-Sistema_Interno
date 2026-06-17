@@ -130,7 +130,7 @@ Regras:
 Regras:
 
 - registros operacionais poderão ser editados conforme perfil de acesso;
-- dados importados da MMS poderão ser editados por Supervisão e Direção/Administração;
+- dados importados da MMS poderão ser editados por Operador, Supervisão e Direção/Administração conforme escopo de posto e perfil;
 - Operador poderá editar registros operacionais relacionados aos seus postos;
 - toda alteração relevante deverá registrar histórico;
 - alterações em dados importados devem preservar o dado original em histórico ou raw_json;
@@ -309,8 +309,8 @@ A assistência importada da MMS será base operacional para consulta, produtivid
 
 Regras:
 
-- usuários Operação poderão editar manualmente dados de assistências importadas da MMS;
-- Supervisão e Direção/Administração podem editar dados importados da MMS;
+- Operador poderá editar manualmente dados de assistências importadas da MMS dentro dos postos vinculados ao seu usuário;
+- Supervisão e Direção/Administração podem editar dados importados da MMS conforme seu escopo de acesso;
 - alterações manuais devem manter histórico;
 - o dado original importado deve ser preservado no histórico ou no raw_json.
 

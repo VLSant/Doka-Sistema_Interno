@@ -168,10 +168,10 @@ Representa os postos operacionais.
 Campos sugeridos:
 
 - id;
-- name;
-- code;
-- description;
-- is_active;
+- nome;
+- codigo;
+- descricao;
+- ativo;
 - created_at;
 - updated_at;
 - deleted_at;
@@ -221,9 +221,9 @@ Representa cargos ou funções internas.
 Campos sugeridos:
 
 - id;
-- name;
-- description;
-- is_active;
+- nome;
+- descricao;
+- ativo;
 - created_at;
 - updated_at;
 - deleted_at.
@@ -241,10 +241,10 @@ Representa prioridades operacionais.
 Campos sugeridos:
 
 - id;
-- name;
-- level;
-- color;
-- is_active;
+- nome;
+- nivel;
+- cor;
+- ativo;
 - created_at;
 - updated_at;
 - deleted_at.
@@ -269,9 +269,9 @@ Representa os tipos de ocorrência do sistema.
 Campos sugeridos:
 
 - id;
-- name;
-- description;
-- is_active;
+- nome;
+- descricao;
+- ativo;
 - created_at;
 - updated_at;
 - deleted_at.
@@ -308,7 +308,7 @@ Campos sugeridos:
 - meta_percentual;
 - vigencia_inicio;
 - vigencia_fim;
-- is_active;
+- ativo;
 - created_at;
 - updated_at.
 
@@ -325,22 +325,22 @@ Representa cada lote de importação MMS.
 Campos sugeridos:
 
 - id;
-- file_name;
-- storage_path;
-- imported_by;
-- imported_at;
-- operation_date;
+- nome_arquivo;
+- caminho_storage;
+- importado_por;
+- importado_em;
+- data_operacao;
 - posto_id;
 - area_trabalho_original;
 - status;
-- total_rows;
+- total_linhas;
 - total_assistencias;
 - total_partes;
-- total_errors;
-- total_warnings;
-- canceled_at;
-- canceled_by;
-- cancel_reason;
+- total_erros;
+- total_alertas;
+- cancelado_em;
+- cancelado_por;
+- motivo_cancelamento;
 - created_at;
 - updated_at.
 
@@ -367,19 +367,19 @@ Representa cada linha original do arquivo importado.
 Campos sugeridos:
 
 - id;
-- import_batch_id;
-- row_number;
+- lote_importacao_id;
+- numero_linha;
 - numero_assistencia;
 - parte_conjunto;
 - raw_json;
-- normalized_json;
-- row_status;
-- error_message;
-- warning_message;
+- json_normalizado;
+- status_linha;
+- mensagem_erro;
+- mensagem_alerta;
 - created_at;
 - updated_at.
 
-Status possíveis de row_status:
+Status possíveis de status_linha:
 
 - lida;
 - importada;
@@ -415,9 +415,9 @@ Campos sugeridos:
 - tipo_atividade_principal;
 - tipo_atividade_normalizado;
 - recurso_principal;
-- import_batch_id;
-- first_import_batch_id;
-- last_import_batch_id;
+- lote_importacao_id;
+- primeiro_lote_importacao_id;
+- ultimo_lote_importacao_id;
 - raw_json_resumo;
 - created_at;
 - updated_at;
@@ -481,9 +481,9 @@ Campos sugeridos:
 - observacao_finalizacao;
 - defeito_identificado;
 - laudo_ou_observacao;
-- import_batch_id;
-- first_import_batch_id;
-- last_import_batch_id;
+- lote_importacao_id;
+- primeiro_lote_importacao_id;
+- ultimo_lote_importacao_id;
 - raw_json;
 - created_at;
 - updated_at;
@@ -496,3 +496,526 @@ Regras:
 - uma assistência pode possuir múltiplas partes;
 - a chave operacional deve considerar posto, data, número da assistência e parte do conjunto;
 - partes diferentes do mesmo número de assistência não devem gerar assistências duplicadas;
+
+## 16. Tabela mms_erros_importacao
+
+Representa erros encontrados durante a leitura, validação ou tratamento de uma importação MMS.
+
+Campos sugeridos:
+
+- id;
+- lote_importacao_id;
+- linha_importacao_id;
+- campo;
+- valor_original;
+- tipo_erro;
+- mensagem_erro;
+- valor_corrigido;
+- corrigido_por;
+- corrigido_em;
+- status;
+- created_at;
+- updated_at.
+
+Valores possíveis de status:
+
+- pendente;
+- corrigido;
+- ignorado.
+
+Regras:
+
+- erros impeditivos devem bloquear a linha ou o lote conforme regra de importação;
+- correções devem preservar valor_original e salvar valor_corrigido separadamente;
+- correções devem gerar registro em historico_auditoria.
+
+## 17. Tabela mms_alertas_importacao
+
+Representa alertas não impeditivos gerados pela importação MMS.
+
+Campos sugeridos:
+
+- id;
+- lote_importacao_id;
+- linha_importacao_id;
+- tipo_alerta;
+- mensagem_alerta;
+- assistencia_id;
+- resolvido_em;
+- resolvido_por;
+- status;
+- created_at;
+- updated_at.
+
+Valores possíveis de status:
+
+- pendente;
+- resolvido;
+- ignorado.
+
+Regras:
+
+- alertas não impedem a importação quando não houver erro obrigatório;
+- alertas podem sugerir criação manual de ocorrência;
+- alertas resolvidos devem manter rastreabilidade.
+
+## 18. Tabela mms_mapeamento_status
+
+Representa o mapeamento entre Status da Atividade original da MMS e status normalizado do Doka.
+
+Campos sugeridos:
+
+- id;
+- valor_original;
+- valor_normalizado;
+- descricao;
+- ativo;
+- created_at;
+- updated_at.
+
+Regras:
+
+- valor_normalizado deve usar status_atividade_mms;
+- valor_original deve ser preservado para auditoria e reprocessamento;
+- mapeamentos inativos não devem ser usados em novas importações.
+
+## 19. Tabela mms_mapeamento_tipo_atividade
+
+Representa o mapeamento entre Tipo de Atividade original da MMS e tipo normalizado do Doka.
+
+Campos sugeridos:
+
+- id;
+- valor_original;
+- valor_normalizado;
+- descricao;
+- ativo;
+- created_at;
+- updated_at.
+
+Regras:
+
+- valor_normalizado será usado em filtros, produtividade e dashboard;
+- raw_json deve preservar o valor original da MMS.
+
+## 20. Tabela ocorrencias
+
+Representa pendências, reclamações e problemas operacionais vinculados a uma assistência.
+
+Campos sugeridos:
+
+- id;
+- assistencia_id;
+- posto_id;
+- tipo_ocorrencia_id;
+- prioridade_id;
+- responsavel_id;
+- criada_por;
+- titulo;
+- descricao;
+- observacoes;
+- status;
+- data_retorno;
+- resolvida_em;
+- encerrada_em;
+- reaberta_em;
+- origem;
+- lote_importacao_id;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
+
+Valores possíveis de status:
+
+- aberta;
+- em_acompanhamento;
+- aguardando_retorno;
+- resolvida;
+- encerrada;
+- reaberta.
+
+Regras:
+
+- toda ocorrência do MVP deve estar vinculada a uma assistência;
+- uma ocorrência não pode envolver mais de uma assistência;
+- uma assistência pode ter várias ocorrências;
+- atrasada será condição calculada por data_retorno e status, não status fixo;
+- mudanças de status devem gerar historico_auditoria.
+
+Índices sugeridos:
+
+- assistencia_id;
+- posto_id;
+- responsavel_id;
+- status;
+- data_retorno;
+- tipo_ocorrencia_id.
+
+## 21. Tabela ocorrencia_comentarios
+
+Representa comentários e acompanhamentos registrados dentro de uma ocorrência.
+
+Campos sugeridos:
+
+- id;
+- ocorrencia_id;
+- usuario_id;
+- comentario;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
+
+Regras:
+
+- comentários devem ficar vinculados a uma única ocorrência;
+- comentários não devem substituir o histórico técnico;
+- exclusão de comentário deve usar soft delete quando permitida.
+
+## 22. Tabela tarefas
+
+Representa tarefas avulsas, tarefas geradas por rotina e estratégias operacionais.
+
+Campos sugeridos:
+
+- id;
+- titulo;
+- descricao;
+- tipo;
+- posto_id;
+- cargo_funcao_id;
+- prioridade_id;
+- criada_por;
+- status;
+- prazo_data;
+- horario_limite;
+- exige_validacao;
+- concluida_em;
+- concluida_por;
+- validada_em;
+- validada_por;
+- reaberta_em;
+- observacoes;
+- rotina_id;
+- rotina_execucao_id;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
+
+Valores possíveis de tipo:
+
+- avulsa;
+- rotina;
+- estrategia.
+
+Valores possíveis de status:
+
+- pendente;
+- em_andamento;
+- concluida;
+- validada;
+- reaberta.
+
+Regras:
+
+- tarefa pode ter um ou múltiplos responsáveis por tarefa_responsaveis;
+- atraso será condição calculada por prazo_data, horario_limite e status;
+- horario_limite não será obrigatório;
+- tarefa com exige_validacao deve ser validada por Supervisão ou Direção/Administração;
+- rotina acumulada deve manter a mesma tarefa aberta até conclusão ou tratamento.
+
+Índices sugeridos:
+
+- posto_id;
+- status;
+- prazo_data;
+- prioridade_id;
+- rotina_id.
+
+## 23. Tabela tarefa_responsaveis
+
+Relaciona tarefas aos seus responsáveis.
+
+Campos sugeridos:
+
+- id;
+- tarefa_id;
+- usuario_id;
+- created_at;
+- created_by;
+- deleted_at;
+- deleted_by.
+
+Regras:
+
+- uma tarefa pode ter múltiplos responsáveis;
+- não deve haver duplicidade ativa de tarefa_id + usuario_id;
+- permissões de visualização devem considerar usuário responsável e posto.
+
+## 24. Tabela rotinas
+
+Representa cadastros de rotinas recorrentes.
+
+Campos sugeridos:
+
+- id;
+- nome;
+- descricao;
+- posto_id;
+- cargo_funcao_id;
+- prioridade_id;
+- recorrencia;
+- dias_semana;
+- dia_mes;
+- horario_limite;
+- exige_validacao;
+- ativa;
+- data_inicio;
+- data_fim;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
+
+Valores sugeridos de recorrencia:
+
+- diaria;
+- semanal;
+- mensal;
+- personalizada.
+
+Regras:
+
+- rotina gera tarefas conforme recorrência;
+- alterações em rotina devem afetar gerações futuras;
+- rotina inativa não gera novas tarefas;
+- rotina acumulada não deve duplicar tarefa ainda aberta.
+
+## 25. Tabela rotina_responsaveis
+
+Relaciona rotinas aos seus responsáveis padrão.
+
+Campos sugeridos:
+
+- id;
+- rotina_id;
+- usuario_id;
+- created_at;
+- created_by;
+- deleted_at;
+- deleted_by.
+
+Regras:
+
+- uma rotina pode ter múltiplos responsáveis;
+- responsáveis da rotina devem ser usados ao gerar tarefas recorrentes.
+
+## 26. Tabela rotina_execucoes
+
+Representa cada ocorrência planejada ou acumulada de uma rotina.
+
+Campos sugeridos:
+
+- id;
+- rotina_id;
+- tarefa_id;
+- data_prevista;
+- status;
+- gerada_em;
+- concluida_em;
+- acumulada_de_execucao_id;
+- created_at;
+- updated_at.
+
+Valores possíveis de status:
+
+- prevista;
+- gerada;
+- acumulada;
+- concluida;
+- cancelada.
+
+Regras:
+
+- cada execução deve apontar para a tarefa gerada quando existir;
+- se a rotina acumular, deve manter referência à mesma tarefa aberta;
+- histórico deve permitir entender quando uma rotina ficou acumulada.
+
+## 27. Tabela deslocamentos
+
+Representa deslocamentos importados da MMS ou lançados manualmente no futuro.
+
+Campos sugeridos:
+
+- id;
+- assistencia_id;
+- parte_assistencia_id;
+- posto_id;
+- origem;
+- valor;
+- data_deslocamento;
+- descricao;
+- lote_importacao_id;
+- raw_json;
+- created_at;
+- created_by;
+- updated_at;
+- updated_by;
+- deleted_at;
+- deleted_by;
+- delete_reason.
+
+Valores possíveis de origem:
+
+- mms;
+- manual.
+
+Regras:
+
+- deslocamentos importados da MMS devem ficar separados de custos extras manuais;
+- deslocamento deve aparecer no detalhe da assistência;
+- edição manual deve gerar historico_auditoria.
+
+## 28. Tabela custos_extras
+
+Representa custos extras manuais vinculados obrigatoriamente a assistências.
+
+Campos sugeridos:
+
+- id;
+- assistencia_id;
+- posto_id;
+- tipo_custo;
+- descricao;
+- valor;
+- data_custo;
+- origem;
+- status_validacao;
+- lancado_por;
+- validado_por;
+- validado_em;
+- observacoes;
+- created_at;
+- updated_at;
+- deleted_at;
+- deleted_by;
+- delete_reason.
+
+Valores possíveis de origem:
+
+- manual.
+
+Valores possíveis de status_validacao:
+
+- pendente;
+- validado.
+
+Regras:
+
+- custo extra não pode ser salvo sem assistência;
+- todos os perfis podem lançar custo extra dentro do seu escopo;
+- apenas Supervisão e Direção/Administração podem validar;
+- não haverá status reprovado ou devolvido para ajuste no MVP;
+- validação deve gerar historico_auditoria.
+
+## 29. Tabela historico_auditoria
+
+Representa o histórico centralizado de ações críticas do sistema.
+
+Campos sugeridos:
+
+- id;
+- entidade_tipo;
+- entidade_id;
+- acao;
+- valor_anterior;
+- valor_novo;
+- metadata;
+- usuario_id;
+- lote_importacao_id;
+- created_at.
+
+Ações sugeridas:
+
+- criado;
+- atualizado;
+- status_alterado;
+- reaberto;
+- concluido;
+- validado;
+- excluido_logicamente;
+- importado;
+- corrigido;
+- cancelado;
+- marcado_removido.
+
+Regras:
+
+- histórico não deve ser apagado;
+- valor_anterior e valor_novo devem usar jsonb quando aplicável;
+- metadata deve guardar contexto adicional da ação;
+- ações críticas de importação, ocorrências, tarefas, custos, soft delete e alterações manuais devem gerar histórico.
+
+## 30. Views de dashboard
+
+As views de dashboard devem consolidar consultas operacionais frequentes sem substituir as regras de RLS.
+
+Views sugeridas:
+
+- view_ocorrencias_dashboard;
+- view_tarefas_dashboard;
+- view_produtividade_mms;
+- view_importacoes_com_alerta.
+
+## 30.1 view_ocorrencias_dashboard
+
+Deve consolidar:
+
+- ocorrências abertas;
+- ocorrências atrasadas;
+- ocorrências com retorno no dia;
+- ocorrências por posto, responsável, tipo e prioridade.
+
+## 30.2 view_tarefas_dashboard
+
+Deve consolidar:
+
+- tarefas pendentes;
+- tarefas atrasadas;
+- tarefas do dia;
+- tarefas aguardando validação;
+- tarefas por posto e responsável.
+
+## 30.3 view_produtividade_mms
+
+Deve consolidar:
+
+- assistências previstas;
+- assistências iniciadas;
+- assistências concluídas;
+- assistências não concluídas;
+- assistências canceladas;
+- eficiência por posto, período e tipo de atividade normalizado.
+
+## 30.4 view_importacoes_com_alerta
+
+Deve consolidar:
+
+- lotes com erro;
+- lotes importados com alertas;
+- total de erros pendentes;
+- total de alertas pendentes;
+- posto, data de operação e usuário importador.
+
+Regras gerais das views:
+
+- devem permitir filtro por posto e período;
+- devem evitar consultas pesadas no frontend;
+- devem respeitar RLS quando consultadas pela aplicação;
+- devem ocultar registros com deleted_at preenchido nas visões operacionais padrão.

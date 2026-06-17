@@ -148,7 +148,7 @@ Reclamações não serão um módulo separado no MVP. Elas serão tratadas como 
 Entra no MVP:
 
 - cadastrar ocorrência vinculada a uma assistência/montagem;
-- cadastrar ocorrência sem assistência apenas quando for ocorrência interna ou administrativa;
+- exigir vínculo com assistência para toda ocorrência do MVP;
 - classificar ocorrência por tipo;
 - definir responsável pelo acompanhamento;
 - definir prioridade;

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Report Deck" description="Doka-branded report deck — cover, data and closing slides ready to extend. Poppins + official palette." -->
+<helmet>
+  <script src="./ds-base.js"></script>
+</helmet>
+<div style="display:flex;flex-direction:column;gap:32px;align-items:center;padding:32px;background:#ECEAED;font-family:'Poppins',system-ui,sans-serif;">
+
+  <!-- COVER -->
+  <section data-screen-label="Cover" style="width:1280px;height:720px;background:#602860;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 96px;box-sizing:border-box;border-radius:16px;box-shadow:0 12px 28px rgba(48,19,48,0.18);">
+    <div style="position:absolute;right:-160px;top:-160px;width:520px;height:520px;border-radius:38%;background:radial-gradient(circle at 30% 30%,#F09018,#D87F10);opacity:0.95;"></div>
+    <div style="position:absolute;right:120px;bottom:-120px;width:280px;height:280px;border-radius:42%;background:#4F204E;"></div>
+    <div style="position:relative;z-index:2;max-width:780px;">
+      <div style="font-weight:700;font-size:16px;letter-spacing:0.14em;text-transform:uppercase;color:#F5B257;">Operações · Entrega & Montagem</div>
+      <h1 style="font-weight:800;font-size:78px;line-height:1.03;letter-spacing:-0.025em;color:#fff;margin:20px 0 0;">Entrega e montagem,<br><span style="color:#F29E30;">sem dor de cabeça.</span></h1>
+      <p style="font-size:22px;font-weight:400;color:rgba(255,255,255,0.78);margin:22px 0 0;max-width:640px;">Relatório do semestre — desempenho da malha, SLA de entregas e montagens, e próximos passos.</p>
+    </div>
+    <div style="position:absolute;left:96px;bottom:56px;display:flex;align-items:center;gap:16px;z-index:2;">
+      <img src="../../assets/logos/doka-logo-orange.png" alt="Doka" style="height:30px;">
+      <span style="font-weight:500;font-size:14px;color:rgba(255,255,255,0.6);padding-left:16px;border-left:1px solid rgba(255,255,255,0.25);font-feature-settings:'tnum' 1;">2026 · 1º semestre</span>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section data-screen-label="Data" style="width:1280px;height:720px;background:#fff;position:relative;overflow:hidden;padding:64px 96px;box-sizing:border-box;border-radius:16px;box-shadow:0 12px 28px rgba(48,19,48,0.12);">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+      <div>
+        <div style="font-weight:700;font-size:14px;letter-spacing:0.12em;text-transform:uppercase;color:#D87F10;">Indicadores · 1º semestre</div>
+        <h2 style="font-weight:800;font-size:46px;letter-spacing:-0.02em;color:#1D1D1F;margin:8px 0 0;">Resumo de desempenho</h2>
+      </div>
+      <img src="../../assets/logos/doka-logo-full.png" alt="Doka" style="height:30px;">
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:44px;">
+      <div style="background:#FAF9FA;border:1px solid #E6E6E6;border-radius:16px;padding:24px;">
+        <div style="font-weight:600;font-size:14px;color:#8B888F;">SLA no prazo</div>
+        <div style="font-weight:800;font-size:52px;line-height:1;letter-spacing:-0.02em;color:#1D1D1F;margin-top:14px;font-feature-settings:'tnum' 1;">96<span style="font-size:24px;font-weight:600;color:#8B888F;">%</span></div>
+      </div>
+      <div style="background:#FAF9FA;border:1px solid #E6E6E6;border-radius:16px;padding:24px;">
+        <div style="font-weight:600;font-size:14px;color:#8B888F;">Entregas</div>
+        <div style="font-weight:800;font-size:52px;line-height:1;letter-spacing:-0.02em;color:#1D1D1F;margin-top:14px;font-feature-settings:'tnum' 1;">184<span style="font-size:24px;font-weight:600;color:#8B888F;">k</span></div>
+      </div>
+      <div style="background:#FAF9FA;border:1px solid #E6E6E6;border-radius:16px;padding:24px;">
+        <div style="font-weight:600;font-size:14px;color:#8B888F;">Montagens</div>
+        <div style="font-weight:800;font-size:52px;line-height:1;letter-spacing:-0.02em;color:#1D1D1F;margin-top:14px;font-feature-settings:'tnum' 1;">61<span style="font-size:24px;font-weight:600;color:#8B888F;">k</span></div>
+      </div>
+      <div style="background:#FAF9FA;border:1px solid #E6E6E6;border-radius:16px;padding:24px;">
+        <div style="font-weight:600;font-size:14px;color:#8B888F;">Atraso médio</div>
+        <div style="font-weight:800;font-size:52px;line-height:1;letter-spacing:-0.02em;color:#1D1D1F;margin-top:14px;font-feature-settings:'tnum' 1;">14<span style="font-size:24px;font-weight:600;color:#8B888F;">min</span></div>
+      </div>
+    </div>
+    <div style="margin-top:36px;display:flex;align-items:flex-end;gap:28px;height:150px;padding:0 8px;">
+      <div style="flex:1;height:62%;background:#C9A5C7;border-radius:8px 8px 0 0;"></div>
+      <div style="flex:1;height:70%;background:#C9A5C7;border-radius:8px 8px 0 0;"></div>
+      <div style="flex:1;height:66%;background:#C9A5C7;border-radius:8px 8px 0 0;"></div>
+      <div style="flex:1;height:84%;background:#A876A6;border-radius:8px 8px 0 0;"></div>
+      <div style="flex:1;height:92%;background:#F29E30;border-radius:8px 8px 0 0;"></div>
+      <div style="flex:1;height:100%;background:#F09018;border-radius:8px 8px 0 0;"></div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section data-screen-label="Closing" style="width:1280px;height:720px;background:#F09018;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 110px;box-sizing:border-box;border-radius:16px;box-shadow:0 12px 28px rgba(48,19,48,0.12);">
+    <div style="position:absolute;left:64px;top:24px;font-weight:800;font-size:320px;color:rgba(255,255,255,0.18);line-height:1;">&ldquo;</div>
+    <blockquote style="position:relative;z-index:2;margin:0;font-weight:600;font-size:56px;line-height:1.12;letter-spacing:-0.02em;color:#fff;max-width:960px;">Não entregamos só caixas — entregamos móveis montados e prazos cumpridos, milhares de vezes por dia.</blockquote>
+    <div style="position:relative;z-index:2;margin-top:34px;font-size:19px;font-weight:700;color:rgba(255,255,255,0.92);">Equipe de Operações<span style="display:block;font-weight:500;color:rgba(255,255,255,0.78);margin-top:2px;">Doka · Centro de Malha Nacional (CMNL)</span></div>
+    <div style="position:absolute;right:64px;bottom:56px;"><img src="../../assets/logos/doka-icon-white.png" alt="Doka" style="height:44px;"></div>
+  </section>
+
+</div>
+</x-dc>
+</body>
+</html>

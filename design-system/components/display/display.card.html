@@ -1,0 +1,65 @@
+<!-- @dsCard group="Components" viewport="700x440" name="Display & Data" subtitle="Card, StatCard, Avatar, Badge, Tag" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); font-family: var(--font-sans); }
+  .stack { display: flex; flex-direction: column; gap: 18px; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .panel { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+  const { Card, StatCard, Avatar, Badge, Tag } = window.DokaDesignSystem_7dbee8;
+  const Ico = ({d, w=18}) => <svg width={w} height={w} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{d}</svg>;
+  const Clock = <Ico d={<><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>} />;
+  const Box = <Ico d={<><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></>} />;
+  const Pin = <Ico d={<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>} w={14} />;
+
+  function Demo() {
+    return (
+      <div className="stack">
+        <div className="kpis">
+          <StatCard label="On-time rate" value="96.4" unit="%" delta="2.1%" deltaDir="up" tone="success" icon={Clock} />
+          <StatCard label="Active shipments" value="1,284" delta="8%" deltaDir="up" tone="brand" icon={Box} />
+          <StatCard label="Avg. delay" value="14" unit="min" delta="3%" deltaDir="down" tone="warning" icon={Clock} />
+        </div>
+        <div className="panel">
+          <div className="lbl">Badges · Status</div>
+          <div className="row">
+            <Badge tone="success" dot>Delivered</Badge>
+            <Badge tone="info" dot>In transit</Badge>
+            <Badge tone="warning" dot>Delayed</Badge>
+            <Badge tone="danger" dot>Exception</Badge>
+            <Badge tone="neutral" dot>Pending</Badge>
+            <Badge tone="brand" soft={false}>New</Badge>
+            <Badge tone="purple">Priority</Badge>
+          </div>
+          <div className="lbl" style={{marginTop:18}}>Tags &amp; Avatars</div>
+          <div className="row">
+            <Tag icon={Pin} onRemove={()=>{}}>Curitiba hub</Tag>
+            <Tag onRemove={()=>{}}>Fragile</Tag>
+            <Tag>Refrigerated</Tag>
+            <span style={{flex:1}}></span>
+            <Avatar name="Marina Alves" status="online" />
+            <Avatar name="João Pedro" status="busy" />
+            <Avatar name="Equipe CMNL" size="lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

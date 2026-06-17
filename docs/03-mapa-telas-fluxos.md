@@ -650,7 +650,7 @@ Blocos recomendados:
 - custos/deslocamentos vinculados;
 - histórico de importações;
 - histórico de alterações manuais;
-- raw_json ou dados originais, visível apenas para perfis autorizados.
+- raw_json ou dados originais, visível aos usuários com acesso à assistência dentro do seu escopo.
 
 ## 13.3 Regras sobre partes do conjunto
 
@@ -1146,7 +1146,7 @@ Passo a passo:
 1. Supervisão ou Direção/Administração acessa Custos Extras;
 2. filtra custos pendentes de validação;
 3. abre custo;
-4. valida ou devolve para ajuste, se aplicável;
+4. valida o custo, se estiver correto;
 5. sistema registra histórico.
 
 ## 33. Priorização das telas do MVP
@@ -1192,20 +1192,25 @@ Decisões incorporadas nesta revisão:
 - a tela de Tarefas e Rotinas deverá ter três visualizações: lista simples, kanban e calendário;
 - custos extras terão apenas os status Pendente e Validado no MVP;
 - a interface não precisa ser otimizada para celular no primeiro ciclo;
-- Operador poderá visualizar dados do cliente final dentro do seu escopo/postos.
+- Operador poderá visualizar todos os campos da assistência dentro do seu escopo/postos.
+
+Pendências resolvidas nesta revisão:
+
+1. campos obrigatórios da ocorrência: assistência, tipo de ocorrência, prioridade, responsável, data de retorno, título e descrição;
+2. campos obrigatórios da tarefa: título, descrição, tipo, posto, responsável ou responsáveis, prioridade, prazo e indicação se exige validação; horário limite não será obrigatório;
+3. acesso e edição dos campos da assistência: Operador poderá visualizar e editar dados importados da assistência dentro dos postos do seu escopo; Supervisão e Direção/Administração poderão editar conforme seu escopo de acesso;
+4. anexos gerais não entram no MVP; os únicos arquivos armazenados serão planilhas de importação MMS;
+5. custo extra terá apenas os status Pendente e Validado; não haverá devolução para ajuste no MVP.
 
 Pendências restantes para refinamento:
 
-1. definir quais campos serão obrigatórios na criação de ocorrência;
-2. definir quais campos serão obrigatórios na criação de tarefa;
-3. definir quais campos da assistência poderão ser editados manualmente;
-4. definir se haverá upload de anexos no MVP ou se ficará para fase futura.
+- não há pendências funcionais abertas nesta seção.
 
 ## 35. Próximos passos
 
 Após validar este mapa de telas, as próximas etapas recomendadas são:
 
-1. fechar pendências de validação listadas na seção 34;
+1. fechar pendências de refinamento listadas na seção 34;
 2. transformar este mapa em wireframes simples;
 3. criar Documento 04 — Especificação Final da Importação MMS;
 4. gerar Documento 05 — Estrutura Inicial do Banco de Dados;

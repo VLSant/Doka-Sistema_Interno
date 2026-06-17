@@ -1,0 +1,108 @@
+/* ===========================================================================
+   Doka · Color tokens
+   Source of truth: official "Paleta Doka" — Orange #FF9800, Plum #642B60,
+   Purple #813271, Light gray #E6E6E6, Charcoal #3B3B3B. Ramps + semantics
+   are derived to harmonize with those anchors.
+   =========================================================================== */
+:root {
+  /* ---- Brand: Orange (primary) — official #F09018 -------------------- */
+  --orange-50:  #FEF4E6;
+  --orange-100: #FBE2C0;
+  --orange-200: #F8CB8C;
+  --orange-300: #F5B257;
+  --orange-400: #F29E30;
+  --orange-500: #F09018;  /* base — brand primary (from logo) */
+  --orange-600: #D87F10;
+  --orange-700: #B0660A;
+  --orange-800: #8A4F0A;
+  --orange-900: #663A08;
+
+  /* ---- Brand: Purple (secondary) — official #602860 ------------------ */
+  --purple-50:  #F3EBF3;
+  --purple-100: #E3CFE2;
+  --purple-200: #C9A5C7;
+  --purple-300: #A876A6;
+  --purple-400: #844E82;
+  --purple-500: #602860;  /* base — brand purple (from logo) */
+  --purple-600: #4F204E;  /* deep — covers, headers, secondary buttons */
+  --purple-700: #401A3F;
+  --purple-800: #301330;
+  --purple-900: #220D22;
+
+  /* ---- Neutrals (warm-leaning grays anchored on #E6E6E6 / #3B3B3B) ----- */
+  --neutral-0:    #FFFFFF;
+  --neutral-50:   #FAF9FA;
+  --neutral-100:  #F4F2F4;
+  --neutral-150:  #ECEAED;
+  --neutral-200:  #E6E6E6;  /* brand light gray */
+  --neutral-300:  #D6D4D8;
+  --neutral-400:  #B4B1B7;
+  --neutral-500:  #8B888F;
+  --neutral-600:  #66636A;
+  --neutral-700:  #3B3B3B;  /* brand charcoal */
+  --neutral-800:  #2A292B;
+  --neutral-900:  #1D1D1F;
+  --neutral-1000: #121214;
+
+  /* ---- Semantic / status (logistics: delivered, transit, delayed…) ---- */
+  --green-50:  #E6F6ED;
+  --green-500: #1E9E5A;  /* delivered / on-time / success */
+  --green-600: #17824A;
+  --blue-50:   #E9F1FE;
+  --blue-500:  #2D7FF9;  /* in-transit / info */
+  --blue-600:  #1B66D6;
+  --amber-50:  #FEF3E0;
+  --amber-500: #F0A024;  /* delayed / pending / warning */
+  --amber-600: #CF8311;
+  --red-50:    #FDECEC;
+  --red-500:   #E0464B;  /* exception / failed / danger */
+  --red-600:   #C2333A;
+
+  /* =====================================================================
+     Semantic aliases — reference these in components, not the ramps above
+     ===================================================================== */
+
+  /* Brand */
+  --brand-primary:        var(--orange-500);
+  --brand-primary-hover:  var(--orange-600);
+  --brand-primary-press:  var(--orange-700);
+  --brand-secondary:      var(--purple-500);
+  --brand-deep:           var(--purple-600);
+  --brand-on-primary:     #FFFFFF;
+
+  /* Text */
+  --text-strong:    var(--neutral-900);
+  --text-body:      var(--neutral-700);
+  --text-muted:     var(--neutral-500);
+  --text-subtle:    var(--neutral-400);
+  --text-on-brand:  #FFFFFF;
+  --text-link:      var(--orange-700);
+
+  /* Surfaces */
+  --surface-page:    var(--neutral-50);
+  --surface-card:    var(--neutral-0);
+  --surface-sunken:  var(--neutral-100);
+  --surface-raised:  var(--neutral-0);
+  --surface-inverse: var(--neutral-900);
+  --surface-brand-soft:   var(--orange-50);
+  --surface-purple-soft:  var(--purple-50);
+
+  /* Borders */
+  --border-subtle:   var(--neutral-200);
+  --border-default:  var(--neutral-300);
+  --border-strong:   var(--neutral-400);
+  --border-brand:    var(--orange-500);
+  --focus-ring:      color-mix(in srgb, var(--orange-500) 45%, transparent);
+
+  /* Status — fill / text / soft-bg triplets */
+  --status-delivered:      var(--green-500);
+  --status-delivered-soft: var(--green-50);
+  --status-transit:        var(--blue-500);
+  --status-transit-soft:   var(--blue-50);
+  --status-delayed:        var(--amber-500);
+  --status-delayed-soft:   var(--amber-50);
+  --status-exception:      var(--red-500);
+  --status-exception-soft: var(--red-50);
+  --status-pending:        var(--neutral-500);
+  --status-pending-soft:   var(--neutral-100);
+}

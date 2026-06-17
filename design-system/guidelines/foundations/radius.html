@@ -1,0 +1,27 @@
+<!-- @dsCard group="Spacing" viewport="700x170" name="Radius" subtitle="Generous & rounded — echoes the rounded-square mark." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; padding: 22px 24px; background: var(--surface-card); font-family: var(--font-sans); }
+  .row { display: flex; gap: 18px; align-items: flex-end; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .box { width: 74px; height: 74px; background: var(--purple-100); border: 2px solid var(--purple-400); }
+  .item b { font-size: 11px; color: var(--text-strong); }
+  .item span { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="border-radius:var(--radius-xs)"></div><b>xs</b><span>6</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-sm)"></div><b>sm</b><span>8</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-md)"></div><b>md</b><span>12</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-lg)"></div><b>lg</b><span>16</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-xl)"></div><b>xl</b><span>20</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-2xl)"></div><b>2xl</b><span>28</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-pill)"></div><b>pill</b><span>999</span></div>
+  </div>
+</body>
+</html>

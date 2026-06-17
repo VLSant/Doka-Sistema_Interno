@@ -364,9 +364,9 @@ Regras:
 - o raw_json deve permitir reprocessamento futuro;
 - o raw_json deve preservar os nomes originais das colunas MMS;
 - alterações manuais no Doka não devem apagar o dado original importado;
-- usuários de Direção/Administração poderão consultar o raw_json;
-- a Supervisão poderá consultar raw_json se for útil ao tratamento operacional;
-- o Operador não precisa visualizar raw_json no MVP, mas poderá visualizar dados tratados da assistência.
+- usuários com acesso à assistência dentro do seu escopo poderão consultar os dados da assistência, incluindo raw_json quando exibido na tela de detalhe;
+- Operador poderá visualizar todos os campos da assistência dos seus postos;
+- edição de dados importados será permitida ao Operador dentro dos postos do seu escopo e à Supervisão/Direção/Administração conforme permissões.
 
 ## 16. Tratamento de erros
 
@@ -479,7 +479,7 @@ Regras:
 
 ## 20. Dados de cliente final
 
-O Operador poderá visualizar dados do cliente final dentro do seu escopo/postos.
+O Operador poderá visualizar todos os campos da assistência dentro do seu escopo/postos.
 
 Regras:
 
@@ -494,45 +494,45 @@ Regras:
 
 A estrutura final será detalhada no documento de banco de dados, mas a importação MMS deve considerar as seguintes entidades:
 
-## 21.1 mms_import_batches
+## 21.1 mms_lotes_importacao
 
 Representa o lote de importação.
 
 Campos sugeridos:
 
 - id;
-- file_name;
-- imported_by;
-- imported_at;
-- operation_date;
+- nome_arquivo;
+- importado_por;
+- importado_em;
+- data_operacao;
 - posto_id;
 - area_trabalho_original;
 - status;
-- total_rows;
+- total_linhas;
 - total_assistencias;
 - total_partes;
-- total_errors;
-- total_warnings;
-- canceled_at;
-- canceled_by;
-- cancel_reason.
+- total_erros;
+- total_alertas;
+- cancelado_em;
+- cancelado_por;
+- motivo_cancelamento.
 
-## 21.2 mms_import_rows
+## 21.2 mms_linhas_importacao
 
 Representa cada linha original da planilha.
 
 Campos sugeridos:
 
 - id;
-- import_batch_id;
-- row_number;
+- lote_importacao_id;
+- numero_linha;
 - numero_assistencia;
 - parte_conjunto;
 - raw_json;
-- normalized_json;
+- json_normalizado;
 - status_linha;
-- error_message;
-- warning_message;
+- mensagem_erro;
+- mensagem_alerta;
 - created_at.
 
 ## 21.3 mms_assistencias
@@ -551,7 +551,7 @@ Campos sugeridos:
 - status_geral;
 - tipo_atividade_principal;
 - recurso_principal;
-- import_batch_id;
+- lote_importacao_id;
 - raw_json_resumo;
 - created_at;
 - updated_at.
@@ -574,42 +574,42 @@ Campos sugeridos:
 - valor_deslocamento;
 - valor_receber_movel;
 - raw_json;
-- import_batch_id;
+- lote_importacao_id;
 - created_at;
 - updated_at.
 
-## 21.5 import_errors
+## 21.5 mms_erros_importacao
 
 Representa erros encontrados no processamento.
 
 Campos sugeridos:
 
 - id;
-- import_batch_id;
-- row_id;
-- field_name;
-- original_value;
-- error_type;
-- error_message;
-- corrected_value;
-- corrected_by;
-- corrected_at;
+- lote_importacao_id;
+- linha_importacao_id;
+- campo;
+- valor_original;
+- tipo_erro;
+- mensagem_erro;
+- valor_corrigido;
+- corrigido_por;
+- corrigido_em;
 - status.
 
-## 21.6 import_warnings
+## 21.6 mms_alertas_importacao
 
 Representa alertas não impeditivos.
 
 Campos sugeridos:
 
 - id;
-- import_batch_id;
-- row_id;
-- warning_type;
-- warning_message;
-- related_assistencia_id;
-- resolved_at;
-- resolved_by;
+- lote_importacao_id;
+- linha_importacao_id;
+- tipo_alerta;
+- mensagem_alerta;
+- assistencia_id;
+- resolvido_em;
+- resolvido_por;
 - status.
 
 ## 22. Desfazer importação
