@@ -1,0 +1,36 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Title slide" subtitle="Plum cover with orange accent + wordmark" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; }
+  .slide { width: 1280px; height: 720px; background: var(--purple-600); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 0 96px; box-sizing: border-box; }
+  .slide::after { content: ''; position: absolute; right: -160px; top: -160px; width: 520px; height: 520px; border-radius: 38%; background: radial-gradient(circle at 30% 30%, rgba(240,144,24,0.96), var(--orange-600)); opacity: 0.92; }
+  .blob2 { position: absolute; right: 120px; bottom: -120px; width: 280px; height: 280px; border-radius: 42%; background: var(--purple-500); }
+  .content { position: relative; z-index: 2; max-width: 760px; }
+  .eyebrow { font-family: var(--font-sans); font-weight: 800; font-size: 16px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange-300); }
+  h1 { font-family: var(--font-display); font-weight: 600; font-size: 80px; line-height: 1.02; letter-spacing: -0.025em; color: #fff; margin: 20px 0 0; }
+  h1 .o { color: var(--orange-400); }
+  p { font-family: var(--font-sans); font-size: 22px; color: rgba(255,255,255,0.78); margin: 22px 0 0; max-width: 620px; }
+  .foot { position: absolute; left: 96px; bottom: 56px; display: flex; align-items: center; gap: 16px; z-index: 2; }
+  .foot img { height: 30px; }
+  .foot .meta { font-family: var(--font-mono); font-size: 14px; color: rgba(255,255,255,0.6); padding-left: 16px; border-left: 1px solid rgba(255,255,255,0.25); }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="blob2"></div>
+    <div class="content">
+      <div class="eyebrow">Operações · Entrega &amp; Montagem</div>
+      <h1>Entrega e montagem,<br><span class="o">sem dor de cabeça.</span></h1>
+      <p>Relatório do semestre — desempenho da malha, SLA de entregas e montagens, e próximos passos.</p>
+    </div>
+    <div class="foot">
+      <img src="../assets/logos/doka-logo-orange.png" alt="Doka">
+      <span class="meta">2026 · 1º semestre</span>
+    </div>
+  </div>
+</body>
+</html>

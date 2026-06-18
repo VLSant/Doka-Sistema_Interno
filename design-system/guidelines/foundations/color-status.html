@@ -1,0 +1,46 @@
+<!-- @dsCard group="Colors" viewport="700x180" name="Status · Logistics" subtitle="Shipment states: delivered, in-transit, delayed, exception, pending." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; padding: 20px; background: var(--surface-card); font-family: var(--font-sans); }
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .cell { display: flex; flex-direction: column; gap: 8px; }
+  .dot { height: 56px; border-radius: var(--radius-md); display: flex; align-items: flex-end; padding: 8px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700; }
+  .pill i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .lbl { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="cell">
+      <div class="dot" style="background:var(--status-delivered)"></div>
+      <div class="pill" style="background:var(--status-delivered-soft);color:var(--green-600)"><i style="background:var(--status-delivered)"></i>Delivered</div>
+      <div class="lbl">#1E9E5A</div>
+    </div>
+    <div class="cell">
+      <div class="dot" style="background:var(--status-transit)"></div>
+      <div class="pill" style="background:var(--status-transit-soft);color:var(--blue-600)"><i style="background:var(--status-transit)"></i>In transit</div>
+      <div class="lbl">#2D7FF9</div>
+    </div>
+    <div class="cell">
+      <div class="dot" style="background:var(--status-delayed)"></div>
+      <div class="pill" style="background:var(--status-delayed-soft);color:var(--amber-600)"><i style="background:var(--status-delayed)"></i>Delayed</div>
+      <div class="lbl">#F0A024</div>
+    </div>
+    <div class="cell">
+      <div class="dot" style="background:var(--status-exception)"></div>
+      <div class="pill" style="background:var(--status-exception-soft);color:var(--red-600)"><i style="background:var(--status-exception)"></i>Exception</div>
+      <div class="lbl">#E0464B</div>
+    </div>
+    <div class="cell">
+      <div class="dot" style="background:var(--status-pending)"></div>
+      <div class="pill" style="background:var(--status-pending-soft);color:var(--neutral-600)"><i style="background:var(--status-pending)"></i>Pending</div>
+      <div class="lbl">#8B888F</div>
+    </div>
+  </div>
+</body>
+</html>

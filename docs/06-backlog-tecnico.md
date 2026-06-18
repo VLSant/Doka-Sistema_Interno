@@ -40,7 +40,7 @@ Premissas já confirmadas:
 - histórico será centralizado em historico_auditoria;
 - usuário poderá estar vinculado a um ou mais postos;
 - Operador poderá iniciar importação MMS;
-- Operador poderá ver dados do cliente final dentro do seu escopo/postos;
+- Operador poderá ver todos os campos da assistência dentro do seu escopo/postos;
 - interface mobile não é obrigatória no primeiro ciclo;
 - anexos do MVP serão apenas os arquivos de importação;
 - file_hash não será usado no MVP;
@@ -59,7 +59,7 @@ Pode:
 - visualizar dados dos postos vinculados;
 - iniciar importação MMS dos seus postos;
 - visualizar assistências dos seus postos;
-- visualizar cliente final dos seus postos;
+- visualizar todos os campos da assistência dos seus postos;
 - criar ocorrência vinculada a uma assistência;
 - acompanhar ocorrências dos seus postos;
 - concluir/reabrir ocorrências conforme regra operacional;
@@ -307,7 +307,7 @@ Campos principais:
 - valor_novo;
 - metadata;
 - usuario_id;
-- import_batch_id;
+- lote_importacao_id;
 - created_at.
 
 Regras:
@@ -502,7 +502,7 @@ Regras:
 
 - anexos do MVP serão apenas planilhas de importação;
 - arquivos devem ficar vinculados ao lote de importação;
-- tabela mms_lotes_importacao deve armazenar storage_path;
+- tabela mms_lotes_importacao deve armazenar caminho_storage;
 - não haverá anexos gerais em ocorrências/tarefas no MVP.
 
 Critérios de aceite:
@@ -735,7 +735,7 @@ Funcionalidades:
 Critérios de aceite:
 
 - Operador vê assistências dos seus postos;
-- dados do cliente final ficam visíveis ao Operador dentro do seu escopo;
+- todos os campos da assistência ficam visíveis ao Operador dentro do seu escopo;
 - registros Removidos podem ficar ocultos por padrão, mas acessíveis em filtro.
 
 ### DOKA-028 — Criar detalhe da assistência
@@ -793,8 +793,8 @@ Prioridade: P1.
 
 Regras:
 
-- Supervisão e Direção/Administração podem editar dados importados;
-- Operador não deve editar dados base importados, salvo campos operacionais liberados;
+- Operador pode visualizar e editar dados importados da assistência dentro dos postos do seu escopo;
+- Supervisão e Direção/Administração podem editar dados importados conforme seu escopo de acesso;
 - toda edição gera histórico;
 - raw_json original não deve ser alterado.
 

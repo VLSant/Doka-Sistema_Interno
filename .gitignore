@@ -24,6 +24,11 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Agent local state
+.agents/*
+!.agents/skills/
+!.agents/skills/**
+
 # Supabase local
 .supabase/
 

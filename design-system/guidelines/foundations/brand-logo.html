@@ -1,0 +1,23 @@
+<!-- @dsCard group="Brand" viewport="700x200" name="Logo" subtitle="Primary lockup: rounded wordmark + orange app mark." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; padding: 0; background: var(--surface-card); font-family: var(--font-sans); }
+  .wrap { display: grid; grid-template-columns: 1fr 1fr; }
+  .cell { display: flex; align-items: center; justify-content: center; height: 200px; padding: 24px; }
+  .light { background: var(--neutral-50); }
+  .plum { background: var(--purple-600); }
+  .cell img { max-width: 78%; max-height: 96px; }
+  .tag { position: absolute; font-size: 10px; font-family: var(--font-mono); margin: 10px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="cell light"><img src="../../assets/logos/doka-logo-full.png" alt="Doka logo on light"></div>
+    <div class="cell plum"><img src="../../assets/logos/doka-logo-orange.png" alt="Doka logo on plum"></div>
+  </div>
+</body>
+</html>

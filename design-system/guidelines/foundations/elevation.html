@@ -1,0 +1,25 @@
+<!-- @dsCard group="Spacing" viewport="700x190" name="Elevation" subtitle="Soft, plum-tinted shadows — never pure black. xs → xl + brand glow." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; padding: 28px 24px; background: var(--surface-page); font-family: var(--font-sans); }
+  .row { display: flex; gap: 24px; align-items: center; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .box { width: 92px; height: 64px; background: var(--surface-card); border-radius: var(--radius-md); }
+  .item b { font-size: 11px; color: var(--text-strong); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-xs)"></div><b>xs</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-sm)"></div><b>sm</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-md)"></div><b>md</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-lg)"></div><b>lg</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-xl)"></div><b>xl</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-brand);background:var(--orange-500)"></div><b>brand</b></div>
+  </div>
+</body>
+</html>

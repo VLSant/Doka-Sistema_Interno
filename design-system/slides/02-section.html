@@ -1,0 +1,29 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Section divider" subtitle="Numbered section break on light surface" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; }
+  .slide { width: 1280px; height: 720px; background: var(--surface-page); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 0 96px; box-sizing: border-box; }
+  .num { font-family: var(--font-display); font-weight: 600; font-size: 240px; line-height: 1; color: var(--orange-100); letter-spacing: -0.04em; position: absolute; right: 90px; top: 50%; transform: translateY(-50%); }
+  .bar { width: 64px; height: 8px; border-radius: 999px; background: var(--orange-500); }
+  .eyebrow { font-family: var(--font-sans); font-weight: 800; font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--purple-500); margin-top: 24px; }
+  h2 { font-family: var(--font-display); font-weight: 600; font-size: 64px; line-height: 1.05; letter-spacing: -0.02em; color: var(--text-strong); margin: 12px 0 0; max-width: 720px; position: relative; z-index: 2; }
+  p { font-family: var(--font-sans); font-size: 20px; color: var(--text-muted); margin: 18px 0 0; max-width: 560px; position: relative; z-index: 2; }
+  .foot { position: absolute; left: 96px; bottom: 52px; display: flex; align-items: center; gap: 10px; }
+  .foot img { height: 26px; }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <div class="num">02</div>
+    <div class="bar"></div>
+    <div class="eyebrow">Desempenho da malha</div>
+    <h2>Como a rede performou neste semestre</h2>
+    <p>SLA de entrega, volumes por hub e os gargalos que priorizamos resolver.</p>
+    <div class="foot"><img src="../assets/logos/doka-icon-orange.png" height="26" alt=""><span style="font-family:var(--font-mono);font-size:13px;color:var(--text-subtle)">Doka · CMNL</span></div>
+  </div>
+</body>
+</html>

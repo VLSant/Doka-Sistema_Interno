@@ -1,0 +1,25 @@
+<!-- @dsCard group="Slides" viewport="1280x720" name="Quote / closing" subtitle="Big statement on orange, brand close" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; }
+  .slide { width: 1280px; height: 720px; background: var(--orange-500); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 0 110px; box-sizing: border-box; }
+  .slide::before { content: '"'; position: absolute; left: 64px; top: 40px; font-family: var(--font-display); font-weight: 700; font-size: 320px; color: rgba(255,255,255,0.18); line-height: 1; }
+  blockquote { position: relative; z-index: 2; margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 58px; line-height: 1.12; letter-spacing: -0.02em; color: #fff; max-width: 940px; }
+  .by { position: relative; z-index: 2; margin-top: 34px; font-family: var(--font-sans); font-size: 19px; font-weight: 700; color: rgba(255,255,255,0.92); }
+  .by span { display: block; font-weight: 500; color: rgba(255,255,255,0.72); margin-top: 2px; }
+  .foot { position: absolute; right: 64px; bottom: 56px; }
+  .foot img { height: 44px; border-radius: 12px; }
+</style>
+</head>
+<body>
+  <div class="slide">
+    <blockquote>Não entregamos só caixas — entregamos móveis montados e prazos cumpridos, milhares de vezes por dia.</blockquote>
+    <div class="by">Equipe de Operações<span>Doka · Centro de Malha Nacional (CMNL)</span></div>
+    <div class="foot"><img src="../assets/logos/doka-icon-white.png" alt="Doka" style="background:transparent"></div>
+  </div>
+</body>
+</html>

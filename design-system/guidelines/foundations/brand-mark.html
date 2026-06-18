@@ -1,0 +1,25 @@
+<!-- @dsCard group="Brand" viewport="700x180" name="App mark" subtitle="The rounded-square 'D' droplet — favicon, avatar, app icon." -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-card); font-family: var(--font-sans); }
+  .row { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .chip { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .chip img { border-radius: 22%; }
+  .chip span { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); }
+  .onp { background: var(--purple-600); padding: 10px; border-radius: var(--radius-lg); }
+  .ond { background: var(--neutral-900); padding: 10px; border-radius: var(--radius-lg); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="chip"><img src="../../assets/logos/doka-icon-orange.png" width="92" height="92" alt="Orange mark"><span>orange</span></div>
+    <div class="chip"><img src="../../assets/logos/doka-icon-purple.png" width="92" height="92" alt="Purple mark"><span>purple</span></div>
+    <div class="chip"><div class="onp"><img src="../../assets/logos/doka-icon-white.png" width="72" height="72" alt="White mark on plum"></div><span>white / plum</span></div>
+    <div class="chip"><div class="ond"><img src="../../assets/logos/doka-icon-orange.png" width="72" height="72" alt="Orange mark on dark"></div><span>on dark</span></div>
+  </div>
+</body>
+</html>
