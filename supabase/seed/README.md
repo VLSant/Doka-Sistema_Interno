@@ -1,18 +1,18 @@
 # Seed Supabase
 
-Esta pasta deve conter dados iniciais para testes e desenvolvimento.
+Esta pasta contem dados iniciais para testes e desenvolvimento.
 
-## Seeds sugeridos
+## Seeds atuais
 
-- perfis de usuário;
-- postos iniciais;
-- prioridades;
-- tipos de ocorrência;
-- mapeamento de Status da Atividade MMS;
-- mapeamento de Tipo de Atividade MMS;
-- massa de teste para assistências;
-- tarefas e rotinas de exemplo.
+- `fundacao_operacional_seed.sql`: usuarios Auth ficticios, usuarios operacionais, postos, cargos/funcoes e vinculos usuario/posto.
+- `cadastros_base_mvp.sql`: prioridades, tipos de ocorrencia e metas de eficiencia usados nos testes da Spec 02.
 
-## Observação
+## Ordem de execucao sugerida
 
-Dados sensíveis reais não devem ser versionados neste repositório.
+1. Aplicar as migrations.
+2. Executar `fundacao_operacional_seed.sql`.
+3. Executar `cadastros_base_mvp.sql`.
+
+## Observacao
+
+Dados sensiveis reais nao devem ser versionados neste repositorio.
