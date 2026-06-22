@@ -11,18 +11,20 @@ on public.usuarios
 for select
 to authenticated
 using (
-  deleted_at is null
-  and (
-    id = app_private.usuario_atual_id()
-    or app_private.usuario_e_direcao_admin()
-    or (
-      app_private.usuario_e_supervisao()
-      and exists (
-        select 1
-        from public.usuarios_postos alvo
-        where alvo.usuario_id = usuarios.id
-          and alvo.deleted_at is null
-          and app_private.usuario_tem_acesso_posto(alvo.posto_id)
+  app_private.usuario_e_direcao_admin()
+  or (
+    deleted_at is null
+    and (
+      id = app_private.usuario_atual_id()
+      or (
+        app_private.usuario_e_supervisao()
+        and exists (
+          select 1
+          from public.usuarios_postos alvo
+          where alvo.usuario_id = usuarios.id
+            and alvo.deleted_at is null
+            and app_private.usuario_tem_acesso_posto(alvo.posto_id)
+        )
       )
     )
   )
@@ -36,13 +38,15 @@ on public.usuarios_postos
 for select
 to authenticated
 using (
-  deleted_at is null
-  and (
-    app_private.usuario_e_direcao_admin()
-    or usuario_id = app_private.usuario_atual_id()
-    or (
-      app_private.usuario_e_supervisao()
-      and app_private.usuario_tem_acesso_posto(posto_id)
+  app_private.usuario_e_direcao_admin()
+  or (
+    deleted_at is null
+    and (
+      usuario_id = app_private.usuario_atual_id()
+      or (
+        app_private.usuario_e_supervisao()
+        and app_private.usuario_tem_acesso_posto(posto_id)
+      )
     )
   )
 );

@@ -42,6 +42,8 @@ select public.assert_true((select count(*) = 0 from public.postos where codigo =
 select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000003', true);
 select public.assert_true((select count(*) = 4 from public.postos where deleted_at is null), 'direcao/admin deve ver todos os postos nao deletados, incluindo inativos');
 select public.assert_true((select count(*) = 4 from public.usuarios where deleted_at is null), 'direcao/admin deve ver usuarios nao deletados');
+select public.assert_true((select count(*) = 1 from public.usuarios where email = 'deletado@doka.test'), 'direcao/admin deve ver usuarios removidos logicamente');
+select public.assert_true((select count(*) = 1 from public.usuarios_postos where id = '50000000-0000-0000-0000-000000000004'), 'direcao/admin deve ver vinculos removidos logicamente');
 
 reset role;
 
