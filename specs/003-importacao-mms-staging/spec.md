@@ -16,15 +16,15 @@ Um usuario autorizado precisa registrar uma tentativa de importacao MMS como um 
 
 **Why this priority**: Sem lote de importacao, a operacao nao consegue auditar quem importou, qual arquivo foi usado, para qual posto/data e qual foi o resultado geral da tentativa.
 
-**Independent Test**: Criar lotes para postos diferentes e validar que cada lote registra origem, importador, status inicial, totais e escopo de posto sem criar assistencias finais.
+**Independent Test**: Criar lotes para postos diferentes e validar que cada lote registra origem, importador, `estado_processamento`, status oficial nulo antes da conclusao quando aplicavel, totais e escopo de posto sem criar assistencias finais.
 
 **Acceptance Scenarios**:
 
-1. **Given** um usuario autorizado com acesso ao posto, **When** ele registra uma tentativa de importacao MMS com nome de arquivo e posto, **Then** o sistema cria um lote com usuario importador, dados de origem e controle tecnico de recebimento/processamento sem usar status oficial fora da lista permitida.
+1. **Given** um usuario autorizado com acesso ao posto, **When** ele registra uma tentativa de importacao MMS com nome de arquivo e posto, **Then** o sistema cria um lote com usuario importador, dados de origem, `estado_processamento = recebido` e status oficial nulo ate a conclusao da validacao bruta ou cancelamento.
 2. **Given** uma tentativa de importacao com data de atividade identificada, **When** o lote e registrado, **Then** a data de atividade fica associada ao lote.
 3. **Given** uma tentativa de importacao sem data de atividade identificada no arquivo, **When** o lote e registrado, **Then** o lote permanece rastreavel e indica a ausencia desse dado como erro ou alerta conforme a severidade.
 4. **Given** um usuario sem acesso ao posto, **When** tenta registrar lote para esse posto, **Then** a operacao e bloqueada.
-5. **Given** uma tentativa de importacao registrada, **When** a operacao termina, **Then** o lote apresenta um dos status oficiais `importado`, `importado_com_alertas`, `erro` ou `cancelado`, totais de linhas, erros e alertas sem criar registros finais de assistencia.
+5. **Given** uma tentativa de importacao registrada, **When** a operacao termina, **Then** o lote apresenta `estado_processamento = validado` e um dos status oficiais `importado`, `importado_com_alertas` ou `erro`, ou status `cancelado` se a tentativa for cancelada, com totais de linhas, erros e alertas sem criar registros finais de assistencia.
 
 ---
 
@@ -91,8 +91,8 @@ Direcao/Admin e Supervisao precisam rastrear criacao, processamento, falha, canc
 
 **Acceptance Scenarios**:
 
-1. **Given** um lote MMS criado, **When** a criacao e concluida, **Then** o historico registra entidade, acao, usuario responsavel e contexto da origem.
-2. **Given** um lote em processamento, **When** seu status oficial muda para `importado`, `importado_com_alertas`, `erro` ou `cancelado`, **Then** a mudanca gera historico centralizado.
+1. **Given** um lote MMS criado, **When** a criacao e concluida, **Then** o historico registra entidade, acao, usuario responsavel, contexto da origem e `estado_processamento = recebido`.
+2. **Given** um lote em processamento, **When** seu `estado_processamento` muda ou seu status oficial muda de nulo para `importado`, `importado_com_alertas`, `erro` ou `cancelado`, **Then** a mudanca gera historico centralizado.
 3. **Given** erros ou alertas relevantes sao registrados em linhas, **When** a validacao termina, **Then** o lote guarda totais e a auditoria permite rastrear a tentativa.
 4. **Given** uma operacao bloqueada por RLS ou validacao, **When** ela falha, **Then** nenhum evento de sucesso enganoso e registrado.
 5. **Given** soft delete aplicavel a lote ou linha de staging, **When** ele ocorre, **Then** os campos de soft delete e o historico centralizado registram a acao.
@@ -113,6 +113,7 @@ Direcao/Admin e Supervisao precisam rastrear criacao, processamento, falha, canc
 - Linhas duplicadas dentro do mesmo lote sem aplicar ainda a chave operacional MMS final.
 - Lote sem linhas.
 - Lote parcialmente processado apos falha.
+- Lote com `status` oficial nulo enquanto `estado_processamento` ainda esta `recebido` ou `processando`.
 - Reprocessamento de validacao bruta do mesmo lote.
 - Cancelamento de lote ja `importado` ou `importado_com_alertas`.
 - Tentativa de alterar `raw_json` depois da linha registrada.
@@ -145,67 +146,68 @@ Direcao/Admin e Supervisao precisam rastrear criacao, processamento, falha, canc
 ### Functional Requirements
 
 - **FR-001**: The system MUST provide `mms_lotes_importacao` to represent each MMS import attempt.
-- **FR-002**: Each import batch MUST record `nome_origem` or equivalent file/source identification, `posto_id`, optional `data_atividade`, importing user, status, totals, timestamps and control fields.
+- **FR-002**: Each import batch MUST record `nome_origem` or equivalent file/source identification, `posto_id`, optional `data_atividade`, importing user, official status when concluded, `estado_processamento`, totals, timestamps and control fields.
 - **FR-003**: Each import batch MUST be linked to exactly one existing operational `posto` when the posto is known.
 - **FR-004**: The system MUST reject creation of batches for missing, inactive or logically removed postos, except administrative historical review of existing records.
 - **FR-005**: The system MUST identify the user who created or started the import batch.
-- **FR-006**: Import batch official status MUST allow only `importado`, `importado_com_alertas`, `erro` and `cancelado`.
-- **FR-006A**: Internal processing steps such as received, processing or validated MAY be represented by separate technical fields or timestamps, but MUST NOT replace or expand the official batch status list.
-- **FR-007**: Import batch totals MUST include total rows, valid rows, rows with errors, rows with warnings and ignored rows when applicable.
-- **FR-008**: Batch totals MUST remain consistent with the current validation state of the lines associated with the batch.
-- **FR-009**: The system MUST preserve auditable technical processing state and timestamps sufficient to understand when a batch was created, validated, completed, failed or cancelled.
-- **FR-010**: The system MUST provide `mms_linhas_importacao` as staging lines linked to an import batch.
-- **FR-011**: Each staging line MUST be linked to exactly one import batch.
-- **FR-012**: Each staging line MUST preserve mandatory `raw_json` with the original MMS row data.
-- **FR-013**: The system MUST reject staging lines without `raw_json`.
-- **FR-014**: The system MUST preserve `raw_json` without destructive normalization of the original values.
-- **FR-015**: The system MUST prevent ordinary operational updates from overwriting `raw_json` after the line is registered.
-- **FR-016**: Each staging line MUST record source row order or row number when available.
-- **FR-017**: Each staging line MUST persist candidate `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` fields when they can be extracted or resolved during gross validation.
-- **FR-018**: Each staging line MUST keep technical validation state separate from the official batch status.
-- **FR-019**: The system MUST provide `mms_erros_importacao` for one or more blocking validation errors.
-- **FR-020**: The system MUST provide `mms_alertas_importacao` for one or more non-blocking validation warnings.
-- **FR-021**: Errors and warnings MUST be traceable to the batch and line that produced them.
-- **FR-022**: Errors and warnings MUST include enough information for an operator or administrator to understand the affected field, issue and severity.
-- **FR-023**: Gross MMS validation MUST check whether minimum expected MMS fields are present when available in the source format.
-- **FR-024**: Gross MMS validation MUST validate candidate `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` fields for presence, basic format and consistency when present or expected in the MMS row data.
-- **FR-025**: Gross MMS validation MUST classify blocking issues as errors and non-blocking suspicious conditions as warnings.
-- **FR-026**: A line with blocking validation errors MUST NOT be treated as valid for future transformation.
-- **FR-027**: A line with warnings and no errors MAY remain valid for future transformation.
-- **FR-028**: A batch with any line errors MUST finish with official status `erro`.
-- **FR-029**: A batch with no line errors and one or more warnings MUST finish with official status `importado_com_alertas`.
-- **FR-030**: A batch with no line errors and no warnings MUST finish with official status `importado`.
-- **FR-031**: A cancelled batch MUST finish with official status `cancelado`.
-- **FR-032**: Validation MUST NOT create final assistencias.
-- **FR-033**: Validation MUST NOT create ocorrencias, tarefas, custos extras or dashboard records.
-- **FR-034**: Validation MUST NOT apply the final MMS operational key as the authoritative assistance identity in this feature.
-- **FR-035**: Validation MUST NOT mark any final assistance as `removido`.
-- **FR-036**: The system MUST allow re-running gross validation for a batch while preserving the original batch, original lines and `raw_json`.
-- **FR-037**: Re-running validation MUST update technical validation state, errors, warnings and totals in a traceable way.
-- **FR-038**: Re-running validation MUST NOT alter the original `raw_json`.
-- **FR-039**: The system MUST prevent users without an active operational profile from accessing MMS import batches, lines, errors and warnings.
-- **FR-040**: Operador MUST be able to consult batches, lines, errors and warnings only for postos in their active scope.
-- **FR-041**: Supervisao MUST be able to consult batches, lines, errors and warnings only for postos in their active scope.
-- **FR-042**: Direcao/Admin MUST be able to consult batches, lines, errors and warnings for all postos.
-- **FR-043**: Creation of import batches MUST be allowed only for users authorized for the target posto or Direcao/Admin.
-- **FR-044**: Management actions such as cancellation, status correction or logical deletion MUST be restricted to authorized profiles and posto scope.
-- **FR-045**: Lines, errors and warnings MUST inherit access control from their parent batch.
-- **FR-046**: Operational default consultations MUST hide soft-deleted batches, lines, errors and warnings.
-- **FR-047**: Direcao/Admin MAY inspect soft-deleted batches, lines, errors and warnings for audit support.
-- **FR-048**: Soft delete, when applied to a batch, line, error or warning, MUST fill `deleted_at`, `deleted_by` and `delete_reason`.
-- **FR-049**: Soft delete MUST NOT be represented by an official status value.
-- **FR-050**: A soft-deleted batch MUST not appear in ordinary operational import lists.
-- **FR-051**: A soft-deleted line MUST not be counted as an active operational staging line unless an administrative audit view explicitly includes it.
-- **FR-052**: Creation, official status changes, validation completion, failure, cancellation and soft delete of a batch MUST generate centralized audit history.
-- **FR-053**: Critical line-level actions, including line creation, validation state change, error/warning association and soft delete, MUST be auditable directly or through batch-level summarized audit events.
-- **FR-054**: Audit history MUST identify entity type, entity id, action, actor, previous values, new values and contextual information when applicable.
-- **FR-055**: Failed or blocked operations MUST NOT create misleading success audit events.
-- **FR-056**: The feature MUST provide SQL validation evidence for RLS by profile/posto, audit history, soft delete, raw_json preservation, raw_json immutability, batch validation, line validation, errors and warnings.
-- **FR-057**: The feature MUST maintain Portuguese table and field naming in `snake_case`.
-- **FR-058**: Primary keys MUST use `id`.
-- **FR-059**: Foreign keys MUST use the `_id` suffix.
-- **FR-060**: The feature MUST preserve compatibility with the Spec 01 operational foundation and Spec 002 cadastro conventions.
-- **FR-061**: The feature MUST NOT introduce final assistance tables, final assistance mutation, occurrence records, task records, extra cost records, dashboards, final screens, complete MMS parser or automatic MMS integrations.
+- **FR-006**: Import batch official status MAY be null while gross validation has not concluded and the batch has not been cancelled.
+- **FR-007**: When official status is filled, it MUST allow only `importado`, `importado_com_alertas`, `erro` and `cancelado`.
+- **FR-008**: Internal processing steps MUST be represented by `estado_processamento` or timestamps, with `estado_processamento` covering at least `recebido`, `processando` and `validado`, without replacing or expanding the official batch status list.
+- **FR-009**: Import batch totals MUST include total rows, valid rows, rows with errors, rows with warnings and ignored rows when applicable.
+- **FR-010**: Batch totals MUST remain consistent with the current validation state of the lines associated with the batch.
+- **FR-011**: The system MUST preserve auditable technical processing state and timestamps sufficient to understand when a batch was created, validated, completed, failed or cancelled.
+- **FR-012**: The system MUST provide `mms_linhas_importacao` as staging lines linked to an import batch.
+- **FR-013**: Each staging line MUST be linked to exactly one import batch.
+- **FR-014**: Each staging line MUST preserve mandatory `raw_json` with the original non-empty MMS row data.
+- **FR-015**: The system MUST reject staging lines without `raw_json`, with null `raw_json` or with empty `raw_json` that does not represent an original MMS row.
+- **FR-016**: The system MUST preserve `raw_json` without destructive normalization of the original values.
+- **FR-017**: The system MUST prevent ordinary operational updates from overwriting `raw_json` after the line is registered.
+- **FR-018**: Each staging line MUST record source row order or row number when available.
+- **FR-019**: Each staging line MUST persist candidate `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` fields when they can be extracted or resolved during gross validation.
+- **FR-020**: Each staging line MUST keep technical validation state separate from the official batch status.
+- **FR-021**: The system MUST provide `mms_erros_importacao` for one or more blocking validation errors.
+- **FR-022**: The system MUST provide `mms_alertas_importacao` for one or more non-blocking validation warnings.
+- **FR-023**: Errors and warnings MUST be traceable to the batch and line that produced them.
+- **FR-024**: Errors and warnings MUST include enough information for an operator or administrator to understand the affected field, issue and severity.
+- **FR-025**: Gross MMS validation MUST check whether minimum expected MMS fields are present when available in the source format.
+- **FR-026**: Gross MMS validation MUST validate candidate `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` fields for presence, basic format and consistency when present or expected in the MMS row data.
+- **FR-027**: Gross MMS validation MUST classify blocking issues as errors and non-blocking suspicious conditions as warnings.
+- **FR-028**: A line with blocking validation errors MUST NOT be treated as valid for future transformation.
+- **FR-029**: A line with warnings and no errors MAY remain valid for future transformation.
+- **FR-030**: A batch with any line errors MUST finish with official status `erro`.
+- **FR-031**: A batch with no line errors and one or more warnings MUST finish with official status `importado_com_alertas`.
+- **FR-032**: A batch with no line errors and no warnings MUST finish with official status `importado`.
+- **FR-033**: A cancelled batch MUST finish with official status `cancelado`.
+- **FR-034**: Validation MUST NOT create final assistencias.
+- **FR-035**: Validation MUST NOT create ocorrencias, tarefas, custos extras or dashboard records.
+- **FR-036**: Validation MUST NOT apply the final MMS operational key as the authoritative assistance identity in this feature.
+- **FR-037**: Validation MUST NOT mark any final assistance as `removido`.
+- **FR-038**: The system MUST allow re-running gross validation for a batch while preserving the original batch, original lines and `raw_json`.
+- **FR-039**: Re-running validation MUST update technical validation state, errors, warnings and totals in a traceable way.
+- **FR-040**: Re-running validation MUST NOT alter the original `raw_json`.
+- **FR-041**: The system MUST prevent users without an active operational profile from accessing MMS import batches, lines, errors and warnings.
+- **FR-042**: Operador MUST be able to consult batches, lines, errors and warnings only for postos in their active scope.
+- **FR-043**: Supervisao MUST be able to consult batches, lines, errors and warnings only for postos in their active scope.
+- **FR-044**: Direcao/Admin MUST be able to consult batches, lines, errors and warnings for all postos.
+- **FR-045**: Creation of import batches MUST be allowed only for users authorized for the target posto or Direcao/Admin.
+- **FR-046**: Management actions such as cancellation, status correction or soft delete MUST be restricted to authorized profiles and posto scope.
+- **FR-047**: Lines, errors and warnings MUST inherit access control from their parent batch.
+- **FR-048**: Operational default consultations MUST hide soft-deleted batches, lines, errors and warnings.
+- **FR-049**: Direcao/Admin MAY inspect soft-deleted batches, lines, errors and warnings for audit support.
+- **FR-050**: Soft delete, when applied to a batch, line, error or warning, MUST fill `deleted_at`, `deleted_by` and `delete_reason`.
+- **FR-051**: Soft delete MUST NOT be represented by an official status value.
+- **FR-052**: A soft-deleted batch MUST not appear in ordinary operational import lists.
+- **FR-053**: A soft-deleted line MUST not be counted as an active operational staging line unless an administrative audit view explicitly includes it.
+- **FR-054**: Creation, official status changes, validation completion, failure, cancellation and soft delete of a batch MUST generate centralized audit history.
+- **FR-055**: Critical line-level actions, including line creation, validation state change, error/warning association and soft delete, MUST be auditable directly or through batch-level summarized audit events.
+- **FR-056**: Audit history MUST identify entity type, entity id, action, actor, previous values, new values and contextual information when applicable.
+- **FR-057**: Failed or blocked operations MUST NOT create misleading success audit events.
+- **FR-058**: The feature MUST provide SQL validation evidence for RLS by profile/posto, audit history, soft delete, raw_json preservation, raw_json immutability, batch validation, line validation, errors and warnings.
+- **FR-059**: The feature MUST maintain Portuguese table and field naming in `snake_case`.
+- **FR-060**: Primary keys MUST use `id`.
+- **FR-061**: Foreign keys MUST use the `_id` suffix.
+- **FR-062**: The feature MUST preserve compatibility with the Spec 01 operational foundation and Spec 002 cadastro conventions.
+- **FR-063**: The feature MUST NOT introduce final assistance tables, final assistance mutation, occurrence records, task records, extra cost records, dashboards, final screens, complete MMS parser or automatic MMS integrations.
 
 ### Permission Rules
 
@@ -218,7 +220,7 @@ Direcao/Admin e Supervisao precisam rastrear criacao, processamento, falha, canc
 
 ### Data Validation Rules
 
-- `raw_json` MUST be mandatory for every staging line and must preserve original MMS values.
+- `raw_json` MUST be mandatory, jsonb, non-null and non-empty for every staging line and must preserve original MMS values.
 - Candidate fields extracted for validation MUST NOT replace `raw_json` as the audit source.
 - Minimum MMS gross validation MUST check presence and basic consistency of `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` when those fields are present or expected in the file pattern.
 - Missing or invalid identifiers needed for future assistance matching MUST be recorded as errors, not silently ignored.
@@ -230,9 +232,10 @@ Direcao/Admin e Supervisao precisam rastrear criacao, processamento, falha, canc
 
 ### Status Rules
 
-- Batch official status MUST be exactly one of `importado`, `importado_com_alertas`, `erro` or `cancelado`.
+- Batch official status MAY be null while `estado_processamento` is `recebido` or `processando` and gross validation has not concluded.
+- When filled, batch official status MUST be exactly one of `importado`, `importado_com_alertas`, `erro` or `cancelado`.
 - Batch official status MUST NOT include received, draft, processing, validated, validated with errors, failed, logically deleted or any other value outside the official list.
-- Internal lifecycle steps MAY be tracked through technical fields or timestamps.
+- Internal lifecycle steps MUST be tracked through `estado_processamento` or timestamps, with `estado_processamento` covering at least `recebido`, `processando` and `validado`.
 - Line technical validation state MAY represent pending validation, valid, valid with warning, invalid and ignored when applicable, without changing the official batch status list.
 - A batch with status `erro` MUST retain any lines and raw evidence already stored before the failure.
 - A cancelled batch MUST remain auditable and must not be physically removed by ordinary operation.
@@ -248,7 +251,7 @@ Direcao/Admin e Supervisao precisam rastrear criacao, processamento, falha, canc
 ### Key Entities *(include if feature involves data)*
 
 - **mms_lotes_importacao**: Represents one MMS import attempt for a source file or source payload. Key attributes: source name, posto, optional activity date, importing user, official status, totals, technical processing timestamps, control fields and soft delete fields when applicable.
-- **mms_linhas_importacao**: Represents one raw MMS row stored in staging. Key attributes: batch, source row number, mandatory immutable `raw_json`, candidate `posto_id`, `data_atividade`, `numero_assistencia`, `parte_conjunto`, technical validation state and control fields.
+- **mms_linhas_importacao**: Represents one raw MMS row stored in staging. Key attributes: batch, source row number, mandatory non-null non-empty immutable `raw_json`, candidate `posto_id`, `data_atividade`, `numero_assistencia`, `parte_conjunto`, technical validation state and control fields.
 - **mms_erros_importacao**: Represents a blocking validation problem tied to a batch and usually to a specific line or field. It explains why the line or batch cannot proceed to future transformation.
 - **mms_alertas_importacao**: Represents a non-blocking suspicious condition tied to a batch and usually to a line or field. It supports review without preventing all future processing.
 - **Posto**: Existing operational entity from Spec 01 used as the main access and operational scope for import batches.
@@ -259,13 +262,13 @@ Direcao/Admin e Supervisao precisam rastrear criacao, processamento, falha, canc
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of created import batches record source identification, importer, posto, official status and totals fields required by this specification.
+- **SC-001**: 100% of created import batches record source identification, importer, posto, `estado_processamento`, official status when concluded and totals fields required by this specification.
 - **SC-002**: 100% of staging lines created in tests preserve non-empty `raw_json` linked to the correct batch.
-- **SC-003**: 100% of tested attempts to create staging lines without `raw_json` are rejected.
+- **SC-003**: 100% of tested attempts to create staging lines without `raw_json`, with null `raw_json` or with empty `raw_json` are rejected.
 - **SC-004**: 100% of tested staging lines persist candidate `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` when those values are extractable or resolvable.
 - **SC-005**: 100% of tested gross validation errors are recorded with batch, line when applicable, severity and understandable message.
 - **SC-006**: 100% of tested gross validation warnings are recorded without incorrectly making the line invalid when no blocking error exists.
-- **SC-007**: 100% of tested batches use only `importado`, `importado_com_alertas`, `erro` or `cancelado` as official status.
+- **SC-007**: 100% of tested batches either keep official status null before conclusion or use only `importado`, `importado_com_alertas`, `erro` or `cancelado` when official status is filled.
 - **SC-008**: 100% of tested soft delete cases use `deleted_at`, `deleted_by` and `delete_reason` instead of a deleted status.
 - **SC-009**: 100% of tested batches consolidate total rows, valid rows, rows with errors and rows with warnings according to their lines.
 - **SC-010**: 100% of tested users without active operational profile are blocked from MMS import batches, lines, errors and warnings.

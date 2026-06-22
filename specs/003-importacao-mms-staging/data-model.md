@@ -36,8 +36,8 @@ Representa uma tentativa de importacao MMS.
 | `posto_id` | uuid | Yes | FK para `postos.id` |
 | `data_atividade` | date | No | Data identificada no arquivo/lote quando disponivel |
 | `usuario_importador_id` | uuid | Yes | FK para `usuarios.id` |
-| `status` | text/enum | Yes | Apenas `importado`, `importado_com_alertas`, `erro`, `cancelado` |
-| `estado_processamento` | text | No | Estado tecnico opcional; nao substitui `status` |
+| `status` | text/enum | No | Nulo ate conclusao/cancelamento; quando preenchido aceita apenas `importado`, `importado_com_alertas`, `erro`, `cancelado` |
+| `estado_processamento` | text | Yes | Estado tecnico do lote: `recebido`, `processando`, `validado` |
 | `processamento_iniciado_at` | timestamptz | No | Timestamp tecnico |
 | `processamento_finalizado_at` | timestamptz | No | Timestamp tecnico |
 | `total_linhas` | integer | Yes | Total de linhas ativas do lote |
@@ -67,7 +67,11 @@ Representa uma tentativa de importacao MMS.
 - `nome_origem` e obrigatorio e nao pode ser vazio.
 - `posto_id` deve referenciar posto existente, ativo e nao removido logicamente
   para criacao de novo lote.
-- `status` deve estar limitado aos quatro valores oficiais.
+- `status` pode ficar nulo enquanto `estado_processamento` estiver `recebido` ou
+  `processando`.
+- `status`, quando preenchido, deve estar limitado aos quatro valores oficiais.
+- `estado_processamento` deve indicar o ciclo interno inicial sem expandir os
+  status oficiais.
 - Totais devem ser maiores ou iguais a zero.
 - Totais devem ser consistentes com linhas, erros e alertas ativos do lote.
 - Quando `deleted_at` estiver preenchido, `deleted_by` e `delete_reason` tambem
@@ -76,9 +80,14 @@ Representa uma tentativa de importacao MMS.
 
 ### State Transitions
 
-- Criado/importado sem erros ou alertas: `status = importado`.
-- Criado/importado com alertas e sem erros: `status = importado_com_alertas`.
-- Criado/importado com qualquer erro bloqueante: `status = erro`.
+- Criado/recebido: `estado_processamento = recebido`, `status = null`.
+- Em validacao bruta: `estado_processamento = processando`, `status = null`.
+- Validado sem erros ou alertas: `estado_processamento = validado`,
+  `status = importado`.
+- Validado com alertas e sem erros: `estado_processamento = validado`,
+  `status = importado_com_alertas`.
+- Validado com qualquer erro bloqueante: `estado_processamento = validado`,
+  `status = erro`.
 - Cancelado por usuario autorizado: `status = cancelado`.
 - Soft delete: preenche `deleted_at`, `deleted_by`, `delete_reason` e remove de
   consultas operacionais padrao sem mudar para status de exclusao.
@@ -94,7 +103,7 @@ Representa uma linha bruta da planilha MMS dentro de um lote.
 | `id` | uuid | Yes | Primary key |
 | `lote_importacao_id` | uuid | Yes | FK para `mms_lotes_importacao.id` |
 | `numero_linha_origem` | integer | No | Numero/ordem da linha no arquivo quando disponivel |
-| `raw_json` | jsonb | Yes | Dado original da linha MMS; imutavel apos criacao |
+| `raw_json` | jsonb | Yes | Dado original da linha MMS; obrigatorio, nao nulo, nao vazio e imutavel apos criacao |
 | `posto_id` | uuid | No | Campo candidato extraido/resolvido |
 | `data_atividade` | date | No | Campo candidato extraido/resolvido |
 | `numero_assistencia` | text | No | Campo candidato extraido/resolvido |
@@ -116,7 +125,8 @@ Representa uma linha bruta da planilha MMS dentro de um lote.
 
 ### Validation
 
-- `raw_json` e obrigatorio e nao pode ser nulo.
+- `raw_json` e obrigatorio, deve ser `jsonb`, nao pode ser nulo e nao pode ser
+  objeto/array vazio ou valor que nao represente uma linha MMS original.
 - `raw_json` nao pode ser alterado apos criacao em fluxos operacionais comuns.
 - Campos candidatos devem ser preenchidos quando extraiveis/resolvidos.
 - Ausencia ou formato invalido de campo candidato esperado gera erro ou alerta,

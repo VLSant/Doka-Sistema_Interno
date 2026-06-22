@@ -31,22 +31,26 @@ do MVP.
 ## Decision: Separar status oficial de estado tecnico
 
 **Rationale**: O lote deve ter apenas os status oficiais `importado`,
-`importado_com_alertas`, `erro` e `cancelado`. Etapas internas como recebido,
-processando e validado podem ser representadas por timestamps ou estado tecnico,
-sem virar status oficial e sem conflitar com os documentos do MVP.
+`importado_com_alertas`, `erro` e `cancelado`, mas pode manter `status` nulo ate
+a conclusao da validacao bruta ou cancelamento. Etapas internas como `recebido`,
+`processando` e `validado` ficam em `estado_processamento` ou timestamps, sem
+virar status oficial e sem conflitar com os documentos do MVP.
 
 **Alternatives considered**:
 
 - Expandir enum/status com `recebido`, `processando` e `validado`: rejeitado
   porque viola a lista oficial.
+- Exigir status oficial no momento da criacao do lote: rejeitado porque o lote
+  pode existir antes da validacao bruta ter resultado conclusivo.
 - Nao guardar qualquer informacao de processamento: rejeitado porque prejudica
   auditoria de tentativas e falhas parciais.
 
 ## Decision: Preservar `raw_json` obrigatorio e imutavel apos criacao
 
 **Rationale**: A MMS e fonte externa e o `raw_json` e a evidencia primaria da
-linha importada. Campos extraidos podem ser corrigidos ou recalculados, mas nao
-podem substituir o dado bruto original.
+linha importada. Por isso ele deve ser jsonb, obrigatorio, nao nulo, nao vazio e
+representar uma linha MMS original. Campos extraidos podem ser corrigidos ou
+recalculados, mas nao podem substituir o dado bruto original.
 
 **Alternatives considered**:
 

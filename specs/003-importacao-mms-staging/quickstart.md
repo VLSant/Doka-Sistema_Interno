@@ -72,7 +72,7 @@ supabase/policies/importacao_mms_staging.md
    - Status fora de `importado`, `importado_com_alertas`, `erro` e `cancelado`
      e rejeitado.
    - Lote para posto inexistente, inativo ou removido e rejeitado.
-   - Linha sem `raw_json` e rejeitada.
+   - Linha sem `raw_json`, com `raw_json` nulo ou com `raw_json` vazio e rejeitada.
    - Erros e alertas sem codigo/mensagem sao rejeitados.
    - Erro/alerta vinculado a linha de outro lote e rejeitado.
    - Soft delete exige usuario e motivo e nao muda status oficial.
@@ -97,7 +97,7 @@ supabase/policies/importacao_mms_staging.md
 
    Expected:
 
-   - `raw_json` permanece imutavel apos criacao.
+   - `raw_json` permanece obrigatorio, jsonb, nao nulo, nao vazio e imutavel apos criacao.
    - Campos candidatos sao persistidos quando extraiveis.
    - Totais do lote batem com linhas, erros e alertas ativos.
    - Lote com erro fica `erro`; lote so com alertas fica
@@ -128,11 +128,12 @@ A feature so deve ser considerada pronta quando:
 - RLS bloquear usuario sem perfil operacional ativo.
 - Operador e Supervisao ficarem restritos a postos do escopo.
 - Direcao/Admin tiver gestao global.
-- `raw_json` for obrigatorio e imutavel apos criacao.
+- `raw_json` for obrigatorio, jsonb, nao nulo, nao vazio e imutavel apos criacao.
 - Campos candidatos forem persistidos e validados.
 - Status oficial do lote for limitado aos quatro valores permitidos.
 - Erros e alertas forem rastreaveis por lote/linha.
 - Totais por lote forem consistentes.
 - Acoes criticas gerarem `historico_auditoria`.
-- Nenhuma assistencia final, ocorrencia, tarefa, custo extra, dashboard, tela
-  final, parser completo ou integracao automatica MMS tiver sido criada.
+- A verificacao contra migration, policies, seed e testes confirmar que nenhuma
+  assistencia final, ocorrencia, tarefa, custo extra, dashboard, tela final,
+  parser completo ou integracao automatica MMS tiver sido criada.

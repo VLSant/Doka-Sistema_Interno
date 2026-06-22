@@ -64,7 +64,7 @@ Cada evento deve identificar, conforme o padrao da Spec 01:
 - Operacoes bloqueadas por RLS ou validacao nao devem criar evento de sucesso.
 - Delete fisico nao faz parte do fluxo operacional comum.
 - Soft delete deve gerar `soft_delete_registrado`.
-- Mudanca de `status` deve gerar evento com valor anterior e novo.
+- Mudanca de `estado_processamento` ou de `status` deve gerar evento com valor anterior e novo, incluindo a transicao de `status` nulo para status oficial concluido.
 - Criacao de erro ou alerta deve ser rastreavel ate lote e linha quando houver.
 - Alteracao de `raw_json` deve ser bloqueada; tentativa bloqueada nao gera evento
   de sucesso.
@@ -75,8 +75,8 @@ Cada evento deve identificar, conforme o padrao da Spec 01:
 - Criar lote gera evento `criado`.
 - Iniciar processamento gera evento `processamento_iniciado`.
 - Concluir validacao gera evento `validacao_concluida`.
-- Mudar status para `importado`, `importado_com_alertas`, `erro` ou `cancelado`
-  gera evento rastreavel.
+- Mudar `estado_processamento` e mudar status de nulo para `importado`,
+  `importado_com_alertas`, `erro` ou `cancelado` gera evento rastreavel.
 - Criar linhas gera evidencia auditavel.
 - Registrar erro gera evidencia auditavel.
 - Registrar alerta gera evidencia auditavel.

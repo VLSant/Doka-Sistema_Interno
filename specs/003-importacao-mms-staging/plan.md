@@ -42,7 +42,7 @@ restrita a banco de dados, regras e contratos de acesso.
 feature.
 
 **Performance Goals**: Consultas de lotes por `posto_id`, status oficial,
-`data_atividade`, `created_at` e `deleted_at` devem usar indices adequados.
+`estado_processamento`, `data_atividade`, `created_at` e `deleted_at` devem usar indices adequados.
 Consultas de linhas, erros e alertas por lote devem evitar varreduras amplas.
 Policies devem evitar joins repetidos desnecessarios alem das funcoes auxiliares
 da Spec 01.
@@ -50,9 +50,12 @@ da Spec 01.
 **Constraints**: Usar portugues em `snake_case`; chaves primarias `id`; FKs com
 sufixo `_id`; soft delete apenas por `deleted_at`, `deleted_by` e
 `delete_reason`; auditoria em `historico_auditoria`; autorizacao por Supabase
-Auth, perfil e posto; `raw_json` obrigatorio e imutavel apos criacao; status
-oficiais de lote limitados a `importado`, `importado_com_alertas`, `erro` e
-`cancelado`; sem funcionalidades fora do MVP sem aprovacao.
+Auth, perfil e posto; `raw_json` obrigatorio, jsonb, nao nulo, nao vazio e
+imutavel apos criacao; status oficiais de lote nulos ate conclusao da validacao
+bruta quando aplicavel e, quando preenchidos, limitados a `importado`,
+`importado_com_alertas`, `erro` e `cancelado`; `estado_processamento` cobre
+`recebido`, `processando` e `validado`; sem funcionalidades fora do MVP sem
+aprovacao.
 
 **Scale/Scope**: MVP com importacoes manuais por posto/data, volume inicial baixo
 a moderado, mas preparado para multiplas tentativas no mesmo dia e crescimento de
@@ -135,11 +138,13 @@ Principais decisoes:
 - Usar quatro entidades oficiais: `mms_lotes_importacao`,
   `mms_linhas_importacao`, `mms_erros_importacao` e
   `mms_alertas_importacao`.
-- Usar status oficial somente em `mms_lotes_importacao.status`, limitado a
+- Usar status oficial somente em `mms_lotes_importacao.status`, permitindo nulo
+  antes da conclusao da validacao bruta e limitando valores preenchidos a
   `importado`, `importado_com_alertas`, `erro` e `cancelado`.
-- Usar estado tecnico separado em linhas/lotes quando necessario para
-  recebimento, processamento e validacao, sem expandir status oficial.
-- Preservar `raw_json` obrigatorio e imutavel em `mms_linhas_importacao`.
+- Usar `estado_processamento` para o ciclo interno inicial `recebido`,
+  `processando` e `validado`, sem expandir status oficial.
+- Preservar `raw_json` obrigatorio, jsonb, nao nulo, nao vazio e imutavel em
+  `mms_linhas_importacao`.
 - Persistir campos candidatos para a Spec seguinte:
   `posto_id`, `data_atividade`, `numero_assistencia` e `parte_conjunto`.
 - Modelar erros e alertas em tabelas separadas para rastreabilidade e contagem.
@@ -163,8 +168,9 @@ Artefatos de design gerados:
   ocorrencias, tarefas, custos, dashboard, telas finais, parser completo ou
   integracao automatica.
 - PASS: Os contratos de RLS preservam perfil e posto conforme Spec 01.
-- PASS: Os contratos de validacao exigem status oficiais, `raw_json`
-  obrigatorio/imutavel, campos candidatos, erros, alertas e totais consistentes.
+- PASS: Os contratos de validacao exigem status oficial nulo ate conclusao,
+  `estado_processamento`, `raw_json` obrigatorio/nao vazio/imutavel, campos
+  candidatos, erros, alertas e totais consistentes.
 - PASS: Os contratos de auditoria exigem `historico_auditoria` e bloqueiam evento
   de sucesso para operacoes rejeitadas.
 - PASS: Soft delete permanece separado de status oficial e exige `deleted_at`,
