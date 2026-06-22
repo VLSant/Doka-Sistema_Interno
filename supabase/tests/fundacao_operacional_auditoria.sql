@@ -30,8 +30,9 @@ select public.assert_true(
     where entidade_tipo = 'postos'
       and entidade_id = '40000000-0000-0000-0000-000000000010'
       and acao = 'criado'
+      and metadata ->> 'posto_id' = '40000000-0000-0000-0000-000000000010'
   ),
-  'criacao de posto deve gerar auditoria'
+  'criacao de posto deve gerar auditoria com posto_id'
 );
 
 insert into public.cargos_funcoes (id, nome, descricao, created_by)
@@ -131,8 +132,9 @@ select public.assert_true(
     where entidade_tipo = 'usuarios_postos'
       and entidade_id = '50000000-0000-0000-0000-000000000010'
       and acao = 'vinculo_posto_criado'
+      and metadata ->> 'posto_id' = '40000000-0000-0000-0000-000000000003'
   ),
-  'criacao de vinculo usuario/posto deve gerar auditoria'
+  'criacao de vinculo usuario/posto deve gerar auditoria com posto_id'
 );
 
 update public.usuarios_postos
@@ -192,6 +194,15 @@ select public.assert_true(
 select public.assert_true(
   not has_table_privilege('authenticated', 'public.historico_auditoria', 'TRIGGER'),
   'authenticated nao deve ter TRIGGER em historico_auditoria'
+);
+
+select public.assert_true(
+  not has_function_privilege(
+    'authenticated',
+    'app_private.registrar_auditoria(text, uuid, text, jsonb, jsonb, jsonb)',
+    'EXECUTE'
+  ),
+  'authenticated nao deve executar registrador interno de auditoria'
 );
 
 reset role;

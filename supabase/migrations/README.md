@@ -30,6 +30,7 @@ Esta pasta contem as migrations SQL do banco do Doka.
 - `202606200003_ajustar_validacao_metas_eficiencia.sql`: ajusta a validacao de `metas_eficiencia` para deixar posto inexistente ser tratado pela FK.
 - `202606200004_liberar_funcao_soft_delete_cadastros.sql`: libera execucao da funcao compartilhada de soft delete para constraints avaliadas por `authenticated`.
 - `202606200005_refinar_cadastros_base_advisors.sql`: move extensoes para `extensions` e consolida policies permissivas equivalentes da Spec 02.
+- `202606220001_corrigir_revisao_spec01.sql`: corrige comentarios de revisao da Spec 01 sobre RLS, privilegios da auditoria e `posto_id` no metadata.
 
 ## Convencao sugerida
 
