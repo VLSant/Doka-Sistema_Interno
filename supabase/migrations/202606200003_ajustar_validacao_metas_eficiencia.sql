@@ -11,7 +11,7 @@ as $$
 begin
   new.tipo_atividade_normalizado := app_private.normalizar_texto_operacional(new.tipo_atividade_normalizado);
 
-  if new.deleted_at is null and new.ativo = true then
+  if TG_OP = 'INSERT' or (new.deleted_at is null and new.ativo = true) then
     if exists (
       select 1
       from public.postos p

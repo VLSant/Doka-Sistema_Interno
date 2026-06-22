@@ -158,6 +158,60 @@ begin
     tipo_atividade_normalizado,
     meta_percentual,
     vigencia_inicio,
+    ativo,
+    created_by
+  )
+  values (
+    '40000000-0000-0000-0000-000000000004',
+    'montagem inativa',
+    85.00,
+    '2026-01-01',
+    false,
+    '30000000-0000-0000-0000-000000000003'
+  );
+  raise exception 'ASSERTION FAILED: meta inativa criada para posto inativo deveria falhar';
+exception
+  when raise_exception then
+    null;
+end
+$$;
+
+do $$
+begin
+  insert into public.metas_eficiencia (
+    posto_id,
+    tipo_atividade_normalizado,
+    meta_percentual,
+    vigencia_inicio,
+    deleted_at,
+    deleted_by,
+    delete_reason,
+    created_by
+  )
+  values (
+    '40000000-0000-0000-0000-000000000005',
+    'montagem removida',
+    85.00,
+    '2026-01-01',
+    now(),
+    '30000000-0000-0000-0000-000000000003',
+    'massa de teste',
+    '30000000-0000-0000-0000-000000000003'
+  );
+  raise exception 'ASSERTION FAILED: meta removida criada para posto removido deveria falhar';
+exception
+  when raise_exception then
+    null;
+end
+$$;
+
+do $$
+begin
+  insert into public.metas_eficiencia (
+    posto_id,
+    tipo_atividade_normalizado,
+    meta_percentual,
+    vigencia_inicio,
     created_by
   )
   values (
