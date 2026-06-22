@@ -32,5 +32,9 @@
 ## Notes
 
 - Validation passed with no clarification markers.
-- Specification intentionally stops at MMS batch/staging/gross validation and excludes final assistencias, final MMS operational key behavior, removido marking, ocorrencias, tarefas, custos, dashboards, final screens and automatic MMS integration.
+- Specification intentionally stops at MMS batch/staging/gross validation and excludes final assistencias, final MMS operational key behavior, removido marking, ocorrencias, tarefas, custos, dashboards, final screens, complete parser and automatic MMS integration.
+- Refinement aligned official table names to `mms_lotes_importacao`, `mms_linhas_importacao`, `mms_erros_importacao` and `mms_alertas_importacao`.
+- Refinement restricted official batch statuses to `importado`, `importado_com_alertas`, `erro` and `cancelado`; internal processing can use separate technical state/timestamps.
+- Refinement clarified that soft delete is represented only by `deleted_at`, `deleted_by` and `delete_reason`, not by status.
+- Refinement made candidate fields `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` required validation/persistence targets for the next assistance/espelho MMS spec.
 - Project constitution references Supabase/PostgreSQL/Auth/RLS as mandatory context; the spec keeps implementation details limited to project-governance alignment and test evidence expectations.
