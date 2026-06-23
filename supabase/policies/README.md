@@ -14,6 +14,7 @@ Esta pasta contem documentacao das policies de Row Level Security do Supabase.
 
 - `fundacao_operacional.md`: policies da Spec 01 para usuarios, postos, vinculos, cargos/funcoes e historico.
 - `cadastros_base_mvp.md`: policies da Spec 02 para `prioridades`, `tipos_ocorrencia` e `metas_eficiencia`.
+- `importacao_mms_staging.md`: policies da Spec 03 para lotes, linhas, erros e alertas de importacao MMS.
 
 ## Funcoes auxiliares
 
