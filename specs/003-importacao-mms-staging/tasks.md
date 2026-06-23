@@ -18,13 +18,13 @@
 
 **Purpose**: Prepare the database-first feature files defined in the implementation plan.
 
-- [ ] T001 Create Supabase migration with `supabase migration new importacao_mms_staging` for `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T002 [P] Create seed file `supabase/seed/importacao_mms_staging.sql`
-- [ ] T003 [P] Create RLS validation file `supabase/tests/importacao_mms_rls.sql`
-- [ ] T004 [P] Create validation constraints file `supabase/tests/importacao_mms_validacoes.sql`
-- [ ] T005 [P] Create audit validation file `supabase/tests/importacao_mms_auditoria.sql`
-- [ ] T006 [P] Create raw_json and totals validation file `supabase/tests/importacao_mms_raw_json_totais.sql`
-- [ ] T007 [P] Create policies documentation file `supabase/policies/importacao_mms_staging.md`
+- [X] T001 Create Supabase migration with `supabase migration new importacao_mms_staging` for `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T002 [P] Create seed file `supabase/seed/importacao_mms_staging.sql`
+- [X] T003 [P] Create RLS validation file `supabase/tests/importacao_mms_rls.sql`
+- [X] T004 [P] Create validation constraints file `supabase/tests/importacao_mms_validacoes.sql`
+- [X] T005 [P] Create audit validation file `supabase/tests/importacao_mms_auditoria.sql`
+- [X] T006 [P] Create raw_json and totals validation file `supabase/tests/importacao_mms_raw_json_totais.sql`
+- [X] T007 [P] Create policies documentation file `supabase/policies/importacao_mms_staging.md`
 
 ---
 
@@ -34,17 +34,17 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T008 Inspect Spec 01 helper functions, RLS patterns and audit table behavior in `supabase/migrations/*_fundacao_operacional.sql`
-- [ ] T009 Inspect Spec 02 database-first conventions, soft-delete helpers and policy style in `supabase/migrations/*_cadastros_base_mvp.sql`
-- [ ] T010 Define official nullable status domain or check constraint allowing null before conclusion and values `importado`, `importado_com_alertas`, `erro` and `cancelado` when filled in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T011 Define shared `estado_processamento` values `recebido`, `processando` and `validado` for import lots plus technical validation state values for staging lines in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T012 Add shared helper or trigger pattern for soft delete requiring `deleted_at`, `deleted_by` and `delete_reason` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T013 Add shared helper or trigger pattern to block operational updates to `mms_linhas_importacao.raw_json` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T014 Add shared helper or function to recalculate MMS import totals by lote in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T015 Add shared audit function or trigger wiring for MMS import actions in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T016 Define baseline grants revoking anonymous table access and limiting authenticated access to RLS-governed operations in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T017 [P] Document shared status, helper, grant and audit decisions in `supabase/policies/importacao_mms_staging.md`
-- [ ] T018 [P] Add seed prerequisites referencing existing Spec 01 users and postos in `supabase/seed/importacao_mms_staging.sql`
+- [X] T008 Inspect Spec 01 helper functions, RLS patterns and audit table behavior in `supabase/migrations/*_fundacao_operacional.sql`
+- [X] T009 Inspect Spec 02 database-first conventions, soft-delete helpers and policy style in `supabase/migrations/*_cadastros_base_mvp.sql`
+- [X] T010 Define official nullable status domain or check constraint allowing null before conclusion and values `importado`, `importado_com_alertas`, `erro` and `cancelado` when filled in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T011 Define shared `estado_processamento` values `recebido`, `processando` and `validado` for import lots plus technical validation state values for staging lines in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T012 Add shared helper or trigger pattern for soft delete requiring `deleted_at`, `deleted_by` and `delete_reason` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T013 Add shared helper or trigger pattern to block operational updates to `mms_linhas_importacao.raw_json` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T014 Add shared helper or function to recalculate MMS import totals by lote in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T015 Add shared audit function or trigger wiring for MMS import actions in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T016 Define baseline grants revoking anonymous table access and limiting authenticated access to RLS-governed operations in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T017 [P] Document shared status, helper, grant and audit decisions in `supabase/policies/importacao_mms_staging.md`
+- [X] T018 [P] Add seed prerequisites referencing existing Spec 01 users and postos in `supabase/seed/importacao_mms_staging.sql`
 
 **Checkpoint**: Shared status, RLS, soft-delete, raw_json, totals and audit primitives are ready.
 
@@ -58,21 +58,21 @@
 
 ### Tests for User Story 1
 
-- [ ] T019 [P] [US1] Add batch creation validation tests for required `nome_origem`, active `posto_id`, importer, `estado_processamento`, nullable official status before conclusion and official status values after conclusion in `supabase/tests/importacao_mms_validacoes.sql`
-- [ ] T020 [P] [US1] Add batch RLS tests for authorized posto creation and blocked out-of-scope creation in `supabase/tests/importacao_mms_rls.sql`
-- [ ] T021 [P] [US1] Add batch audit assertions for `criado`, processing timestamps and status changes in `supabase/tests/importacao_mms_auditoria.sql`
+- [X] T019 [P] [US1] Add batch creation validation tests for required `nome_origem`, active `posto_id`, importer, `estado_processamento`, nullable official status before conclusion and official status values after conclusion in `supabase/tests/importacao_mms_validacoes.sql`
+- [X] T020 [P] [US1] Add batch RLS tests for authorized posto creation and blocked out-of-scope creation in `supabase/tests/importacao_mms_rls.sql`
+- [X] T021 [P] [US1] Add batch audit assertions for `criado`, processing timestamps and status changes in `supabase/tests/importacao_mms_auditoria.sql`
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Create `public.mms_lotes_importacao` table with `id`, `nome_origem`, `posto_id`, optional `data_atividade`, importer, nullable official `status`, required `estado_processamento`, totals, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T023 [US1] Add FKs from `mms_lotes_importacao.posto_id` to `postos.id` and user-control fields to `usuarios.id` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T024 [US1] Add constraints for required `nome_origem`, allowed `estado_processamento`, nullable official status before conclusion, official status list when filled, non-negative totals and soft-delete required fields in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T025 [US1] Add trigger or validation to reject creation of lots for missing, inactive or soft-deleted postos in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T026 [US1] Add indexes for `mms_lotes_importacao.posto_id`, `status`, `data_atividade`, `created_at`, `deleted_at` and control FKs in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T027 [US1] Enable RLS and create select/insert/update policies for `mms_lotes_importacao` according to `contracts/rls-access-contract.md` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T028 [US1] Attach audit trigger to `public.mms_lotes_importacao` for creation, status changes, cancellation and soft delete in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T029 [US1] Add seed batches covering valid import, alert import, error import and cancelled examples in `supabase/seed/importacao_mms_staging.sql`
-- [ ] T030 [US1] Document `mms_lotes_importacao` policies, nullable official status lifecycle, `estado_processamento`, validations and audit behavior in `supabase/policies/importacao_mms_staging.md`
+- [X] T022 [US1] Create `public.mms_lotes_importacao` table with `id`, `nome_origem`, `posto_id`, optional `data_atividade`, importer, nullable official `status`, required `estado_processamento`, totals, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T023 [US1] Add FKs from `mms_lotes_importacao.posto_id` to `postos.id` and user-control fields to `usuarios.id` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T024 [US1] Add constraints for required `nome_origem`, allowed `estado_processamento`, nullable official status before conclusion, official status list when filled, non-negative totals and soft-delete required fields in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T025 [US1] Add trigger or validation to reject creation of lots for missing, inactive or soft-deleted postos in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T026 [US1] Add indexes for `mms_lotes_importacao.posto_id`, `status`, `data_atividade`, `created_at`, `deleted_at` and control FKs in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T027 [US1] Enable RLS and create select/insert/update policies for `mms_lotes_importacao` according to `contracts/rls-access-contract.md` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T028 [US1] Attach audit trigger to `public.mms_lotes_importacao` for creation, status changes, cancellation and soft delete in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T029 [US1] Add seed batches covering valid import, alert import, error import and cancelled examples in `supabase/seed/importacao_mms_staging.sql`
+- [X] T030 [US1] Document `mms_lotes_importacao` policies, nullable official status lifecycle, `estado_processamento`, validations and audit behavior in `supabase/policies/importacao_mms_staging.md`
 
 **Checkpoint**: US1 is complete when batch tests prove auditable lote creation and scoped access independently.
 
@@ -86,22 +86,22 @@
 
 ### Tests for User Story 2
 
-- [ ] T031 [P] [US2] Add line validation tests for required non-null non-empty `raw_json`, positive `numero_linha_origem` and lote linkage in `supabase/tests/importacao_mms_validacoes.sql`
-- [ ] T032 [P] [US2] Add raw_json immutability tests for blocked updates after creation in `supabase/tests/importacao_mms_raw_json_totais.sql`
-- [ ] T033 [P] [US2] Add line RLS tests proving lines inherit access from parent lote in `supabase/tests/importacao_mms_rls.sql`
-- [ ] T034 [P] [US2] Add line audit assertions for creation and blocked raw_json update attempts in `supabase/tests/importacao_mms_auditoria.sql`
+- [X] T031 [P] [US2] Add line validation tests for required non-null non-empty `raw_json`, positive `numero_linha_origem` and lote linkage in `supabase/tests/importacao_mms_validacoes.sql`
+- [X] T032 [P] [US2] Add raw_json immutability tests for blocked updates after creation in `supabase/tests/importacao_mms_raw_json_totais.sql`
+- [X] T033 [P] [US2] Add line RLS tests proving lines inherit access from parent lote in `supabase/tests/importacao_mms_rls.sql`
+- [X] T034 [P] [US2] Add line audit assertions for creation and blocked raw_json update attempts in `supabase/tests/importacao_mms_auditoria.sql`
 
 ### Implementation for User Story 2
 
-- [ ] T035 [US2] Create `public.mms_linhas_importacao` table with lote FK, source row number, mandatory jsonb non-null non-empty `raw_json`, candidate fields, technical validation state, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T036 [US2] Add FKs from `mms_linhas_importacao.lote_importacao_id` to `mms_lotes_importacao.id`, `posto_id` to `postos.id` and control fields to `usuarios.id` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T037 [US2] Add constraints for non-null non-empty `raw_json`, positive `numero_linha_origem`, allowed technical validation state and soft-delete required fields in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T038 [US2] Add trigger to prevent operational updates to `mms_linhas_importacao.raw_json` after creation in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T039 [US2] Add indexes for `mms_linhas_importacao.lote_importacao_id`, `numero_linha_origem`, `estado_validacao`, candidate fields, `deleted_at` and control FKs in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T040 [US2] Enable RLS and create inherited lote-scope policies for `mms_linhas_importacao` according to `contracts/rls-access-contract.md` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T041 [US2] Attach audit trigger or batch-level audit summary for line creation, validation state changes and soft delete in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T042 [US2] Add seed lines with complete candidates, missing candidates, extra MMS fields and malformed candidate examples in `supabase/seed/importacao_mms_staging.sql`
-- [ ] T043 [US2] Document `mms_linhas_importacao`, `raw_json` immutability and candidate field behavior in `supabase/policies/importacao_mms_staging.md`
+- [X] T035 [US2] Create `public.mms_linhas_importacao` table with lote FK, source row number, mandatory jsonb non-null non-empty `raw_json`, candidate fields, technical validation state, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T036 [US2] Add FKs from `mms_linhas_importacao.lote_importacao_id` to `mms_lotes_importacao.id`, `posto_id` to `postos.id` and control fields to `usuarios.id` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T037 [US2] Add constraints for non-null non-empty `raw_json`, positive `numero_linha_origem`, allowed technical validation state and soft-delete required fields in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T038 [US2] Add trigger to prevent operational updates to `mms_linhas_importacao.raw_json` after creation in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T039 [US2] Add indexes for `mms_linhas_importacao.lote_importacao_id`, `numero_linha_origem`, `estado_validacao`, candidate fields, `deleted_at` and control FKs in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T040 [US2] Enable RLS and create inherited lote-scope policies for `mms_linhas_importacao` according to `contracts/rls-access-contract.md` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T041 [US2] Attach audit trigger or batch-level audit summary for line creation, validation state changes and soft delete in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T042 [US2] Add seed lines with complete candidates, missing candidates, extra MMS fields and malformed candidate examples in `supabase/seed/importacao_mms_staging.sql`
+- [X] T043 [US2] Document `mms_linhas_importacao`, `raw_json` immutability and candidate field behavior in `supabase/policies/importacao_mms_staging.md`
 
 **Checkpoint**: US2 is complete when raw_json preservation, immutability and inherited access pass independently.
 
@@ -115,25 +115,25 @@
 
 ### Tests for User Story 3
 
-- [ ] T044 [P] [US3] Add candidate field validation tests for `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` in `supabase/tests/importacao_mms_validacoes.sql`
-- [ ] T045 [P] [US3] Add error and alert validation tests for required `codigo`, `mensagem`, same-lote line linkage and soft delete fields in `supabase/tests/importacao_mms_validacoes.sql`
-- [ ] T046 [P] [US3] Add status and totals tests for nullable status before conclusion and `erro`, `importado_com_alertas` and `importado` outcomes after validation in `supabase/tests/importacao_mms_raw_json_totais.sql`
-- [ ] T047 [P] [US3] Add validation audit assertions for `validacao_concluida`, `erro_registrado` and `alerta_registrado` in `supabase/tests/importacao_mms_auditoria.sql`
+- [X] T044 [P] [US3] Add candidate field validation tests for `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` in `supabase/tests/importacao_mms_validacoes.sql`
+- [X] T045 [P] [US3] Add error and alert validation tests for required `codigo`, `mensagem`, same-lote line linkage and soft delete fields in `supabase/tests/importacao_mms_validacoes.sql`
+- [X] T046 [P] [US3] Add status and totals tests for nullable status before conclusion and `erro`, `importado_com_alertas` and `importado` outcomes after validation in `supabase/tests/importacao_mms_raw_json_totais.sql`
+- [X] T047 [P] [US3] Add validation audit assertions for `validacao_concluida`, `erro_registrado` and `alerta_registrado` in `supabase/tests/importacao_mms_auditoria.sql`
 
 ### Implementation for User Story 3
 
-- [ ] T048 [US3] Create `public.mms_erros_importacao` table with lote FK, optional line FK, `campo`, `codigo`, `mensagem`, `contexto`, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T049 [US3] Create `public.mms_alertas_importacao` table with lote FK, optional line FK, `campo`, `codigo`, `mensagem`, `contexto`, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T050 [US3] Add constraints ensuring error and alert `codigo` and `mensagem` are not blank and soft-delete fields are complete in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T051 [US3] Add trigger or constraint ensuring `linha_importacao_id` in errors and alerts belongs to the same `lote_importacao_id` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T052 [US3] Add validation helper or documented SQL function to persist/validate candidate fields without applying final MMS upsert in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T053 [US3] Add totals recalculation trigger/function covering active lines, active errors, active alerts and ignored lines in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T054 [US3] Add status mapping logic from validation results to `importado`, `importado_com_alertas` or `erro`, keeping status null before conclusion and not adding non-official status values in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T055 [US3] Add indexes for error and alert lote, line, `codigo`, `campo`, `deleted_at` and control FKs in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T056 [US3] Enable RLS and create inherited lote-scope policies for `mms_erros_importacao` and `mms_alertas_importacao` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T057 [US3] Attach audit trigger or batch-level audit summary for errors, alerts and validation completion in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T058 [US3] Add seed errors and alerts for missing candidates, invalid dates, duplicate-looking lines and optional suspicious fields in `supabase/seed/importacao_mms_staging.sql`
-- [ ] T059 [US3] Document validation rules, candidate fields, totals mapping and out-of-scope final key behavior in `supabase/policies/importacao_mms_staging.md`
+- [X] T048 [US3] Create `public.mms_erros_importacao` table with lote FK, optional line FK, `campo`, `codigo`, `mensagem`, `contexto`, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T049 [US3] Create `public.mms_alertas_importacao` table with lote FK, optional line FK, `campo`, `codigo`, `mensagem`, `contexto`, control fields and soft-delete fields in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T050 [US3] Add constraints ensuring error and alert `codigo` and `mensagem` are not blank and soft-delete fields are complete in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T051 [US3] Add trigger or constraint ensuring `linha_importacao_id` in errors and alerts belongs to the same `lote_importacao_id` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T052 [US3] Add validation helper or documented SQL function to persist/validate candidate fields without applying final MMS upsert in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T053 [US3] Add totals recalculation trigger/function covering active lines, active errors, active alerts and ignored lines in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T054 [US3] Add status mapping logic from validation results to `importado`, `importado_com_alertas` or `erro`, keeping status null before conclusion and not adding non-official status values in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T055 [US3] Add indexes for error and alert lote, line, `codigo`, `campo`, `deleted_at` and control FKs in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T056 [US3] Enable RLS and create inherited lote-scope policies for `mms_erros_importacao` and `mms_alertas_importacao` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T057 [US3] Attach audit trigger or batch-level audit summary for errors, alerts and validation completion in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T058 [US3] Add seed errors and alerts for missing candidates, invalid dates, duplicate-looking lines and optional suspicious fields in `supabase/seed/importacao_mms_staging.sql`
+- [X] T059 [US3] Document validation rules, candidate fields, totals mapping and out-of-scope final key behavior in `supabase/policies/importacao_mms_staging.md`
 
 **Checkpoint**: US3 is complete when validation, errors, alerts, totals and official status mapping pass independently.
 
@@ -147,18 +147,18 @@
 
 ### Tests for User Story 4
 
-- [ ] T060 [P] [US4] Add cross-table RLS tests for user without active operational profile across all four MMS tables in `supabase/tests/importacao_mms_rls.sql`
-- [ ] T061 [P] [US4] Add Operador scoped select tests for lots, lines, errors and alerts in `supabase/tests/importacao_mms_rls.sql`
-- [ ] T062 [P] [US4] Add Supervisao scoped management tests for lots, validation data, errors and alerts in `supabase/tests/importacao_mms_rls.sql`
-- [ ] T063 [P] [US4] Add Direcao/Admin global access tests and soft-deleted administrative review cases in `supabase/tests/importacao_mms_rls.sql`
+- [X] T060 [P] [US4] Add cross-table RLS tests for user without active operational profile across all four MMS tables in `supabase/tests/importacao_mms_rls.sql`
+- [X] T061 [P] [US4] Add Operador scoped select tests for lots, lines, errors and alerts in `supabase/tests/importacao_mms_rls.sql`
+- [X] T062 [P] [US4] Add Supervisao scoped management tests for lots, validation data, errors and alerts in `supabase/tests/importacao_mms_rls.sql`
+- [X] T063 [P] [US4] Add Direcao/Admin global access tests and soft-deleted administrative review cases in `supabase/tests/importacao_mms_rls.sql`
 
 ### Implementation for User Story 4
 
-- [ ] T064 [US4] Refine all MMS RLS policies to block users without active operational profile in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T065 [US4] Refine all child-table policies to inherit scope from `mms_lotes_importacao.posto_id` in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T066 [US4] Refine update policies to prevent moving lots or child records outside Supervisao posto scope in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T067 [US4] Add administrative review behavior for Direcao/Admin to inspect soft-deleted MMS rows in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T068 [US4] Document final MMS access matrix for all four tables in `supabase/policies/importacao_mms_staging.md`
+- [X] T064 [US4] Refine all MMS RLS policies to block users without active operational profile in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T065 [US4] Refine all child-table policies to inherit scope from `mms_lotes_importacao.posto_id` in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T066 [US4] Refine update policies to prevent moving lots or child records outside Supervisao posto scope in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T067 [US4] Add administrative review behavior for Direcao/Admin to inspect soft-deleted MMS rows in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T068 [US4] Document final MMS access matrix for all four tables in `supabase/policies/importacao_mms_staging.md`
 
 **Checkpoint**: US4 is complete when one RLS test run proves the full permission matrix.
 
@@ -172,17 +172,17 @@
 
 ### Tests for User Story 5
 
-- [ ] T069 [P] [US5] Add consolidated audit assertions for batch creation, processing, validation completion, status change and cancellation in `supabase/tests/importacao_mms_auditoria.sql`
-- [ ] T070 [P] [US5] Add consolidated audit assertions for line creation, validation state changes, error registration and alert registration in `supabase/tests/importacao_mms_auditoria.sql`
-- [ ] T071 [P] [US5] Add blocked-operation audit assertions for RLS denial and raw_json mutation attempts in `supabase/tests/importacao_mms_auditoria.sql`
+- [X] T069 [P] [US5] Add consolidated audit assertions for batch creation, processing, validation completion, status change and cancellation in `supabase/tests/importacao_mms_auditoria.sql`
+- [X] T070 [P] [US5] Add consolidated audit assertions for line creation, validation state changes, error registration and alert registration in `supabase/tests/importacao_mms_auditoria.sql`
+- [X] T071 [P] [US5] Add blocked-operation audit assertions for RLS denial and raw_json mutation attempts in `supabase/tests/importacao_mms_auditoria.sql`
 
 ### Implementation for User Story 5
 
-- [ ] T072 [US5] Refine MMS audit trigger/function to populate entity type, entity id, action, actor, previous values, new values and context in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T073 [US5] Ensure batch audit context includes `lote_importacao_id`, `posto_id`, `nome_origem` and official status in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T074 [US5] Ensure line/error/alert audit context includes parent lote and line identifiers when applicable in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T075 [US5] Ensure ordinary authenticated roles cannot physically delete rows from any MMS import table in `supabase/migrations/*_importacao_mms_staging.sql`
-- [ ] T076 [US5] Document audit events and physical-delete restrictions in `supabase/policies/importacao_mms_staging.md`
+- [X] T072 [US5] Refine MMS audit trigger/function to populate entity type, entity id, action, actor, previous values, new values and context in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T073 [US5] Ensure batch audit context includes `lote_importacao_id`, `posto_id`, `nome_origem` and official status in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T074 [US5] Ensure line/error/alert audit context includes parent lote and line identifiers when applicable in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T075 [US5] Ensure ordinary authenticated roles cannot physically delete rows from any MMS import table in `supabase/migrations/*_importacao_mms_staging.sql`
+- [X] T076 [US5] Document audit events and physical-delete restrictions in `supabase/policies/importacao_mms_staging.md`
 
 **Checkpoint**: US5 is complete when audit tests cover required actions and blocked-operation behavior.
 
@@ -192,9 +192,9 @@
 
 **Purpose**: Validate the feature as a whole and update operational documentation.
 
-- [ ] T077 [P] Update `supabase/migrations/README.md` with the Importacao MMS Staging migration order and purpose
-- [ ] T078 [P] Update `supabase/seed/README.md` with `supabase/seed/importacao_mms_staging.sql` usage
-- [ ] T079 [P] Update `supabase/policies/README.md` to reference `supabase/policies/importacao_mms_staging.md`
+- [X] T077 [P] Update `supabase/migrations/README.md` with the Importacao MMS Staging migration order and purpose
+- [X] T078 [P] Update `supabase/seed/README.md` with `supabase/seed/importacao_mms_staging.sql` usage
+- [X] T079 [P] Update `supabase/policies/README.md` to reference `supabase/policies/importacao_mms_staging.md`
 - [ ] T080 Run `supabase db reset` locally and record the result in `specs/003-importacao-mms-staging/quickstart.md`
 - [ ] T081 Run `supabase db query --local --file supabase/seed/importacao_mms_staging.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
 - [ ] T082 Run `supabase db query --local --file supabase/tests/importacao_mms_validacoes.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
@@ -203,8 +203,8 @@
 - [ ] T085 Run `supabase db query --local --file supabase/tests/importacao_mms_auditoria.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
 - [ ] T086 If local Docker/psql is unavailable, validate the migration and tests against the Supabase project Doka via MCP and record the result in `specs/003-importacao-mms-staging/quickstart.md`
 - [ ] T087 Run Supabase security and performance advisors for project Doka and document residual alerts in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T088 Validate Doka constitution gates for staging-only scope, RLS/profile/posto, soft delete, `historico_auditoria`, `raw_json` and candidate MMS key fields in `specs/003-importacao-mms-staging/tasks.md`
-- [ ] T089 Verify generated implementation files `supabase/migrations/*_importacao_mms_staging.sql`, `supabase/policies/importacao_mms_staging.md`, `supabase/seed/importacao_mms_staging.sql` and `supabase/tests/importacao_mms_*.sql` do not create final assistencias, final MMS upsert/idempotency, `removido` marking, ocorrencias, tarefas, custos extras, dashboard, final screens, complete parser or automatic MMS integration, then record the verification in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T088 Validate Doka constitution gates for staging-only scope, RLS/profile/posto, soft delete, `historico_auditoria`, `raw_json` and candidate MMS key fields in `specs/003-importacao-mms-staging/tasks.md`
+- [X] T089 Verify generated implementation files `supabase/migrations/*_importacao_mms_staging.sql`, `supabase/policies/importacao_mms_staging.md`, `supabase/seed/importacao_mms_staging.sql` and `supabase/tests/importacao_mms_*.sql` do not create final assistencias, final MMS upsert/idempotency, `removido` marking, ocorrencias, tarefas, custos extras, dashboard, final screens, complete parser or automatic MMS integration, then record the verification in `specs/003-importacao-mms-staging/quickstart.md`
 
 ---
 

@@ -137,3 +137,17 @@ A feature so deve ser considerada pronta quando:
 - A verificacao contra migration, policies, seed e testes confirmar que nenhuma
   assistencia final, ocorrencia, tarefa, custo extra, dashboard, tela final,
   parser completo ou integracao automatica MMS tiver sido criada.
+
+## Implementation Validation Log
+
+- 2026-06-23: arquivos esperados da Spec 03 criados em `supabase/migrations`,
+  `supabase/seed`, `supabase/tests` e `supabase/policies`.
+- 2026-06-23: `git diff --check -- supabase specs/003-importacao-mms-staging`
+  executado com sucesso.
+- 2026-06-23: busca estatica confirmou que a migration/seed/testes/policies nao
+  criam assistencias finais, ocorrencias, tarefas, custos extras, dashboard,
+  telas finais, parser completo, upsert/idempotencia final ou marcacao `removido`.
+- 2026-06-23: validacao executavel local bloqueada porque `supabase`, `psql` e
+  `docker` nao estao instalados no PATH deste ambiente.
+- 2026-06-23: validacao remota via MCP nao aplicada porque exigiria executar DDL
+  em projeto Supabase remoto ou criar branch remota com confirmacao explicita.
