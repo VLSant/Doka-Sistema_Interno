@@ -36,6 +36,7 @@ Esta pasta contem as migrations SQL do banco do Doka.
 - `202606230003_corrigir_totais_linhas_validas_mms.sql`: corrige `total_linhas_validas` para contar linhas ativas sem erro bloqueante.
 - `202606230004_liberar_soft_delete_filhos_mms.sql`: explicita policies de soft delete das tabelas filhas MMS.
 - `202606230005_liberar_revisao_soft_delete_filhos_mms.sql`: permite revisao gerencial de filhos MMS soft-deleted para viabilizar soft delete sob RLS.
+- `202606230006_proteger_rpc_concluir_validacao_mms.sql`: adiciona checagem de escopo gerencial na RPC de conclusao de validacao MMS.
 
 ## Convencao sugerida
 

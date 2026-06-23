@@ -73,6 +73,8 @@ A funcao `app_private.mms_recalcular_totais_lote(lote_uuid)` recalcula:
 
 A funcao `app_private.mms_concluir_validacao_lote(lote_uuid)` recalcula totais e
 define o status oficial final: `erro`, `importado_com_alertas` ou `importado`.
+Ela valida `app_private.mms_lote_gerenciavel(lote_uuid)` antes de executar
+qualquer update, mesmo sendo `SECURITY DEFINER`.
 
 ## Campos Candidatos
 

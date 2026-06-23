@@ -94,6 +94,23 @@ exception
 end
 $$;
 
+do $$
+begin
+  perform app_private.mms_concluir_validacao_lote('90000000-0000-0000-0000-000000000302');
+  raise exception 'ASSERTION FAILED: operador nao deve concluir lote fora do escopo via RPC';
+exception
+  when insufficient_privilege then
+    null;
+end
+$$;
+
+select pg_temp.assert_true(
+  (select estado_processamento = 'recebido' and status is null
+   from public.mms_lotes_importacao
+   where id = '90000000-0000-0000-0000-000000000302'),
+  'tentativa bloqueada de RPC nao deve alterar lote fora do escopo'
+);
+
 select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000002', true);
 select pg_temp.assert_true((select count(*) = 2 from public.mms_lotes_importacao), 'supervisao ve lotes dos postos A e B');
 update public.mms_lotes_importacao

@@ -169,3 +169,7 @@ A feature so deve ser considerada pronta quando:
   informativos de FKs sem indice em tabelas das Specs 01/02, indices ainda sem
   uso por base nova e multiplas policies permissivas, incluindo policies
   gerenciais da Spec 03.
+- 2026-06-23: review PR #5 validado via MCP: chamada direta a
+  `app_private.mms_concluir_validacao_lote(lote_uuid)` por operador sem escopo
+  retorna `insufficient_privilege` e nao altera o lote; supervisao com escopo
+  conclui o lote normalmente.

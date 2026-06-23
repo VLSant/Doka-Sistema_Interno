@@ -197,6 +197,11 @@ declare
   possui_alerta boolean;
   novo_status public.mms_status_lote_importacao;
 begin
+  if not app_private.mms_lote_gerenciavel(lote_uuid) then
+    raise exception 'usuario sem permissao para concluir validacao do lote MMS'
+      using errcode = '42501';
+  end if;
+
   perform app_private.mms_recalcular_totais_lote(lote_uuid);
 
   select exists (
