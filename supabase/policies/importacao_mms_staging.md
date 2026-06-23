@@ -39,12 +39,16 @@ Todas as quatro tabelas usam RLS.
 | Direcao/Admin | Acesso global, incluindo revisao de soft delete | Acesso global, incluindo revisao de soft delete |
 
 As tabelas filhas herdam escopo do lote por `lote_importacao_id`.
+Tabelas filhas soft-deleted podem ser revisadas por usuarios com permissao
+gerencial sobre o lote pai para permitir soft delete auditavel sob RLS.
 
 ## Soft Delete
 
 Soft delete usa somente `deleted_at`, `deleted_by` e `delete_reason`. Quando
 `deleted_at` for preenchido, usuario e motivo sao obrigatorios. Delete fisico e
-revogado de `authenticated` nas quatro tabelas.
+revogado de `authenticated` nas quatro tabelas. Linhas, erros e alertas possuem
+policies explicitas para soft delete e revisao gerencial de registros ja
+soft-deleted.
 
 ## Auditoria
 

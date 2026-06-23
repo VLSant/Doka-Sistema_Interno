@@ -50,55 +50,6 @@ as $$
     and not (jsonb_typeof(valor) = 'string' and nullif(btrim(valor #>> '{}'), '') is null)
 $$;
 
-create or replace function app_private.mms_lote_acessivel(lote_uuid uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public, auth, pg_temp
-as $$
-  select coalesce(
-    exists (
-      select 1
-      from public.mms_lotes_importacao l
-      where l.id = lote_uuid
-        and (
-          app_private.usuario_e_direcao_admin()
-          or (
-            l.deleted_at is null
-            and app_private.usuario_tem_acesso_posto(l.posto_id)
-          )
-        )
-    ),
-    false
-  )
-$$;
-
-create or replace function app_private.mms_lote_gerenciavel(lote_uuid uuid)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public, auth, pg_temp
-as $$
-  select coalesce(
-    exists (
-      select 1
-      from public.mms_lotes_importacao l
-      where l.id = lote_uuid
-        and (
-          app_private.usuario_e_direcao_admin()
-          or (
-            l.deleted_at is null
-            and app_private.usuario_e_supervisao()
-            and app_private.usuario_tem_acesso_posto(l.posto_id)
-          )
-        )
-    ),
-    false
-  )
-$$;
-
 create or replace function app_private.mms_validar_lote()
 returns trigger
 language plpgsql
@@ -176,8 +127,7 @@ begin
   select
     count(li.id)::integer as total_linhas,
     count(li.id) filter (
-      where li.estado_validacao <> 'ignorada'::public.mms_estado_validacao_linha
-        and not exists (
+      where not exists (
           select 1
           from public.mms_erros_importacao e
           where e.lote_importacao_id = li.lote_importacao_id
@@ -439,9 +389,13 @@ create table public.mms_lotes_importacao (
   delete_reason text,
   constraint mms_lotes_importacao_nome_origem_not_blank check (btrim(nome_origem) <> ''),
   constraint mms_lotes_importacao_status_lifecycle check (
-    status = 'cancelado'::public.mms_status_lote_importacao
+    coalesce(status = 'cancelado'::public.mms_status_lote_importacao, false)
     or (estado_processamento in ('recebido', 'processando') and status is null)
-    or (estado_processamento = 'validado' and status in ('importado', 'importado_com_alertas', 'erro'))
+    or (
+      estado_processamento = 'validado'
+      and status is not null
+      and status in ('importado', 'importado_com_alertas', 'erro')
+    )
   ),
   constraint mms_lotes_importacao_totais_non_negative check (
     total_linhas >= 0
@@ -577,6 +531,55 @@ create index mms_alertas_importacao_campo_idx on public.mms_alertas_importacao (
 create index mms_alertas_importacao_deleted_at_idx on public.mms_alertas_importacao (deleted_at);
 create index mms_alertas_importacao_created_by_idx on public.mms_alertas_importacao (created_by);
 create index mms_alertas_importacao_deleted_by_idx on public.mms_alertas_importacao (deleted_by);
+
+create or replace function app_private.mms_lote_acessivel(lote_uuid uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, auth, pg_temp
+as $$
+  select coalesce(
+    exists (
+      select 1
+      from public.mms_lotes_importacao l
+      where l.id = lote_uuid
+        and (
+          app_private.usuario_e_direcao_admin()
+          or (
+            l.deleted_at is null
+            and app_private.usuario_tem_acesso_posto(l.posto_id)
+          )
+        )
+    ),
+    false
+  )
+$$;
+
+create or replace function app_private.mms_lote_gerenciavel(lote_uuid uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, auth, pg_temp
+as $$
+  select coalesce(
+    exists (
+      select 1
+      from public.mms_lotes_importacao l
+      where l.id = lote_uuid
+        and (
+          app_private.usuario_e_direcao_admin()
+          or (
+            l.deleted_at is null
+            and app_private.usuario_e_supervisao()
+            and app_private.usuario_tem_acesso_posto(l.posto_id)
+          )
+        )
+    ),
+    false
+  )
+$$;
 
 drop trigger if exists mms_lotes_importacao_validar on public.mms_lotes_importacao;
 create trigger mms_lotes_importacao_validar

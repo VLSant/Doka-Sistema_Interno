@@ -196,13 +196,13 @@
 - [X] T078 [P] Update `supabase/seed/README.md` with `supabase/seed/importacao_mms_staging.sql` usage
 - [X] T079 [P] Update `supabase/policies/README.md` to reference `supabase/policies/importacao_mms_staging.md`
 - [ ] T080 Run `supabase db reset` locally and record the result in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T081 Run `supabase db query --local --file supabase/seed/importacao_mms_staging.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T082 Run `supabase db query --local --file supabase/tests/importacao_mms_validacoes.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T083 Run `supabase db query --local --file supabase/tests/importacao_mms_raw_json_totais.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T084 Run `supabase db query --local --file supabase/tests/importacao_mms_rls.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T085 Run `supabase db query --local --file supabase/tests/importacao_mms_auditoria.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T086 If local Docker/psql is unavailable, validate the migration and tests against the Supabase project Doka via MCP and record the result in `specs/003-importacao-mms-staging/quickstart.md`
-- [ ] T087 Run Supabase security and performance advisors for project Doka and document residual alerts in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T081 Run `supabase db query --local --file supabase/seed/importacao_mms_staging.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T082 Run `supabase db query --local --file supabase/tests/importacao_mms_validacoes.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T083 Run `supabase db query --local --file supabase/tests/importacao_mms_raw_json_totais.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T084 Run `supabase db query --local --file supabase/tests/importacao_mms_rls.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T085 Run `supabase db query --local --file supabase/tests/importacao_mms_auditoria.sql` and record the result in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T086 If local Docker/psql is unavailable, validate the migration and tests against the Supabase project Doka via MCP and record the result in `specs/003-importacao-mms-staging/quickstart.md`
+- [X] T087 Run Supabase security and performance advisors for project Doka and document residual alerts in `specs/003-importacao-mms-staging/quickstart.md`
 - [X] T088 Validate Doka constitution gates for staging-only scope, RLS/profile/posto, soft delete, `historico_auditoria`, `raw_json` and candidate MMS key fields in `specs/003-importacao-mms-staging/tasks.md`
 - [X] T089 Verify generated implementation files `supabase/migrations/*_importacao_mms_staging.sql`, `supabase/policies/importacao_mms_staging.md`, `supabase/seed/importacao_mms_staging.sql` and `supabase/tests/importacao_mms_*.sql` do not create final assistencias, final MMS upsert/idempotency, `removido` marking, ocorrencias, tarefas, custos extras, dashboard, final screens, complete parser or automatic MMS integration, then record the verification in `specs/003-importacao-mms-staging/quickstart.md`
 

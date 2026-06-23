@@ -149,5 +149,23 @@ A feature so deve ser considerada pronta quando:
   telas finais, parser completo, upsert/idempotencia final ou marcacao `removido`.
 - 2026-06-23: validacao executavel local bloqueada porque `supabase`, `psql` e
   `docker` nao estao instalados no PATH deste ambiente.
-- 2026-06-23: validacao remota via MCP nao aplicada porque exigiria executar DDL
-  em projeto Supabase remoto ou criar branch remota com confirmacao explicita.
+- 2026-06-23: inicialmente a validacao remota via MCP nao foi aplicada porque
+  exigia confirmacao explicita para executar DDL em projeto Supabase remoto.
+- 2026-06-23: apos autorizacao do usuario, validacao remota via MCP aplicada no
+  projeto Supabase Doka (`zwxxjbiwpgqjsmaxybbm`).
+- 2026-06-23: migration `202606230001_importacao_mms_staging` aplicada com
+  sucesso no remoto.
+- 2026-06-23: migrations corretivas `202606230002`,
+  `202606230003`, `202606230004` e `202606230005` aplicadas para corrigir,
+  respectivamente, ciclo de status nulo em lote validado, totais de linhas
+  validas, soft delete de filhos MMS e revisao gerencial de filhos soft-deleted.
+- 2026-06-23: seed remoto `importacao_mms_staging.sql` executado com sucesso.
+- 2026-06-23: validacoes remotas equivalentes aos testes SQL passaram para:
+  status oficial/estado tecnico, rejeicao de `raw_json` vazio, imutabilidade de
+  `raw_json`, posto inativo, totais, mapeamento final de status, RLS por perfil e
+  posto, auditoria e operacoes bloqueadas sem evento de sucesso.
+- 2026-06-23: advisors MCP executados. Security retornou aviso global
+  `auth_leaked_password_protection` desabilitado. Performance retornou avisos
+  informativos de FKs sem indice em tabelas das Specs 01/02, indices ainda sem
+  uso por base nova e multiplas policies permissivas, incluindo policies
+  gerenciais da Spec 03.
