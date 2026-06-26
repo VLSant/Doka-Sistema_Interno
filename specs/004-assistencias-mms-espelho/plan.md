@@ -38,10 +38,14 @@ precedencia de valores corrigidos, protecao de raw evidence e auditoria quando
 necessario.
 
 **Testing**: Validacoes SQL via Supabase CLI quando Docker/psql estiverem
-disponiveis; validacao remota via MCP Supabase no projeto Doka quando necessario.
-Os testes devem cobrir duplicidade, idempotencia, RLS, auditoria, preservacao de
-`raw_json`, `raw_json_resumo`, correcao manual, marcacao/remarcacao `removido`,
-reativacao por reaparecimento e bloqueio de lotes inelegiveis.
+disponiveis ou, como metodo remoto aprovado, via Supabase MCP no projeto Doka de
+desenvolvimento. O encerramento desta spec usa `list_migrations`, `execute_sql`,
+`get_advisors` e `get_logs`; os testes SQL executam em transacoes com rollback.
+Essa validacao remota confirma o schema aplicado e o comportamento no projeto,
+mas nao declara um replay local desde banco vazio. Os testes devem cobrir
+duplicidade, idempotencia, RLS, auditoria, preservacao de `raw_json`,
+`raw_json_resumo`, correcao manual, marcacao/remarcacao `removido`, reativacao
+por reaparecimento e bloqueio de lotes inelegiveis.
 
 **Target Platform**: Plataforma interna web desktop-first no MVP, com esta
 feature restrita a banco de dados, regras e contratos de acesso.

@@ -197,13 +197,13 @@
 - [X] T085 [P] Update `README.md` implementation status for Spec 04 assistance mirror scope if the project status section tracks completed specs
 - [X] T086 [P] Review `specs/004-assistencias-mms-espelho/quickstart.md` against final file names, local commands and remote fallback guidance
 - [X] T087 [P] Review `specs/004-assistencias-mms-espelho/contracts/future-consumer-contract.md` for mandatory principal assistance links before future specs consume it
-- [ ] T088 Run `supabase db reset` validation for all Spec 04 migrations and seed files referenced in `specs/004-assistencias-mms-espelho/quickstart.md`
-- [ ] T089 Run `supabase/tests/assistencias_mms_idempotencia.sql` and fix any failing assertions
-- [ ] T090 Run `supabase/tests/assistencias_mms_rls.sql` and fix any failing assertions
-- [ ] T091 Run `supabase/tests/assistencias_mms_auditoria.sql` and fix any failing assertions
-- [ ] T092 Run `supabase/tests/assistencias_mms_removido_raw_json.sql` and fix any failing assertions
-- [ ] T093 If local Supabase validation is unavailable, run equivalent remote validation through Supabase MCP and record which tests were executed remotely in `specs/004-assistencias-mms-espelho/quickstart.md`
-- [ ] T094 Run Supabase advisors/log review after local or remote validation and record any required fixes in `specs/004-assistencias-mms-espelho/quickstart.md`
+- [X] T088 Validate the approved remote Doka project through Supabase MCP by checking migration history, required Spec 01/03/04 objects and test fixtures, recording that this replaces local validation for this execution without claiming a clean local replay
+- [X] T089 Run `supabase/tests/assistencias_mms_idempotencia.sql` through Supabase MCP `execute_sql` and fix any failing assertions
+- [X] T090 Run `supabase/tests/assistencias_mms_rls.sql` through Supabase MCP `execute_sql` and fix any failing assertions
+- [X] T091 Run `supabase/tests/assistencias_mms_auditoria.sql` through Supabase MCP `execute_sql` and fix any failing assertions
+- [X] T092 Run `supabase/tests/assistencias_mms_removido_raw_json.sql` through Supabase MCP `execute_sql` and fix any failing assertions
+- [X] T093 Record the remote project, migrations, individual test results and zero residual test UUIDs after transaction rollback in `specs/004-assistencias-mms-espelho/quickstart.md`
+- [X] T094 Run Supabase security/performance advisors and PostgreSQL log review, fix Spec 04 findings through versioned migrations, rerun the remote validation and document unrelated project warnings in `specs/004-assistencias-mms-espelho/quickstart.md`
 - [X] T095 Validate Doka constitution gates for RLS/profile/posto, Portuguese `snake_case`, soft delete separation, `historico_auditoria`, MMS `raw_json`, operational key, `removido` and mandatory future assistance links in `specs/004-assistencias-mms-espelho/tasks.md`
 - [X] T096 Confirm no parsing/upload, import error treatment, ocorrencias, reclamacoes, tarefas, custos extras, dashboard, final screens or automatic MMS integration files were introduced outside approved scope in `specs/004-assistencias-mms-espelho/tasks.md`
 

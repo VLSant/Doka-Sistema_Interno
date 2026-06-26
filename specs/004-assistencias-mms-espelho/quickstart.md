@@ -12,6 +12,8 @@
 
 ```text
 supabase/migrations/202606260001_assistencias_mms_espelho.sql
+supabase/migrations/20260626213218_adicionar_indices_fk_assistencias_mms.sql
+supabase/migrations/20260626213506_corrigir_trigger_raw_json_assistencias_mms.sql
 supabase/seed/assistencias_mms_espelho.sql
 supabase/policies/assistencias_mms_espelho.md
 supabase/tests/assistencias_mms_idempotencia.sql
@@ -97,8 +99,10 @@ psql "$env:SUPABASE_DB_URL" -f supabase/tests/assistencias_mms_auditoria.sql
 psql "$env:SUPABASE_DB_URL" -f supabase/tests/assistencias_mms_removido_raw_json.sql
 ```
 
-Use validacao remota via Supabase MCP quando o ambiente local nao estiver
-disponivel.
+Quando o ambiente local nao estiver disponivel, a validacao remota aprovada usa
+Supabase MCP com `list_migrations`, `execute_sql`, `get_advisors` e `get_logs`.
+Os arquivos de teste devem ser enviados integralmente ao `execute_sql`, pois
+cada um controla sua propria transacao com `begin` e `rollback`.
 
 ## Implementation Validation Notes
 
@@ -128,15 +132,42 @@ Validacoes executadas localmente:
 - Nova tentativa de `supabase db reset` apos os ajustes de RLS/raw evidence:
   ainda bloqueada pelo Docker Desktop/daemon indisponivel no Windows.
 
-Validacoes bloqueadas pelo ambiente local:
+Validacao remota concluida em 2026-06-26:
 
-- `supabase db reset` falhou porque o Docker Desktop/daemon nao esta acessivel
-  neste Windows.
-- Os testes SQL individuais dependem do banco local resetado ou de
-  `SUPABASE_DB_URL`; nao foram executados neste ambiente.
-- Validacao remota via Supabase MCP/advisors nao foi executada porque nao ha
-  `project_id`, `.mcp.json` ou `supabase/config.toml` no workspace para
-  identificar um projeto de validacao aprovado.
+- Projeto Doka de desenvolvimento: `zwxxjbiwpgqjsmaxybbm`, configurado em
+  `.mcp.json` com escopo por `project_ref`.
+- `list_migrations` confirmou as migrations das Specs 01 e 03, a migration
+  `assistencias_mms_espelho` na versao remota `20260626195418` e as correcoes
+  `adicionar_indices_fk_assistencias_mms` (`20260626213243`) e
+  `corrigir_trigger_raw_json_assistencias_mms` (`20260626213526`).
+- `execute_sql` confirmou tabelas, views, funcao de processamento e fixtures de
+  posto, usuario operacional e `auth.users` usados pelos testes.
+- `assistencias_mms_idempotencia.sql`: aprovado sem assertion.
+- `assistencias_mms_rls.sql`: aprovado sem assertion.
+- `assistencias_mms_auditoria.sql`: aprovado sem assertion apos a migration que
+  separou por tabela o acesso a `OLD/NEW` no trigger de protecao de raw evidence.
+- `assistencias_mms_removido_raw_json.sql`: aprovado sem assertion.
+- A consulta posterior encontrou zero lotes e zero linhas com os prefixos UUID
+  temporarios `95`, `96`, `97` e `98`, alem de zero assistencias, partes e
+  auditorias dos cenarios, confirmando o rollback dos testes.
+- Os seis indices de FK de `lote_criacao_id`, `linha_criacao_id` e
+  `removido_lote_id` foram encontrados nas duas tabelas da Spec 04.
+
+Revisao final de advisors e logs:
+
+- O advisor de performance nao apresenta mais `unindexed_foreign_keys` para
+  `mms_assistencias` ou `mms_partes_assistencia`.
+- Avisos de indices ainda nao utilizados na Spec 04 sao esperados no ambiente
+  recente e nao justificam remocao antes de haver carga operacional.
+- Avisos de FKs sem indice e policies permissivas em tabelas de outras specs
+  permanecem como pendencias preexistentes, fora do fechamento da Spec 04.
+- O advisor de seguranca manteve o aviso de protecao contra senhas vazadas
+  desabilitada no Supabase Auth. A configuracao e recomendada antes da producao,
+  mas nao e causada pelas migrations desta spec.
+- Os logs PostgreSQL registraram a falha inicial do trigger e as quatro
+  transacoes finais sem erro apos a migration corretiva.
+- `supabase db reset` continua indisponivel sem Docker; a execucao remota valida
+  o estado aplicado, mas nao equivale a reconstruir localmente um banco vazio.
 
 ## Remote Validation Fallback
 
