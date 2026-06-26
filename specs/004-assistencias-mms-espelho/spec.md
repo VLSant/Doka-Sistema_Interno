@@ -161,6 +161,8 @@ Direcao/Admin e Supervisao precisam rastrear criacao, atualizacao por importacao
 - **FR-020A**: A lot with official status `importado` MAY update the mirror and MAY mark absent records as `removido` when it is complete for the posto/data.
 - **FR-020B**: A lot with official status `importado_com_alertas` MAY update the mirror and MAY mark absent records as `removido` only when alerts are non-blocking and the lot is complete for the posto/data.
 - **FR-020C**: A lot with official status `erro` or `cancelado` MUST NOT update the mirror and MUST NOT mark absent records as `removido`.
+- **FR-020D**: Lot completeness for this feature MUST be derived from Spec 03 data: `estado_processamento = validado`, status `importado` or `importado_com_alertas`, no active blocking errors, non-zero active line total, consistent totals, `posto_id` and `data_atividade` resolved for the lote, and every active line intended for transformation has `estado_validacao` `valida` or `valida_com_alerta` with `posto_id`, `data_atividade`, `numero_assistencia` and `parte_conjunto` present.
+- **FR-020E**: A lot MUST be treated as partial/incomplete when it has status null, `estado_processamento` not `validado`, active lines in `pendente`, `invalida` or `ignorada`, missing required candidate fields, inconsistent totals, active blocking errors, no active lines, or any unresolved condition that prevents proving the posto/data mirror is complete.
 - **FR-021**: Reprocessing the same eligible lot/line input MUST NOT create duplicate principal assistances.
 - **FR-022**: Reprocessing the same eligible lot/line input MUST NOT create duplicate parts.
 - **FR-023**: When an eligible line refers to an existing principal assistance, the system MUST reuse that principal assistance.
@@ -182,10 +184,14 @@ Direcao/Admin e Supervisao precisam rastrear criacao, atualizacao por importacao
 - **FR-039**: Records with `deleted_at` filled MUST be hidden from operational default consultations.
 - **FR-040**: The system MUST support authorized manual correction of imported operational fields without overwriting `raw_json` or `raw_json_resumo`.
 - **FR-041**: Imported values and corrected values MUST be distinguishable for fields that support correction.
+- **FR-041A**: Correctable fields in v1 are limited to `mms_assistencias.cliente_nome`, `mms_assistencias.endereco`, `mms_partes_assistencia.descricao_mercadoria` and `mms_partes_assistencia.recurso`.
+- **FR-041B**: Manual correction functions MUST accept only an allowed field identifier, corrected value, required reason/context and actor inferred from the authenticated operational user; attempts to correct fields outside the v1 allowlist MUST be rejected.
 - **FR-042**: The visible operational value MUST use the corrected value when an active correction exists; otherwise it MUST use the latest eligible imported value.
 - **FR-043**: A new eligible import MUST update latest imported values and traceability even when an active correction continues to define the visible value.
 - **FR-044**: A new eligible import MUST NOT erase an active correction without audit history and an explicit correction-resolution action.
 - **FR-045**: Manual correction MUST retain previous visible value, imported value when relevant, corrected value, actor, timestamp and reason or context.
+- **FR-045A**: Direct updates to `raw_json` and `raw_json_resumo` after creation MUST be blocked outside approved import-processing routines.
+- **FR-045B**: If visible-value projections are implemented as views, the views MUST use `WITH (security_invoker = true)` or an equivalent RLS-preserving strategy; otherwise visible values MUST be exposed through functions or columns that remain governed by table RLS.
 - **FR-046**: Future ocorrencias, reclamacoes and custos MUST link obligatorily to the principal `mms_assistencias` record.
 - **FR-047**: Future ocorrencias, reclamacoes and custos MAY also reference `mms_partes_assistencia` when the issue or cost applies to a specific part.
 - **FR-048**: The assistance mirror contract MUST allow future consumers to find all parts for a principal assistance.
@@ -202,7 +208,7 @@ Direcao/Admin e Supervisao precisam rastrear criacao, atualizacao por importacao
 - **FR-059**: Manual correction MUST generate centralized audit history.
 - **FR-060**: Marking a principal assistance or part as `removido` MUST generate centralized audit history.
 - **FR-061**: Reactivation by reappearance in an eligible import MUST generate centralized audit history.
-- **FR-062**: Cancellation effects that change a mirrored record MUST generate centralized audit history.
+- **FR-062**: Canceled import lots MUST NOT change mirrored records in this feature; cancellation audit remains part of the import-lot flow from Spec 03.
 - **FR-063**: Audit history MUST identify entity type, entity id, action, actor, timestamp, previous values, new values, import batch context and import line context when applicable.
 - **FR-064**: Failed or blocked operations MUST NOT create misleading success audit events.
 - **FR-065**: The feature MUST provide SQL validation coverage for idempotence of principal assistances.
@@ -226,8 +232,10 @@ Direcao/Admin e Supervisao precisam rastrear criacao, atualizacao por importacao
 
 - `mms_assistencias` uses `posto_id + data_atividade + numero_assistencia` as the principal service identity.
 - `mms_partes_assistencia` uses `posto_id + data_atividade + numero_assistencia + parte_conjunto` as the complete idempotent operational key, inherited through the linked assistance plus `parte_conjunto`.
-- Eligible lots are `importado` and complete `importado_com_alertas`; ineligible lots include `erro`, `cancelado`, incomplete lots, partial lots and lots with unresolved blocking errors.
-- Eligible lines must be valid for transformation according to Spec 03, have the normalized candidate fields required by the mirror and have no blocking error attached.
+- Eligible lots are `importado` and complete `importado_com_alertas`; ineligible lots include `erro`, `cancelado`, status null, `estado_processamento` different from `validado`, incomplete lots, partial lots, lots with inconsistent totals and lots with unresolved blocking errors.
+- A lot is complete only when Spec 03 data proves the whole posto/data mirror is represented: status eligible, `estado_processamento = validado`, `posto_id` and `data_atividade` resolved, active line total greater than zero, totals consistent, no active blocking errors and no active line left in a non-transformable state.
+- Eligible lines must have `estado_validacao` equal to `valida` or `valida_com_alerta`, have the normalized candidate fields required by the mirror and have no blocking error attached.
+- Lines with `estado_validacao` equal to `pendente`, `invalida` or `ignorada` MUST NOT update the mirror and MUST make the lot ineligible for `removido` synchronization when they prevent proving completeness.
 - `numero_assistencia` and `parte_conjunto` MUST be normalized enough to prevent duplicate keys caused only by leading/trailing spaces or inconsistent letter case.
 - The system MUST reject or quarantine eligible mirror updates when required candidate fields from Spec 03 are missing.
 - A new eligible complete import for a posto/data is the only event that can mark absent parts from that same posto/data as `removido`.
@@ -235,13 +243,15 @@ Direcao/Admin e Supervisao precisam rastrear criacao, atualizacao por importacao
 - `raw_json` MUST preserve original MMS column names and values received from the source import line.
 - `raw_json_resumo` MUST be derived from imported evidence and remain auditable; it MUST NOT erase part-level `raw_json`.
 - Corrected values MUST NOT replace preserved original `raw_json` or `raw_json_resumo`.
+- Correctable fields in v1 are only `cliente_nome`, `endereco`, `descricao_mercadoria` and `recurso`; other imported fields remain read-only until a later approved spec expands the allowlist.
 - The visible value precedence is: active corrected value first; otherwise latest eligible imported value.
 - When a corrected field receives a new imported value, both the new imported value and the existing correction MUST remain traceable until an authorized action changes or resolves the correction.
+- Visible-value views, when used, MUST preserve RLS with `security_invoker = true`; non-view projections must remain under table RLS.
 
 ### Audit Events
 
-- `mms_assistencias` MUST emit audit events for `criado`, `atualizado_por_importacao`, `corrigido`, `marcado_removido`, `reativado_por_importacao`, `cancelado_quando_aplicavel` and `soft_delete_registrado` when applicable.
-- `mms_partes_assistencia` MUST emit audit events for `criado`, `atualizado_por_importacao`, `corrigido`, `marcado_removido`, `reativado_por_importacao`, `cancelado_quando_aplicavel` and `soft_delete_registrado` when applicable.
+- `mms_assistencias` MUST emit audit events for `criado`, `atualizado_por_importacao`, `corrigido`, `marcado_removido`, `reativado_por_importacao` and `soft_delete_registrado` when applicable.
+- `mms_partes_assistencia` MUST emit audit events for `criado`, `atualizado_por_importacao`, `corrigido`, `marcado_removido`, `reativado_por_importacao` and `soft_delete_registrado` when applicable.
 - Audit events MUST use `historico_auditoria` from Spec 01.
 - Audit events caused by import processing MUST include import batch and line context when available.
 
