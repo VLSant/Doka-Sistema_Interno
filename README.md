@@ -79,7 +79,11 @@ Ele contém:
 - estrutura base do projeto;
 - pastas preparadas para Supabase;
 - pastas preparadas para aplicação;
-- scripts futuros de importação MMS.
+- scripts futuros de importação MMS;
+- migrations, seeds, policies e testes SQL para a fundação operacional,
+  cadastros base, staging MMS e artefatos iniciais do espelho operacional de
+  assistências MMS (`mms_assistencias` e `mms_partes_assistencia`), ainda
+  pendentes de validação local/remota completa da Spec 04.
 
 Ainda pode não existir uma aplicação frontend executável até que a implementação comece.
 
