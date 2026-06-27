@@ -41,3 +41,11 @@ venv/
 # Temporary files
 *.tmp
 *.log
+
+# Tests
+coverage/
+playwright-report/
+test-results/
+playwright/.auth/
+*.tsbuildinfo
+supabase/.temp/

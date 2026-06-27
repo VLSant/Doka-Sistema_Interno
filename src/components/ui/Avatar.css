@@ -1,0 +1,76 @@
+.doka-avatar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.doka-avatar__circle {
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--purple-500);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  width: 100%;
+  height: 100%;
+}
+
+.doka-avatar__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.doka-avatar--xs {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+.doka-avatar--sm {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+.doka-avatar--md {
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+}
+.doka-avatar--lg {
+  width: 48px;
+  height: 48px;
+  font-size: 19px;
+}
+.doka-avatar--xl {
+  width: 64px;
+  height: 64px;
+  font-size: 26px;
+}
+
+.doka-avatar__status {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 28%;
+  height: 28%;
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-card);
+}
+
+.doka-avatar__status--online {
+  background: var(--green-500);
+}
+.doka-avatar__status--busy {
+  background: var(--red-500);
+}
+.doka-avatar__status--away {
+  background: var(--amber-500);
+}
+.doka-avatar__status--offline {
+  background: var(--neutral-400);
+}

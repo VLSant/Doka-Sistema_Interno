@@ -1,0 +1,37 @@
+.doka-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 240px;
+  padding: var(--space-8);
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+}
+
+.doka-loading-state__spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--brand-primary);
+  animation: doka-loading-spin 0.7s linear infinite;
+}
+
+.doka-loading-state__message {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+@keyframes doka-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doka-loading-state__spinner {
+    animation: none;
+  }
+}

@@ -1,0 +1,30 @@
+.doka-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow var(--dur-base) var(--ease-standard),
+    transform var(--dur-base) var(--ease-standard);
+}
+
+.doka-card--padding-none {
+  padding: 0;
+}
+.doka-card--padding-sm {
+  padding: var(--space-4);
+}
+.doka-card--padding-md {
+  padding: var(--space-6);
+}
+.doka-card--padding-lg {
+  padding: var(--space-7);
+}
+
+.doka-card--interactive {
+  cursor: pointer;
+}
+.doka-card--interactive:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(var(--hover-lift));
+}
