@@ -53,7 +53,7 @@ const ALLOWED_TRANSITIONS: Record<AuthStateName, AuthStateName[]> = {
   resolvendo_contexto: ["autorizado", "bloqueado", "expirado", "nao_autenticado", "falha_temporaria"],
   autorizado: ["resolvendo_contexto", "expirado", "nao_autenticado", "bloqueado"],
   bloqueado: [],
-  expirado: ["nao_autenticado"],
+  expirado: ["nao_autenticado", "autenticando"],
   falha_temporaria: ["resolvendo_contexto"],
 };
 

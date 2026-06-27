@@ -5,7 +5,7 @@
  * the form again (`auth-session-contract.md` Public Routes: "/login ...
  * autorizado redireciona").
  */
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Card } from "../../../components/ui/Card";
 import { useAuth } from "../AuthProvider";
 import { LoginForm, type LoginFormValues } from "../components/LoginForm";
@@ -32,6 +32,9 @@ export function LoginPage() {
         <h1 className="doka-login-page__title">Entrar</h1>
         <p className="doka-login-page__subtitle">Acesse com seu e-mail e senha cadastrados.</p>
         <LoginForm onSubmit={handleSubmit} submitting={state.name === "autenticando"} />
+        <Link className="doka-login-page__recovery-link" to="/recuperar-senha">
+          Esqueci minha senha
+        </Link>
       </Card>
     </div>
   );

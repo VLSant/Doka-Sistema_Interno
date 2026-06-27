@@ -78,6 +78,17 @@ body {
   color: var(--text-muted);
 }
 
+.doka-login-page__recovery-link {
+  align-self: flex-start;
+  color: var(--brand-primary, var(--text-link, inherit));
+  font-size: var(--text-sm);
+}
+
+.doka-login-page__recovery-link:focus-visible {
+  outline: 2px solid var(--focus-ring, currentColor);
+  outline-offset: 2px;
+}
+
 /* ---- Dashboard neutral content --------------------------------------------- */
 .doka-dashboard-page {
   display: flex;

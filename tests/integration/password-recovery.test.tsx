@@ -146,6 +146,42 @@ describe("PASSWORD_RECOVERY flow", () => {
     expect(signOut).toHaveBeenCalledWith({ scope: "local" });
   });
 
+  it("keeps recovery state valid when confirmNewPassword fails so the user can retry", async () => {
+    const mock = createMockSupabaseClient({ initialUser: null, initialSession: null });
+    const signOut = vi.spyOn(mock.auth, "signOut");
+    const confirmNewPassword = vi
+      .fn()
+      .mockResolvedValue({ ok: false, message: "Senha não atende aos requisitos." });
+    render(
+      <AuthProvider
+        supabase={asClient(mock)}
+        recoveryService={buildRecoveryService({ confirmNewPassword })}
+      >
+        <RecoveryProbe />
+      </AuthProvider>,
+    );
+    await waitFor(() => expect(screen.getByTestId("recovery-state")).toHaveTextContent("invalido"));
+
+    const user = buildMockAuthUser();
+    const session = buildMockSession({ user });
+    await act(async () => {
+      mock.auth.__emit("PASSWORD_RECOVERY", session);
+      await waitFor(() => expect(screen.getByTestId("recovery-state")).toHaveTextContent("valido"));
+    });
+
+    await act(async () => {
+      screen.getByRole("button", { name: "Confirmar" }).click();
+      await Promise.resolve();
+    });
+
+    await waitFor(() => expect(confirmNewPassword).toHaveBeenCalledWith("NovaSenhaForte123"));
+    // A rule-validation failure must not invalidate the recovery link: the
+    // user should be able to correct the password and retry without being
+    // sent to the invalid/expired-link screen.
+    expect(screen.getByTestId("recovery-state")).toHaveTextContent("valido");
+    expect(signOut).not.toHaveBeenCalled();
+  });
+
   it("clears sensitive recovery state on demand without calling Supabase again", async () => {
     const mock = createMockSupabaseClient({ initialUser: null, initialSession: null });
     render(

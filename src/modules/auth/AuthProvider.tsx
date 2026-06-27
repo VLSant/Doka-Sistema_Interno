@@ -393,12 +393,12 @@ export function AuthProvider({
   const confirmNewPassword = useCallback(
     async (newPassword: string) => {
       const result = await recovery.confirmNewPassword(newPassword);
-      setRecoveryAuthorization("invalido");
 
       if (result.ok) {
         // The password-recovery authorization is itself a Supabase session.
         // Clear it explicitly so reload/USER_UPDATED cannot grant operational
         // access without a fresh sign-in using the new password.
+        setRecoveryAuthorization("invalido");
         try {
           await client.auth.signOut({ scope: "local" });
         } finally {
@@ -406,6 +406,9 @@ export function AuthProvider({
           setState((current) => transitionAuthState(current, { type: "LOGOUT" }));
         }
       }
+      // On failure (e.g. weak/reused password), keep the recovery
+      // authorization valid so the user can correct the input and retry
+      // without the link being treated as invalid/expired.
       return result;
     },
     [client, recovery, setRecoveryAuthorization],

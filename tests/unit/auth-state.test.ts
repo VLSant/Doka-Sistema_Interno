@@ -66,6 +66,19 @@ describe("auth-state", () => {
     expect(state).toEqual({ name: "nao_autenticado" });
   });
 
+  it("allows re-login directly from expirado without requiring a reload", () => {
+    const expired = { name: "expirado" as const };
+    let state = transitionAuthState(expired, { type: "LOGIN_INICIADO" });
+    expect(state).toEqual({ name: "autenticando" });
+
+    state = transitionAuthState(state, { type: "IDENTIDADE_CONFIRMADA" });
+    expect(state).toEqual({ name: "resolvendo_contexto" });
+
+    state = transitionAuthState(state, { type: "CONTEXTO_RESOLVIDO", context: operadorContext });
+    expect(state).toEqual({ name: "autorizado", context: operadorContext });
+    expect(isProtectedContentAllowed(state)).toBe(true);
+  });
+
   it("blocked context from resolvendo_contexto stores the blocked reason", () => {
     const state = transitionAuthState(
       { name: "resolvendo_contexto" },
