@@ -27,6 +27,8 @@ import { FeedbackState } from "../components/feedback/FeedbackState";
 import { AuthProvider, useAuth } from "../modules/auth/AuthProvider";
 import { decideProtectedRoute } from "../modules/auth/protected-loader";
 import { LoginPage } from "../modules/auth/pages/LoginPage";
+import { RecoverPasswordPage } from "../modules/auth/pages/RecoverPasswordPage";
+import { ResetPasswordPage } from "../modules/auth/pages/ResetPasswordPage";
 import { SessionExpiredPage } from "../modules/auth/pages/SessionExpiredPage";
 import { TemporaryFailurePage } from "../modules/auth/pages/TemporaryFailurePage";
 import { AccessDeniedPage } from "../modules/access/AccessDeniedPage";
@@ -113,14 +115,20 @@ export const router = createBrowserRouter([
         element: <LoginPage />,
       },
       {
-        // US4 (out of scope here) implements the recovery-request form.
+        // Public: accepts any e-mail and always returns the same neutral
+        // confirmation (`auth-session-contract.md` Password Recovery
+        // Request), so no Auth/context check gates this route.
         path: "recuperar-senha",
-        element: <LoadingState message="Verificando sessao..." />,
+        element: <RecoverPasswordPage />,
       },
       {
-        // US4 (out of scope here) implements the new-password form.
+        // Guarded by `recoveryState` inside `ResetPasswordPage` itself
+        // (read from `AuthProvider`, derived only from a `PASSWORD_RECOVERY`
+        // Auth event): an invalid/expired/reused link renders a safe failure
+        // with a "Solicitar novo link" exit instead of the form
+        // (`auth-session-contract.md` Password Recovery Completion).
         path: "redefinir-senha",
-        element: <LoadingState message="Verificando sessao..." />,
+        element: <ResetPasswordPage />,
       },
       {
         path: "sessao-expirada",

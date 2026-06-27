@@ -32,6 +32,7 @@ import {
   type AuthState,
 } from "./auth-state";
 import { createAuthService, type AuthService } from "./auth-service";
+import { createRecoveryService, type RecoveryService } from "./recovery-service";
 
 export interface AuthProviderProps {
   children: ReactNode;
@@ -40,7 +41,17 @@ export interface AuthProviderProps {
   authService?: AuthService;
   accessService?: AccessService;
   auditService?: AuditService;
+  recoveryService?: RecoveryService;
 }
+
+/**
+ * Password-recovery authorization state, derived exclusively from the
+ * `PASSWORD_RECOVERY` Auth event (`auth-session-contract.md`: "Exigir
+ * evento/sessao de recovery valida"). `valido` only while a session arrived
+ * with that event; any other Auth event, sign-out, or explicit cleanup
+ * returns it to `invalido`. Never persisted outside memory.
+ */
+export type RecoveryState = "invalido" | "valido";
 
 export interface AuthContextValue {
   state: AuthState;
@@ -50,6 +61,12 @@ export interface AuthContextValue {
   signOut: () => Promise<void>;
   /** Re-runs identity/context revalidation outside any Auth callback. */
   revalidate: () => void;
+  /** Whether a valid `PASSWORD_RECOVERY` authorization is currently active. */
+  recoveryState: RecoveryState;
+  /** Completes the active recovery authorization with a new password. */
+  confirmNewPassword: (newPassword: string) => Promise<{ ok: boolean; message?: string }>;
+  /** Clears recovery state without contacting Supabase (safe exit/cleanup). */
+  clearRecoveryState: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -57,13 +74,22 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 /** Pending revalidation reasons, queued by the Auth listener for an effect to pick up. */
 type PendingRevalidation = { reason: "initial" } | { reason: "auth-event"; event: AuthChangeEvent; session: Session | null };
 
-export function AuthProvider({ children, supabase, authService, accessService, auditService }: AuthProviderProps) {
+export function AuthProvider({
+  children,
+  supabase,
+  authService,
+  accessService,
+  auditService,
+  recoveryService,
+}: AuthProviderProps) {
   const client = useMemo(() => supabase ?? getSupabaseClient(), [supabase]);
   const auth = useMemo(() => authService ?? createAuthService(client), [authService, client]);
   const access = useMemo(() => accessService ?? createAccessService(client), [accessService, client]);
   const audit = useMemo(() => auditService ?? createAuditService(client), [auditService, client]);
+  const recovery = useMemo(() => recoveryService ?? createRecoveryService(client), [recoveryService, client]);
 
   const [state, setState] = useState<AuthState>(createInitialAuthState());
+  const [recoveryState, setRecoveryState] = useState<RecoveryState>("invalido");
   const stateRef = useRef(state);
   useEffect(() => {
     stateRef.current = state;
@@ -154,6 +180,18 @@ export function AuthProvider({ children, supabase, authService, accessService, a
 
       if (event === "SIGNED_OUT") {
         setState((current) => transitionAuthState(current, { type: "LOGOUT" }));
+        setRecoveryState("invalido");
+        return;
+      }
+
+      if (event === "PASSWORD_RECOVERY") {
+        // Routed entirely outside the `onAuthStateChange` callback
+        // (`auth-session-contract.md`: callbacks "nao devem executar cadeias
+        // assincronas longas"; this effect is the only place that reacts).
+        // A `PASSWORD_RECOVERY` session is a one-time recovery authorization,
+        // never a normal authorized session (data-model.md): it intentionally
+        // does not feed `resolveContextForAuthUserId`/`autorizado`.
+        setRecoveryState(session?.user ? "valido" : "invalido");
         return;
       }
 
@@ -225,13 +263,33 @@ export function AuthProvider({ children, supabase, authService, accessService, a
     await auth.signOut();
     revalidationTokenRef.current += 1;
     setState((current) => transitionAuthState(current, { type: "LOGOUT" }));
+    setRecoveryState("invalido");
   }, [auth]);
 
   const revalidate = useCallback(() => {
     enqueueRevalidation({ reason: "initial" });
   }, [enqueueRevalidation]);
 
-  const value = useMemo<AuthContextValue>(() => ({ state, signIn, signOut, revalidate }), [state, signIn, signOut, revalidate]);
+  const clearRecoveryState = useCallback(() => {
+    setRecoveryState("invalido");
+  }, []);
+
+  const confirmNewPassword = useCallback(
+    async (newPassword: string) => {
+      const result = await recovery.confirmNewPassword(newPassword);
+      // Clear the sensitive recovery authorization after either outcome
+      // (`auth-session-contract.md` Completion: "Limpar estado sensivel e
+      // retornar ao login"); the caller decides the actual navigation.
+      setRecoveryState("invalido");
+      return result;
+    },
+    [recovery],
+  );
+
+  const value = useMemo<AuthContextValue>(
+    () => ({ state, signIn, signOut, revalidate, recoveryState, confirmNewPassword, clearRecoveryState }),
+    [state, signIn, signOut, revalidate, recoveryState, confirmNewPassword, clearRecoveryState],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

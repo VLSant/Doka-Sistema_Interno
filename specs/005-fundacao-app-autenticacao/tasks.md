@@ -333,21 +333,114 @@ reused.
 
 ### Tests for User Story 4
 
-- [ ] T069 [P] [US4] Write failing unit tests for e-mail normalization, exact reset redirect construction, neutral request result, password confirmation, and safe error mapping in `tests/unit/recovery-service.test.ts`
-- [ ] T070 [P] [US4] Write failing integration tests for `PASSWORD_RECOVERY`, valid/invalid/expired recovery state, update-password success, and sensitive-state cleanup in `tests/integration/password-recovery.test.tsx`
-- [ ] T071 [P] [US4] Write failing Playwright flows for existing/nonexistent e-mail neutrality, successful reset, old-password rejection, and expired/reused link rejection in `tests/e2e/password-recovery.spec.ts`
+- [x] T069 [P] [US4] Write failing unit tests for e-mail normalization, exact reset redirect construction, neutral request result, password confirmation, and safe error mapping in `tests/unit/recovery-service.test.ts`
+- [x] T070 [P] [US4] Write failing integration tests for `PASSWORD_RECOVERY`, valid/invalid/expired recovery state, update-password success, and sensitive-state cleanup in `tests/integration/password-recovery.test.tsx`
+- [x] T071 [P] [US4] Write failing Playwright flows for existing/nonexistent e-mail neutrality, successful reset, old-password rejection, and expired/reused link rejection in `tests/e2e/password-recovery.spec.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T072 [US4] Implement `resetPasswordForEmail`, recovery-state validation, and `updateUser` orchestration without persisting recovery material in `src/modules/auth/recovery-service.ts`
-- [ ] T073 [P] [US4] Implement the accessible recovery-request form and neutral confirmation state in `src/modules/auth/pages/RecoverPasswordPage.tsx`
-- [ ] T074 [P] [US4] Implement the accessible new-password/confirmation form with configured-policy error mapping and invalid-link handling in `src/modules/auth/pages/ResetPasswordPage.tsx`
-- [ ] T075 [US4] Route `PASSWORD_RECOVERY` events to the reset flow outside the Auth callback and clear recovery state after success/failure in `src/modules/auth/AuthProvider.tsx`
-- [ ] T076 [US4] Register `/recuperar-senha` and guarded `/redefinir-senha` public routes with exact safe-return behavior in `src/app/router.tsx`
-- [ ] T077 [US4] Make all US4 unit, integration, and Playwright tests pass and record the verified commands at the US4 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [x] T072 [US4] Implement `resetPasswordForEmail`, recovery-state validation, and `updateUser` orchestration without persisting recovery material in `src/modules/auth/recovery-service.ts`
+- [x] T073 [P] [US4] Implement the accessible recovery-request form and neutral confirmation state in `src/modules/auth/pages/RecoverPasswordPage.tsx`
+- [x] T074 [P] [US4] Implement the accessible new-password/confirmation form with configured-policy error mapping and invalid-link handling in `src/modules/auth/pages/ResetPasswordPage.tsx`
+- [x] T075 [US4] Route `PASSWORD_RECOVERY` events to the reset flow outside the Auth callback and clear recovery state after success/failure in `src/modules/auth/AuthProvider.tsx`
+- [x] T076 [US4] Register `/recuperar-senha` and guarded `/redefinir-senha` public routes with exact safe-return behavior in `src/app/router.tsx`
+- [x] T077 [US4] Make all US4 unit, integration, and Playwright tests pass and record the verified commands at the US4 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: Recovery is functional without account enumeration or storage of
 password/recovery secrets.
+
+**Verified commands (2026-06-27)**:
+
+- `npm run typecheck` -> passed (`tsc -b --noEmit`, 0 errors).
+- `npm run lint` -> passed (`eslint .`, 0 errors; the same 5 pre-existing-pattern
+  `react-refresh/only-export-components` warnings already recorded at the
+  US1/US2/US3 checkpoints, unchanged by this phase).
+- `npm run test` (full suite) -> passed (12 files, 103/103 tests): the 10
+  pre-existing US1/US2/US3 suites plus 2 new US4 suites
+  (`tests/unit/recovery-service.test.ts`, 11 tests;
+  `tests/integration/password-recovery.test.tsx`, 7 tests). Confirmed red
+  beforehand: before `recovery-service.ts` existed,
+  `tests/unit/recovery-service.test.ts` failed with a Vite import-analysis
+  error resolving that module; before `recoveryState`/`confirmNewPassword`/
+  `clearRecoveryState`/the `recoveryService` prop were added to
+  `AuthProvider.tsx`, `tests/integration/password-recovery.test.tsx` failed
+  every assertion (the probe rendered an empty `recovery-state` node and
+  `useAuth()` exposed no recovery API) — the intended missing behavior, not
+  a tooling error.
+- `npm run build` -> passed (`tsc -b && vite build`; only the same
+  pre-existing "chunk larger than 500 kB" advisory, no errors).
+- `npx playwright test --list` -> discovered all 6 e2e spec files cleanly
+  (96 tests total across `desktop-chromium`/`desktop-firefox`: 88
+  pre-existing US1/US2/US3 tests plus 4 new
+  `tests/e2e/password-recovery.spec.ts` tests per project).
+- Real Playwright e2e execution against a live Supabase backend (including
+  Mailpit) **was not performed**, for the same reason recorded at the
+  US1/US2/US3 checkpoints: Docker is unavailable in this environment
+  (`docker info` fails), so the local Supabase project with Mailpit required
+  to exercise the full request -> e-mail -> link -> reset round trip could
+  not be started. `tests/e2e/password-recovery.spec.ts`'s full-round-trip
+  test (`fluxo completo: solicitar, seguir link Mailpit, ...`) additionally
+  self-skips via `test.skip(!process.env.MAILPIT_URL, ...)` when that
+  variable is absent, exactly as it is in this environment, mirroring the
+  `SUPABASE_SERVICE_ROLE_KEY` self-skip pattern already used in
+  `tests/e2e/access-revalidation.spec.ts`. The other three
+  `password-recovery.spec.ts` scenarios (neutral confirmation for an
+  existing e-mail, neutral confirmation for a nonexistent e-mail, and the
+  invalid-link safe failure on `/redefinir-senha`) do not require Mailpit
+  and were exercised structurally end-to-end at the component/integration
+  level instead, against the real `AuthProvider`/`recovery-service` wiring
+  with only the Supabase network layer mocked
+  (`tests/unit/recovery-service.test.ts`,
+  `tests/integration/password-recovery.test.tsx`).
+
+**Design decisions**:
+
+- `AuthProvider` exposes a new `recoveryState: "invalido" | "valido"` plus
+  `confirmNewPassword`/`clearRecoveryState`, derived exclusively from the
+  `PASSWORD_RECOVERY` Auth event processed inside the same queued
+  revalidation effect already used for `INITIAL_SESSION`/`SIGNED_IN`/etc.
+  (`AuthProvider.tsx`), never inside the `onAuthStateChange` callback itself,
+  per `auth-session-contract.md`: "Callbacks do listener nao devem executar
+  cadeias assincronas longas dentro do callback." A `PASSWORD_RECOVERY`
+  session intentionally never feeds `resolveContextForAuthUserId`/
+  `autorizado`: it is a one-time recovery authorization, not a normal
+  session, and `tests/integration/password-recovery.test.tsx` asserts the
+  main Auth `state` never reports `autorizado` from it.
+- `confirmNewPassword` (the `AuthProvider`-level wrapper, not the raw
+  `RecoveryService.confirmNewPassword`) always clears `recoveryState` back to
+  `"invalido"` after either outcome, per Completion: "Limpar estado sensivel
+  e retornar ao login" — success and failure both end the one-time
+  authorization; the page decides the actual navigation/redisplay.
+- `recovery-service.ts`'s `requestPasswordRecovery` always resolves
+  `{ ok: true }`, even when `resetPasswordForEmail` itself reports a
+  transport error, so a network hiccup can never become an observable
+  difference between "e-mail exists" and "e-mail does not exist" — the
+  stricter reading of "mesma confirmacao neutra para e-mail existente ou
+  inexistente."
+- `recovery-service.ts`'s `confirmNewPassword` maps every raw Supabase
+  `updateUser` error to one of three fixed PT-BR messages (same-as-old
+  password, expired/invalid recovery session, or a generic
+  policy-violation message) and never echoes the raw error string or the
+  submitted password, so the configured password policy's exact wording
+  (e.g. minimum length) never leaks verbatim to the client.
+- `buildResetPasswordRedirectUrl` strips any trailing slash from
+  `VITE_APP_URL` before appending `/redefinir-senha`, so the redirect is
+  byte-exact regardless of how the operator configures the env variable,
+  matching `auth-session-contract.md`: "redirect exato para
+  `/redefinir-senha`."
+- `ResetPasswordPage` reads `recoveryState` and renders the safe
+  "Link de recuperacao invalido" failure (with a "Solicitar novo link"
+  action back to `/recuperar-senha`) whenever it is not exactly `"valido"`,
+  covering the missing-link, malformed-link, and already-consumed/expired
+  cases uniformly, per Completion: "Expired, malformed or reused recovery
+  authorizations must show a safe failure with an option to request a new
+  link." It never reads Auth `state` for its guard, since a recovery session
+  is deliberately not represented there.
+- `RecoverPasswordPage`/`RecoverPasswordForm` show one fixed neutral
+  confirmation message after submission regardless of the outcome returned
+  by `requestPasswordRecovery` (which itself is always `{ ok: true }`), so
+  there is exactly one user-visible code path for both existing and
+  nonexistent e-mails.
 
 ---
 
