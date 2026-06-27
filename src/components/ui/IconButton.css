@@ -1,0 +1,66 @@
+.doka-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+
+.doka-icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.doka-icon-button:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+.doka-icon-button--sm {
+  width: 32px;
+  height: 32px;
+}
+.doka-icon-button--md {
+  width: 40px;
+  height: 40px;
+}
+.doka-icon-button--lg {
+  width: 48px;
+  height: 48px;
+}
+
+.doka-icon-button--ghost {
+  background: transparent;
+  color: var(--text-body);
+}
+.doka-icon-button--ghost:hover:not(:disabled) {
+  background: var(--neutral-100);
+}
+
+.doka-icon-button--soft {
+  background: var(--neutral-100);
+  color: var(--text-strong);
+}
+.doka-icon-button--soft:hover:not(:disabled) {
+  background: var(--neutral-150);
+}
+
+.doka-icon-button--primary {
+  background: var(--brand-primary);
+  color: #fff;
+}
+.doka-icon-button--primary:hover:not(:disabled) {
+  background: var(--brand-primary-hover);
+}
+
+.doka-icon-button--outline {
+  background: transparent;
+  color: var(--text-strong);
+  border-color: var(--border-default);
+}
+.doka-icon-button--outline:hover:not(:disabled) {
+  background: var(--neutral-100);
+}

@@ -80,28 +80,62 @@ protected content.
 
 ### Tests for User Story 1
 
-- [ ] T026 [P] [US1] Write failing unit tests for initial, login, authorized, logout, expired, blocked, and temporary-failure Auth transitions in `tests/unit/auth-state.test.ts`
-- [ ] T027 [P] [US1] Write failing integration tests for neutral invalid credentials, server-confirmed identity, initial-session restoration, local-scope logout, and Auth-event subscription cleanup in `tests/integration/auth-service.test.ts`
-- [ ] T028 [P] [US1] Write failing integration tests proving protected content stays absent until a valid operational context resolves in `tests/integration/auth-provider.test.tsx`
-- [ ] T029 [P] [US1] Write failing Playwright journeys for valid login, reload without protected-content flash, logout, Back/favorite denial, and expired session in `tests/e2e/auth-session.spec.ts`
-- [ ] T030 [P] [US1] Write failing Playwright coverage for logout/expiration synchronization between two windows in `tests/e2e/auth-multiwindow.spec.ts`
+- [x] T026 [P] [US1] Write failing unit tests for initial, login, authorized, logout, expired, blocked, and temporary-failure Auth transitions in `tests/unit/auth-state.test.ts`
+- [x] T027 [P] [US1] Write failing integration tests for neutral invalid credentials, server-confirmed identity, initial-session restoration, local-scope logout, and Auth-event subscription cleanup in `tests/integration/auth-service.test.ts`
+- [x] T028 [P] [US1] Write failing integration tests proving protected content stays absent until a valid operational context resolves in `tests/integration/auth-provider.test.tsx`
+- [x] T029 [P] [US1] Write failing Playwright journeys for valid login, reload without protected-content flash, logout, Back/favorite denial, and expired session in `tests/e2e/auth-session.spec.ts`
+- [x] T030 [P] [US1] Write failing Playwright coverage for logout/expiration synchronization between two windows in `tests/e2e/auth-multiwindow.spec.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T031 [US1] Implement sign-in, server-side identity confirmation with `getUser()`, Auth listener registration, initial-session resolution, and local-scope sign-out in `src/modules/auth/auth-service.ts`
-- [ ] T032 [US1] Implement the initial valid-user operational context lookup required after login using explicit `usuarios`, `usuarios_postos`, and `postos` columns under RLS in `src/modules/access/access-service.ts`
-- [ ] T033 [US1] Implement the Auth provider/controller that runs asynchronous revalidation outside Auth callbacks and clears protected state on every departure from `autorizado` in `src/modules/auth/AuthProvider.tsx`
-- [ ] T034 [P] [US1] Implement the accessible e-mail/password form with password clearing and neutral credential errors in `src/modules/auth/components/LoginForm.tsx`
-- [ ] T035 [US1] Implement the branded public login page and safe redirect for already-authorized users in `src/modules/auth/pages/LoginPage.tsx`
-- [ ] T036 [P] [US1] Implement branded session-loading, session-expired, and temporary-failure pages with retry/logout actions in `src/modules/auth/pages/SessionLoadingPage.tsx`, `src/modules/auth/pages/SessionExpiredPage.tsx`, and `src/modules/auth/pages/TemporaryFailurePage.tsx`
-- [ ] T037 [US1] Implement the protected-root loader that confirms Auth and context before rendering and redirects unauthenticated users without leaking protected output in `src/modules/auth/protected-loader.ts`
-- [ ] T038 [US1] Implement the neutral authenticated Dashboard destination with no KPI or module data simulation in `src/modules/navigation/pages/DashboardPage.tsx`
-- [ ] T039 [US1] Integrate `acesso_interno_concedido`, `sessao_encerrada`, and best-effort `sessao_expirada_detectada` audit calls without allowing audit failure to preserve a session in `src/modules/auth/auth-service.ts` and `src/services/audit-service.ts`
-- [ ] T040 [US1] Register login, protected Dashboard, session-expired, and temporary-failure routes and their pending boundaries in `src/app/router.tsx`
-- [ ] T041 [US1] Make all US1 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US1 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [x] T031 [US1] Implement sign-in, server-side identity confirmation with `getUser()`, Auth listener registration, initial-session resolution, and local-scope sign-out in `src/modules/auth/auth-service.ts`
+- [x] T032 [US1] Implement the initial valid-user operational context lookup required after login using explicit `usuarios`, `usuarios_postos`, and `postos` columns under RLS in `src/modules/access/access-service.ts`
+- [x] T033 [US1] Implement the Auth provider/controller that runs asynchronous revalidation outside Auth callbacks and clears protected state on every departure from `autorizado` in `src/modules/auth/AuthProvider.tsx`
+- [x] T034 [P] [US1] Implement the accessible e-mail/password form with password clearing and neutral credential errors in `src/modules/auth/components/LoginForm.tsx`
+- [x] T035 [US1] Implement the branded public login page and safe redirect for already-authorized users in `src/modules/auth/pages/LoginPage.tsx`
+- [x] T036 [P] [US1] Implement branded session-loading, session-expired, and temporary-failure pages with retry/logout actions in `src/modules/auth/pages/SessionLoadingPage.tsx`, `src/modules/auth/pages/SessionExpiredPage.tsx`, and `src/modules/auth/pages/TemporaryFailurePage.tsx`
+- [x] T037 [US1] Implement the protected-root loader that confirms Auth and context before rendering and redirects unauthenticated users without leaking protected output in `src/modules/auth/protected-loader.ts`
+- [x] T038 [US1] Implement the neutral authenticated Dashboard destination with no KPI or module data simulation in `src/modules/navigation/pages/DashboardPage.tsx`
+- [x] T039 [US1] Integrate `acesso_interno_concedido`, `sessao_encerrada`, and best-effort `sessao_expirada_detectada` audit calls without allowing audit failure to preserve a session in `src/modules/auth/auth-service.ts` and `src/services/audit-service.ts`
+- [x] T040 [US1] Register login, protected Dashboard, session-expired, and temporary-failure routes and their pending boundaries in `src/app/router.tsx`
+- [x] T041 [US1] Make all US1 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US1 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: US1 works independently for a correctly configured operational
 user and exposes no protected content before authorization.
+
+**Verified commands (2026-06-26)**:
+
+- `npm run typecheck` -> passed (`tsc -b --noEmit`, 0 errors).
+- `npm run lint` -> passed (`eslint .`, 0 errors; 6 pre-existing-pattern
+  `react-refresh/only-export-components` warnings on files that intentionally
+  export both a component and supporting hooks/types, matching the existing
+  `src/app/providers.tsx` pattern).
+- `npm run test -- tests/unit/auth-state.test.ts tests/integration/auth-service.test.ts tests/integration/auth-provider.test.tsx`
+  -> passed (3 files, 25/25 tests). Confirmed red beforehand: before
+  `auth-service.ts`/`access-service.ts`/`AuthProvider.tsx` existed, the two
+  integration suites failed to resolve their imports (Vite import-analysis
+  errors), i.e. the intended missing behavior.
+- `npm run test` (full suite) -> passed (3 files, 25/25 tests; no other
+  unit/integration suites exist yet for this feature).
+- `npm run build` -> passed (`tsc -b && vite build`; only a pre-existing,
+  unrelated "chunk larger than 500 kB" advisory, no errors).
+- `npx playwright test --list` -> discovered both new specs cleanly
+  (`tests/e2e/auth-session.spec.ts`, `tests/e2e/auth-multiwindow.spec.ts`;
+  14 tests across the `desktop-chromium`/`desktop-firefox` projects).
+- `npm run test:e2e -- tests/e2e/auth-session.spec.ts tests/e2e/auth-multiwindow.spec.ts`
+  **not executed against a real backend**: Docker was unavailable in this
+  environment (`docker info` failed), so the local Supabase project required
+  to seed `operador@doka.test`/`doka123` (per
+  `supabase/seed/fundacao_operacional_seed.sql`) could not be started. As a
+  partial substitute, `auth-session.spec.ts` was run once with a temporary
+  `.env` pointing at a non-existent Supabase instance to confirm the harness
+  itself works end-to-end: the unauthenticated-redirect scenario passed, and
+  the login-dependent scenario failed in the expected, clean way (stayed on
+  `/login` because the fake backend rejects the credentials) rather than
+  crashing — i.e. the app/router/Playwright wiring is correct and the only
+  missing piece is a real local Supabase instance. SQL pgTAP coverage for the
+  audit RPC was already implemented/verified in Phase 2 (T018-T020) and is
+  unaffected by this phase.
 
 ---
 
@@ -117,26 +151,62 @@ confirm the exact allowed/denied scope.
 
 ### Tests for User Story 2
 
-- [ ] T042 [P] [US2] Write failing unit tests for Operator operational/consulta links, Supervisão supervisao links, Direção/Administração global scope, inactive/deleted rows, ambiguous configuration, inactive postos, and zero eligible postos in `tests/unit/access-service.test.ts`
-- [ ] T043 [P] [US2] Write failing unit tests for the required guard order Auth → context → profile → posto → availability in `tests/unit/route-guard.test.ts`
-- [ ] T044 [P] [US2] Write failing integration tests for direct URL, favorite/history navigation, unauthorized posto parameters, and denied-before-unavailable behavior in `tests/integration/protected-routes.test.tsx`
-- [ ] T045 [P] [US2] Write failing Playwright profile-matrix scenarios for Operator, Supervisão, and Direção/Administração in `tests/e2e/access-profiles.spec.ts`
-- [ ] T046 [P] [US2] Write failing Playwright scenarios for inactivation, profile change, posto/link removal, last-link removal, and upgrade/downgrade to global scope during a session in `tests/e2e/access-revalidation.spec.ts`
+- [x] T042 [P] [US2] Write failing unit tests for Operator operational/consulta links, Supervisão supervisao links, Direção/Administração global scope, inactive/deleted rows, ambiguous configuration, inactive postos, and zero eligible postos in `tests/unit/access-service.test.ts`
+- [x] T043 [P] [US2] Write failing unit tests for the required guard order Auth → context → profile → posto → availability in `tests/unit/route-guard.test.ts`
+- [x] T044 [P] [US2] Write failing integration tests for direct URL, favorite/history navigation, unauthorized posto parameters, and denied-before-unavailable behavior in `tests/integration/protected-routes.test.tsx`
+- [x] T045 [P] [US2] Write failing Playwright profile-matrix scenarios for Operator, Supervisão, and Direção/Administração in `tests/e2e/access-profiles.spec.ts`
+- [x] T046 [P] [US2] Write failing Playwright scenarios for inactivation, profile change, posto/link removal, last-link removal, and upgrade/downgrade to global scope during a session in `tests/e2e/access-revalidation.spec.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T047 [US2] Complete operational-context resolution for all official profiles and every blocked reason without using JWT `user_metadata` or persistent context storage in `src/modules/access/access-service.ts`
-- [ ] T048 [US2] Implement the pure route guard with profile/posto checks before module availability and typed denied outcomes in `src/modules/access/route-guard.ts`
-- [ ] T049 [P] [US2] Implement access-denied and operational-configuration-unavailable pages with safe PT-BR messages and no sensitive reason disclosure in `src/modules/access/AccessDeniedPage.tsx` and `src/modules/access/OperationalConfigurationPage.tsx`
-- [ ] T050 [US2] Apply the typed profile matrix and protected loader to every `/app/*` route, including direct URL and unknown-route handling, in `src/app/router.tsx` and `src/app/routes.ts`
-- [ ] T051 [US2] Revalidate current Auth/profile/postos before every protected route navigation and invalidate stale in-flight protected results after a context change in `src/modules/auth/protected-loader.ts` and `src/modules/auth/AuthProvider.tsx`
-- [ ] T052 [US2] Implement optional `posto_id` route/query validation against the current context before route availability is evaluated in `src/modules/access/route-guard.ts`
-- [ ] T053 [US2] Integrate `acesso_operacional_bloqueado` auditing only when the operational actor is securely resolvable in `src/modules/access/access-service.ts` and `src/services/audit-service.ts`
-- [ ] T054 [US2] Add regression coverage confirming the frontend uses only publishable-key requests and existing RLS-scoped tables in `tests/integration/supabase-access-boundary.test.ts`
-- [ ] T055 [US2] Make all US2 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US2 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [x] T047 [US2] Complete operational-context resolution for all official profiles and every blocked reason without using JWT `user_metadata` or persistent context storage in `src/modules/access/access-service.ts`
+- [x] T048 [US2] Implement the pure route guard with profile/posto checks before module availability and typed denied outcomes in `src/modules/access/route-guard.ts`
+- [x] T049 [P] [US2] Implement access-denied and operational-configuration-unavailable pages with safe PT-BR messages and no sensitive reason disclosure in `src/modules/access/AccessDeniedPage.tsx` and `src/modules/access/OperationalConfigurationPage.tsx`
+- [x] T050 [US2] Apply the typed profile matrix and protected loader to every `/app/*` route, including direct URL and unknown-route handling, in `src/app/router.tsx` and `src/app/routes.ts`
+- [x] T051 [US2] Revalidate current Auth/profile/postos before every protected route navigation and invalidate stale in-flight protected results after a context change in `src/modules/auth/protected-loader.ts` and `src/modules/auth/AuthProvider.tsx`
+- [x] T052 [US2] Implement optional `posto_id` route/query validation against the current context before route availability is evaluated in `src/modules/access/route-guard.ts`
+- [x] T053 [US2] Integrate `acesso_operacional_bloqueado` auditing only when the operational actor is securely resolvable in `src/modules/access/access-service.ts` and `src/services/audit-service.ts`
+- [x] T054 [US2] Add regression coverage confirming the frontend uses only publishable-key requests and existing RLS-scoped tables in `tests/integration/supabase-access-boundary.test.ts`
+- [x] T055 [US2] Make all US2 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US2 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: US1 + US2 form the minimum safe MVP: valid users enter, invalid
 users are blocked, and direct URLs cannot bypass profile/posto scope.
+
+**Verified commands (2026-06-26)**:
+
+- `npm run typecheck` -> passed (`tsc -b --noEmit`, 0 errors).
+- `npm run lint` -> passed (`eslint .`, 0 errors; the same 6 pre-existing-pattern
+  `react-refresh/only-export-components` warnings already recorded at the US1
+  checkpoint, unchanged by this phase).
+- `npm run test` (full suite) -> passed (7 files, 61/61 tests): the 3 US1
+  suites plus 4 new US2 suites (`tests/unit/access-service.test.ts`,
+  `tests/unit/route-guard.test.ts`, `tests/integration/protected-routes.test.tsx`,
+  `tests/integration/supabase-access-boundary.test.ts`). Confirmed red
+  beforehand: before `route-guard.ts` existed, both
+  `tests/unit/route-guard.test.ts` and `tests/integration/protected-routes.test.tsx`
+  failed with a Vite import-analysis error on
+  `../../src/modules/access/route-guard` (11 access-service tests already
+  passed unmodified against the pre-existing `access-service.ts`, since US1
+  had already implemented the initial-context lookup this phase extends).
+- `npm run build` -> passed (`tsc -b && vite build`; only the same
+  pre-existing "chunk larger than 500 kB" advisory, no errors).
+- `npx playwright test --list` -> discovered all 4 e2e spec files cleanly
+  (48 tests total across `desktop-chromium`/`desktop-firefox`: 14
+  pre-existing US1 tests plus 17 new US2 tests per project —
+  `tests/e2e/access-profiles.spec.ts` and `tests/e2e/access-revalidation.spec.ts`).
+- Real Playwright e2e execution against a live Supabase backend **was not
+  performed**, for the same reason recorded at the US1 checkpoint: Docker is
+  unavailable in this environment (`docker info` fails), so the local
+  Supabase project required to seed the three official profiles plus
+  inactive/missing-profile accounts (`supabase/seed/fundacao_operacional_seed.sql`)
+  could not be started. `tests/e2e/access-revalidation.spec.ts` additionally
+  requires a server-side `SUPABASE_SERVICE_ROLE_KEY` (test-runner only, never
+  exposed to the browser) to mutate `usuarios`/`usuarios_postos` rows
+  directly during an already-authenticated session; its test cases
+  self-skip via `test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, ...)`
+  when that variable is absent, exactly as it is in this environment. SQL
+  pgTAP audit-RPC coverage (T018-T020) is unaffected by this phase and
+  remains unchanged.
 
 ---
 

@@ -1,0 +1,30 @@
+/* ===========================================================================
+   Doka · Global application styles
+   Imports the design-system tokens/base, then adds app-shell-level layout
+   rules used across stories (sidebar width, container, full-height root).
+   =========================================================================== */
+@import "./design-system.css";
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.doka-app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+}
+
+.doka-app-shell__content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.doka-app-shell__main {
+  flex: 1;
+  padding: var(--space-7);
+  max-width: var(--container-max);
+}

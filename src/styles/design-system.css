@@ -1,0 +1,355 @@
+/* ===========================================================================
+   Doka · Design system tokens for the web app
+   Ports the official tokens from `design-system/tokens/*` and `@font-face`
+   declarations pointing at the self-hosted fonts copied into
+   `public/design-system/fonts/`. This file is the single entry imported by
+   `src/styles/app.css`.
+   =========================================================================== */
+
+/* ---- Fonts: Poppins, self-hosted from /design-system/fonts/ ------------- */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-Light.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-Italic.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-SemiBold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-ExtraBold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("/design-system/fonts/Poppins-Black.ttf") format("truetype");
+}
+
+:root {
+  /* ---- Brand: Orange (primary) — official #F09018 ---------------------- */
+  --orange-50: #fef4e6;
+  --orange-100: #fbe2c0;
+  --orange-200: #f8cb8c;
+  --orange-300: #f5b257;
+  --orange-400: #f29e30;
+  --orange-500: #f09018;
+  --orange-600: #d87f10;
+  --orange-700: #b0660a;
+  --orange-800: #8a4f0a;
+  --orange-900: #663a08;
+
+  /* ---- Brand: Purple (secondary) — official #602860 --------------------- */
+  --purple-50: #f3ebf3;
+  --purple-100: #e3cfe2;
+  --purple-200: #c9a5c7;
+  --purple-300: #a876a6;
+  --purple-400: #844e82;
+  --purple-500: #602860;
+  --purple-600: #4f204e;
+  --purple-700: #401a3f;
+  --purple-800: #301330;
+  --purple-900: #220d22;
+
+  /* ---- Neutrals ----------------------------------------------------------- */
+  --neutral-0: #ffffff;
+  --neutral-50: #faf9fa;
+  --neutral-100: #f4f2f4;
+  --neutral-150: #eceaed;
+  --neutral-200: #e6e6e6;
+  --neutral-300: #d6d4d8;
+  --neutral-400: #b4b1b7;
+  --neutral-500: #8b888f;
+  --neutral-600: #66636a;
+  --neutral-700: #3b3b3b;
+  --neutral-800: #2a292b;
+  --neutral-900: #1d1d1f;
+  --neutral-1000: #121214;
+
+  /* ---- Semantic / status -------------------------------------------------- */
+  --green-50: #e6f6ed;
+  --green-500: #1e9e5a;
+  --green-600: #17824a;
+  --blue-50: #e9f1fe;
+  --blue-500: #2d7ff9;
+  --blue-600: #1b66d6;
+  --amber-50: #fef3e0;
+  --amber-500: #f0a024;
+  --amber-600: #cf8311;
+  --red-50: #fdecec;
+  --red-500: #e0464b;
+  --red-600: #c2333a;
+
+  /* ---- Semantic aliases ---------------------------------------------------- */
+  --brand-primary: var(--orange-500);
+  --brand-primary-hover: var(--orange-600);
+  --brand-primary-press: var(--orange-700);
+  --brand-secondary: var(--purple-500);
+  --brand-deep: var(--purple-600);
+  --brand-on-primary: #ffffff;
+
+  --text-strong: var(--neutral-900);
+  --text-body: var(--neutral-700);
+  --text-muted: var(--neutral-500);
+  --text-subtle: var(--neutral-400);
+  --text-on-brand: #ffffff;
+  --text-link: var(--orange-700);
+
+  --surface-page: var(--neutral-50);
+  --surface-card: var(--neutral-0);
+  --surface-sunken: var(--neutral-100);
+  --surface-raised: var(--neutral-0);
+  --surface-inverse: var(--neutral-900);
+  --surface-brand-soft: var(--orange-50);
+  --surface-purple-soft: var(--purple-50);
+
+  --border-subtle: var(--neutral-200);
+  --border-default: var(--neutral-300);
+  --border-strong: var(--neutral-400);
+  --border-brand: var(--orange-500);
+  --focus-ring: color-mix(in srgb, var(--orange-500) 45%, transparent);
+
+  --status-delivered: var(--green-500);
+  --status-delivered-soft: var(--green-50);
+  --status-transit: var(--blue-500);
+  --status-transit-soft: var(--blue-50);
+  --status-delayed: var(--amber-500);
+  --status-delayed-soft: var(--amber-50);
+  --status-exception: var(--red-500);
+  --status-exception-soft: var(--red-50);
+  --status-pending: var(--neutral-500);
+  --status-pending-soft: var(--neutral-100);
+
+  /* ---- Spacing, sizing & radius -------------------------------------------- */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+  --space-13: 128px;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+  --radius-card: var(--radius-lg);
+  --radius-control: var(--radius-md);
+
+  --control-h-sm: 32px;
+  --control-h-md: 40px;
+  --control-h-lg: 48px;
+
+  --container-max: 1280px;
+  --sidebar-w: 248px;
+  --topbar-h: 64px;
+
+  /* ---- Typography ------------------------------------------------------- */
+  --font-display: "Poppins", system-ui, sans-serif;
+  --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Poppins", system-ui, sans-serif;
+
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+  --fw-black: 900;
+  --fw-display: 700;
+
+  --num-tabular: "tnum" 1, "lnum" 1;
+
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 30px;
+  --text-3xl: 38px;
+  --text-4xl: 48px;
+  --text-5xl: 62px;
+  --text-6xl: 80px;
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  --tracking-tighter: -0.02em;
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-caps: 0.08em;
+
+  --role-display-font: var(--font-display);
+  --role-display-weight: 700;
+  --role-heading-font: var(--font-display);
+  --role-heading-weight: 700;
+  --role-body-font: var(--font-sans);
+  --role-eyebrow-tracking: var(--tracking-caps);
+
+  /* ---- Elevation, borders & effects --------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(48, 19, 48, 0.06);
+  --shadow-sm: 0 1px 3px rgba(48, 19, 48, 0.08), 0 1px 2px rgba(48, 19, 48, 0.04);
+  --shadow-md: 0 4px 12px rgba(48, 19, 48, 0.08), 0 2px 4px rgba(48, 19, 48, 0.04);
+  --shadow-lg: 0 12px 28px rgba(48, 19, 48, 0.12), 0 4px 10px rgba(48, 19, 48, 0.05);
+  --shadow-xl: 0 24px 56px rgba(48, 19, 48, 0.16), 0 8px 18px rgba(48, 19, 48, 0.06);
+  --shadow-brand: 0 6px 18px rgba(240, 144, 24, 0.32);
+
+  --ring-width: 3px;
+  --ring: 0 0 0 var(--ring-width) var(--focus-ring);
+
+  --border-w: 1px;
+  --border-hairline: 1px solid var(--border-subtle);
+  --border-card: 1px solid var(--border-subtle);
+
+  --blur-sm: blur(8px);
+  --blur-md: blur(16px);
+  --scrim: rgba(29, 29, 31, 0.45);
+
+  /* ---- Motion -------------------------------------------------------------- */
+  --dur-instant: 80ms;
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 360ms;
+  --dur-slower: 560ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --press-scale: 0.97;
+  --hover-lift: -1px;
+}
+
+/* ---- Base element defaults ------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-body);
+  background: var(--surface-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  color: var(--text-strong);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+::selection {
+  background: var(--orange-200);
+  color: var(--neutral-900);
+}
+
+/* ---- Visible focus behavior (accessibility requirement) ------------------- */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--radius-xs);
+}
+
+/* ---- Reduced motion default ------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
