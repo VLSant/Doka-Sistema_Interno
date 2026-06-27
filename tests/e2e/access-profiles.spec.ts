@@ -41,9 +41,9 @@ for (const [profileName, profile] of Object.entries(PROFILES)) {
         // Allowed by profile; the module itself is a placeholder for this
         // feature, so a neutral "unavailable" state (not a denial) is shown.
         await expect(page).toHaveURL(/\/app\/cadastros$/);
-        await expect(page.getByText(/acesso negado/i)).not.toBeVisible();
+        await expect(page.getByRole("heading", { name: /acesso negado/i })).not.toBeVisible();
       } else {
-        await expect(page.getByText(/acesso negado|nao tem acesso/i)).toBeVisible();
+        await expect(page.getByRole("heading", { name: /acesso negado/i })).toBeVisible();
       }
     });
 
@@ -53,9 +53,9 @@ for (const [profileName, profile] of Object.entries(PROFILES)) {
 
       if (profile.canAccessAdminOnly) {
         await expect(page).toHaveURL(/\/app\/historico-auditoria$/);
-        await expect(page.getByText(/acesso negado/i)).not.toBeVisible();
+        await expect(page.getByRole("heading", { name: /acesso negado/i })).not.toBeVisible();
       } else {
-        await expect(page.getByText(/acesso negado|nao tem acesso/i)).toBeVisible();
+        await expect(page.getByRole("heading", { name: /acesso negado/i })).toBeVisible();
       }
     });
   });

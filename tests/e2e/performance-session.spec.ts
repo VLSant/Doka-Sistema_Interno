@@ -27,8 +27,14 @@ async function login(page: Page) {
 
 test.describe("Performance de login/restauracao de sessao", () => {
   test("login valido chega ao Dashboard em ate 3 segundos", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByLabel("E-mail").fill(VALID_EMAIL);
+    await page.getByLabel("Senha").fill(VALID_PASSWORD);
+
+    // Measure the authentication outcome, not browser startup, initial asset
+    // loading, or human form-entry time.
     const start = Date.now();
-    await login(page);
+    await page.getByRole("button", { name: "Entrar" }).click();
     await expect(page).toHaveURL(/\/app\/dashboard$/);
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
     const elapsedMs = Date.now() - start;

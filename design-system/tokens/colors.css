@@ -68,15 +68,16 @@
   --brand-primary-press:  var(--orange-700);
   --brand-secondary:      var(--purple-500);
   --brand-deep:           var(--purple-600);
-  --brand-on-primary:     #FFFFFF;
+  /* Dark foreground keeps the official orange CTA WCAG-AA compliant. */
+  --brand-on-primary:     var(--neutral-900);
 
   /* Text */
   --text-strong:    var(--neutral-900);
   --text-body:      var(--neutral-700);
-  --text-muted:     var(--neutral-500);
-  --text-subtle:    var(--neutral-400);
+  --text-muted:     var(--neutral-600);
+  --text-subtle:    var(--neutral-500);
   --text-on-brand:  #FFFFFF;
-  --text-link:      var(--orange-700);
+  --text-link:      var(--orange-800);
 
   /* Surfaces */
   --surface-page:    var(--neutral-50);

@@ -115,6 +115,7 @@ describe("PASSWORD_RECOVERY flow", () => {
 
   it("completes confirmNewPassword successfully and clears recovery state afterwards", async () => {
     const mock = createMockSupabaseClient({ initialUser: null, initialSession: null });
+    const signOut = vi.spyOn(mock.auth, "signOut");
     const confirmNewPassword = vi.fn().mockResolvedValue({ ok: true });
     render(
       <AuthProvider
@@ -142,6 +143,7 @@ describe("PASSWORD_RECOVERY flow", () => {
 
     await waitFor(() => expect(confirmNewPassword).toHaveBeenCalledWith("NovaSenhaForte123"));
     await waitFor(() => expect(screen.getByTestId("recovery-state")).toHaveTextContent("invalido"));
+    expect(signOut).toHaveBeenCalledWith({ scope: "local" });
   });
 
   it("clears sensitive recovery state on demand without calling Supabase again", async () => {
@@ -179,6 +181,7 @@ describe("PASSWORD_RECOVERY flow", () => {
     const user = buildMockAuthUser();
     const session = buildMockSession({ user });
     mock.auth.__emit("PASSWORD_RECOVERY", session);
+    mock.auth.__emit("USER_UPDATED", session);
 
     // A PASSWORD_RECOVERY session must never be treated as a normal
     // authorized session (data-model.md: protected content stays hidden

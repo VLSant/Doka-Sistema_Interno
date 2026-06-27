@@ -6,6 +6,12 @@ const baseURL = `http://localhost:${PORT}`;
 export default defineConfig({
   testDir: "./tests/e2e",
   outputDir: "./test-results",
+  // Remote Supabase Auth/context confirmation can exceed Playwright's
+  // five-second assertion default even though each test still has a strict
+  // 30-second ceiling. Performance has its own dedicated acceptance test.
+  expect: {
+    timeout: 15_000,
+  },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

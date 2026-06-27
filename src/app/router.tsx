@@ -13,19 +13,16 @@
  * `posto_id` query parameter validated by the route guard
  * (`route-navigation-contract.md` Evaluation Order).
  */
-import type { ReactNode } from "react";
 import {
   createBrowserRouter,
   Navigate,
   Outlet,
   useNavigation,
-  useRouteError,
-  useSearchParams,
 } from "react-router-dom";
 import { LoadingState } from "../components/feedback/LoadingState";
 import { FeedbackState } from "../components/feedback/FeedbackState";
-import { AuthProvider, useAuth } from "../modules/auth/AuthProvider";
-import { decideProtectedRoute } from "../modules/auth/protected-loader";
+import { AuthProvider } from "../modules/auth/AuthProvider";
+import { ProtectedRoute } from "../modules/auth/ProtectedRoute";
 import { LoginPage } from "../modules/auth/pages/LoginPage";
 import { RecoverPasswordPage } from "../modules/auth/pages/RecoverPasswordPage";
 import { ResetPasswordPage } from "../modules/auth/pages/ResetPasswordPage";
@@ -37,7 +34,7 @@ import { DashboardPage } from "../modules/navigation/pages/DashboardPage";
 import { ModuleUnavailablePage } from "../modules/navigation/pages/ModuleUnavailablePage";
 import { NotFoundPage } from "../modules/navigation/pages/NotFoundPage";
 import { AppShell } from "../components/layout/AppShell";
-import { ROUTE_DEFINITIONS, type RouteId } from "./routes";
+import { ROUTE_DEFINITIONS } from "./routes";
 
 function RootLayout() {
   const navigation = useNavigation();
@@ -54,50 +51,13 @@ function RootLayout() {
 }
 
 function RootErrorBoundary() {
-  const error = useRouteError();
-  const message = error instanceof Error ? error.message : "Erro inesperado.";
-
   return (
     <FeedbackState
       tone="error"
       title="Algo deu errado"
-      description={`Nao foi possivel carregar esta pagina. ${message}`}
+      description="Não foi possível carregar esta página. Tente novamente em alguns instantes."
     />
   );
-}
-
-/**
- * Gate for every `/app/*` route. Revalidates the full route guard (Auth ->
- * context -> profile -> posto -> availability) on every render and renders
- * children only when the outcome is exactly `autorizado`; otherwise shows a
- * loading state, a neutral unavailable state, or redirects to a safe
- * destination, never the protected children.
- */
-function ProtectedRoute({ routeId, children }: { routeId: RouteId; children: ReactNode }) {
-  const { state } = useAuth();
-  const [searchParams] = useSearchParams();
-  const route = ROUTE_DEFINITIONS.find((definition) => definition.id === routeId) ?? null;
-  const requestedPostoId = searchParams.get("posto_id");
-
-  const decision = decideProtectedRoute({ authState: state, route, requestedPostoId });
-
-  if (decision.kind === "loading") {
-    return <LoadingState message="Verificando sessao..." />;
-  }
-
-  if (decision.kind === "redirect") {
-    return <Navigate to={decision.to} replace />;
-  }
-
-  if (decision.kind === "modulo_indisponivel") {
-    return <ModuleUnavailablePage moduleLabel={route?.label ?? "Módulo"} />;
-  }
-
-  if (decision.kind === "rota_nao_encontrada") {
-    return <NotFoundPage />;
-  }
-
-  return <>{children}</>;
 }
 
 export const router = createBrowserRouter([

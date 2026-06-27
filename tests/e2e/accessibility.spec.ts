@@ -80,7 +80,7 @@ test.describe("Acessibilidade automatizada (axe-core)", () => {
   }) => {
     await login(page);
     await page.goto("/app/ocorrencias");
-    await expect(page.getByText(/ainda n[aã]o dispon[ií]vel/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Ocorrências ainda não disponível/i })).toBeVisible();
     await expectNoSeriousOrCriticalViolations(page);
   });
 

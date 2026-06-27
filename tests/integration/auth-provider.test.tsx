@@ -5,7 +5,7 @@
  * `data-model.md` AuthState table.
  */
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   buildMockAuthUser,
@@ -15,17 +15,39 @@ import {
 import { operadorResult, semConfiguracaoOperacionalResult } from "../helpers/access-fixtures";
 import { AuthProvider, useAuth } from "../../src/modules/auth/AuthProvider";
 import type { AccessService } from "../../src/modules/access/access-service";
+import type { AuthListener, AuthService, SignInResult } from "../../src/modules/auth/auth-service";
 
 function asClient(mock: ReturnType<typeof createMockSupabaseClient>): SupabaseClient {
   return mock as unknown as SupabaseClient;
 }
 
 function ProtectedProbe() {
-  const { state } = useAuth();
+  const { state, revalidate, signOut, signIn } = useAuth();
+  const controls = (
+    <>
+      <button onClick={() => void revalidate()}>Revalidar</button>
+      <button onClick={() => void signOut()}>Sair</button>
+      <button onClick={() => void signIn({ email: "operador@doka.test", password: "doka123" })}>
+        Entrar teste
+      </button>
+    </>
+  );
   if (state.name !== "autorizado") {
-    return <div data-testid="no-protected-content">Sem conteudo protegido</div>;
+    return (
+      <>
+        <div data-testid="auth-state">{state.name}</div>
+        <div data-testid="no-protected-content">Sem conteudo protegido</div>
+        {controls}
+      </>
+    );
   }
-  return <div data-testid="protected-content">Conteudo protegido para {state.context.nome}</div>;
+  return (
+    <>
+      <div data-testid="auth-state">{state.name}</div>
+      <div data-testid="protected-content">Conteudo protegido para {state.context.nome}</div>
+      {controls}
+    </>
+  );
 }
 
 function buildAccessService(result: Awaited<ReturnType<AccessService["resolveInitialContext"]>>): AccessService {
@@ -99,5 +121,88 @@ describe("AuthProvider gating", () => {
     mock.auth.__emit("SIGNED_OUT", null);
 
     await waitFor(() => expect(screen.getByTestId("no-protected-content")).toBeInTheDocument());
+  });
+
+  it("reloads the operational context and removes stale protected content on revalidation", async () => {
+    const user = buildMockAuthUser();
+    const mock = createMockSupabaseClient({ initialUser: user, initialSession: buildMockSession({ user }) });
+    const resolveInitialContext = vi
+      .fn()
+      .mockResolvedValueOnce(operadorResult)
+      .mockResolvedValueOnce(semConfiguracaoOperacionalResult);
+
+    render(
+      <AuthProvider
+        supabase={asClient(mock)}
+        accessService={{ resolveInitialContext }}
+      >
+        <ProtectedProbe />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId("protected-content")).toBeInTheDocument());
+    fireEvent.click(screen.getByRole("button", { name: "Revalidar" }));
+
+    await waitFor(() => expect(screen.getByTestId("auth-state")).toHaveTextContent("bloqueado"));
+    expect(screen.queryByTestId("protected-content")).not.toBeInTheDocument();
+    expect(resolveInitialContext).toHaveBeenCalledTimes(2);
+  });
+
+  it("logout clears a blocked state instead of leaving the login flow stuck", async () => {
+    const user = buildMockAuthUser();
+    const mock = createMockSupabaseClient({ initialUser: user, initialSession: buildMockSession({ user }) });
+
+    render(
+      <AuthProvider
+        supabase={asClient(mock)}
+        accessService={buildAccessService(semConfiguracaoOperacionalResult)}
+      >
+        <ProtectedProbe />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId("auth-state")).toHaveTextContent("bloqueado"));
+    fireEvent.click(screen.getByRole("button", { name: "Sair" }));
+    await waitFor(() => expect(screen.getByTestId("auth-state")).toHaveTextContent("nao_autenticado"));
+  });
+
+  it("ignores a late null INITIAL_SESSION instead of stranding a successful login in autenticando", async () => {
+    const user = buildMockAuthUser();
+    const mock = createMockSupabaseClient({ initialUser: null, initialSession: null });
+    let listener: AuthListener | undefined;
+    let resolveSignIn: ((result: SignInResult) => void) | undefined;
+    const authService: AuthService = {
+      resolveInitialSession: vi.fn().mockResolvedValue({ user: null, session: null }),
+      signIn: vi.fn(
+        () =>
+          new Promise<SignInResult>((resolve) => {
+            resolveSignIn = resolve;
+          }),
+      ),
+      signOut: vi.fn().mockResolvedValue(undefined),
+      onAuthStateChange: vi.fn((callback: AuthListener) => {
+        listener = callback;
+        return () => undefined;
+      }),
+    };
+
+    render(
+      <AuthProvider
+        supabase={asClient(mock)}
+        authService={authService}
+        accessService={buildAccessService(operadorResult)}
+      >
+        <ProtectedProbe />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId("auth-state")).toHaveTextContent("nao_autenticado"));
+    fireEvent.click(screen.getByRole("button", { name: "Entrar teste" }));
+    await waitFor(() => expect(screen.getByTestId("auth-state")).toHaveTextContent("autenticando"));
+
+    listener?.("INITIAL_SESSION", null);
+    resolveSignIn?.({ ok: true, user });
+
+    await waitFor(() => expect(screen.getByTestId("auth-state")).toHaveTextContent("autorizado"));
   });
 });

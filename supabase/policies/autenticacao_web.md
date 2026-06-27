@@ -107,17 +107,26 @@ best-effort:
 
 ## Security review
 
-Revisao em 2026-06-26 (implementacao da Fase 2 da Spec 005):
+Revisão final em 2026-06-27 contra o projeto de validação Doka
+(`zwxxjbiwpgqjsmaxybbm`):
 
-- Revisao estatica confirma que a migration
-  `20260626230929_auditoria_autenticacao_web.sql` nao altera nenhuma policy
-  de RLS existente nem cria nova tabela.
-- Revisao estatica confirma `search_path` fixo, ausencia de SQL dinamico e
-  resolucao de ator exclusivamente via `auth.uid()`.
-- Revisao estatica confirma `REVOKE ALL ... FROM PUBLIC`,
-  `REVOKE ALL ... FROM anon` e `GRANT EXECUTE ... TO authenticated`
-  explicitos na propria migration.
-- Pendente: aplicacao da migration em projeto Supabase real e execucao do
-  Security/Performance Advisor (T083 do `tasks.md`), a ser registrada nesta
-  secao quando a Fase 7 (Polish) for executada. Sem ambiente Supabase
-  local/remoto disponivel neste momento para validar via MCP/CLI.
+- A migration inicial não altera policies de RLS nem cria tabelas.
+- A migration
+  `20260627172235_endurecer_rpc_auditoria_autenticacao.sql` move a operação
+  privilegiada para `app_private.registrar_evento_autenticacao` e deixa
+  `public.registrar_evento_autenticacao` como wrapper `SECURITY INVOKER`.
+- Ambas as funções usam `search_path` vazio e referências qualificadas.
+- `anon` não executa nenhuma das funções; `authenticated` executa somente o
+  contrato necessário, e a função privada continua exigindo `auth.uid()` e
+  resolvendo o ator no banco.
+- A migration foi aplicada com sucesso no projeto de validação. Consulta a
+  `pg_proc` confirmou o wrapper público com `prosecdef=false`, a implementação
+  privada com `prosecdef=true`, `search_path=""` em ambas e privilégios
+  explícitos.
+- O Security Advisor foi executado novamente depois da migration e o finding
+  `authenticated_security_definer_function_executable` da RPC pública deixou
+  de existir.
+- Permanece somente o aviso de configuração do projeto
+  `auth_leaked_password_protection`. Ele não é causado por schema ou código da
+  Spec 005 e deve ser habilitado nas configurações de Auth após verificar o
+  plano Supabase e o impacto sobre senhas operacionais existentes.

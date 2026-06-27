@@ -50,7 +50,7 @@ const ALLOWED_TRANSITIONS: Record<AuthStateName, AuthStateName[]> = {
   inicializando: ["nao_autenticado", "resolvendo_contexto"],
   nao_autenticado: ["autenticando"],
   autenticando: ["resolvendo_contexto", "nao_autenticado"],
-  resolvendo_contexto: ["autorizado", "bloqueado", "falha_temporaria"],
+  resolvendo_contexto: ["autorizado", "bloqueado", "expirado", "nao_autenticado", "falha_temporaria"],
   autorizado: ["resolvendo_contexto", "expirado", "nao_autenticado", "bloqueado"],
   bloqueado: [],
   expirado: ["nao_autenticado"],
@@ -75,6 +75,11 @@ function transitionTo(state: AuthState, next: AuthState): AuthState {
  * requirement; this function never holds protected content itself).
  */
 export function transitionAuthState(state: AuthState, event: AuthEvent): AuthState {
+  // Logout is a local security boundary and must clear even terminal states.
+  if (event.type === "LOGOUT") {
+    return { name: "nao_autenticado" };
+  }
+
   switch (event.type) {
     case "SESSAO_AUSENTE":
       return transitionTo(state, { name: "nao_autenticado" });
@@ -96,8 +101,6 @@ export function transitionAuthState(state: AuthState, event: AuthEvent): AuthSta
       return transitionTo(state, { name: "resolvendo_contexto" });
     case "SESSAO_EXPIROU":
       return transitionTo(state, { name: "expirado" });
-    case "LOGOUT":
-      return transitionTo(state, { name: "nao_autenticado" });
     default:
       return state;
   }

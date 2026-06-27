@@ -75,10 +75,12 @@ describe("auth-state", () => {
     expect(isProtectedContentAllowed(state)).toBe(false);
   });
 
-  it("bloqueado is a terminal state with no allowed transitions", () => {
-    const blocked = { name: "bloqueado" as const, reason: "usuario_inativo_ou_removido" as const };
-    const state = transitionAuthState(blocked, { type: "REVALIDAR_CONTEXTO" });
-    expect(state).toEqual(blocked);
+  it("logout always clears blocked and temporary-failure states", () => {
+    const blocked = { name: "bloqueado" as const, reason: "sem_configuracao_operacional" as const };
+    expect(transitionAuthState(blocked, { type: "LOGOUT" })).toEqual({ name: "nao_autenticado" });
+    expect(transitionAuthState({ name: "falha_temporaria" }, { type: "LOGOUT" })).toEqual({
+      name: "nao_autenticado",
+    });
   });
 
   it("temporary failure from resolvendo_contexto can retry back into resolvendo_contexto", () => {

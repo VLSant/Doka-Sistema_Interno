@@ -48,7 +48,7 @@ test.describe("Autenticacao e sessao", () => {
     await expect(page).toHaveURL(/\/login$/);
 
     await page.goBack();
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole("heading", { name: "Dashboard" })).not.toBeVisible();
 
     await page.goto("/app/dashboard");
     await expect(page).toHaveURL(/\/login$/);

@@ -98,7 +98,7 @@ protected content.
 - [x] T038 [US1] Implement the neutral authenticated Dashboard destination with no KPI or module data simulation in `src/modules/navigation/pages/DashboardPage.tsx`
 - [x] T039 [US1] Integrate `acesso_interno_concedido`, `sessao_encerrada`, and best-effort `sessao_expirada_detectada` audit calls without allowing audit failure to preserve a session in `src/modules/auth/auth-service.ts` and `src/services/audit-service.ts`
 - [x] T040 [US1] Register login, protected Dashboard, session-expired, and temporary-failure routes and their pending boundaries in `src/app/router.tsx`
-- [x] T041 [US1] Make all US1 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US1 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [ ] T041 [US1] Make all US1 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US1 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: US1 works independently for a correctly configured operational
 user and exposes no protected content before authorization.
@@ -167,7 +167,7 @@ confirm the exact allowed/denied scope.
 - [x] T052 [US2] Implement optional `posto_id` route/query validation against the current context before route availability is evaluated in `src/modules/access/route-guard.ts`
 - [x] T053 [US2] Integrate `acesso_operacional_bloqueado` auditing only when the operational actor is securely resolvable in `src/modules/access/access-service.ts` and `src/services/audit-service.ts`
 - [x] T054 [US2] Add regression coverage confirming the frontend uses only publishable-key requests and existing RLS-scoped tables in `tests/integration/supabase-access-boundary.test.ts`
-- [x] T055 [US2] Make all US2 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US2 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [ ] T055 [US2] Make all US2 unit, integration, SQL, and Playwright tests pass and record the verified commands at the US2 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: US1 + US2 form the minimum safe MVP: valid users enter, invalid
 users are blocked, and direct URLs cannot bypass profile/posto scope.
@@ -237,7 +237,7 @@ and authorized placeholder behavior.
 - [x] T065 [P] [US3] Implement the PT-BR page-not-found state with authentication-aware safe return in `src/modules/navigation/pages/NotFoundPage.tsx`
 - [x] T066 [US3] Register every planned module destination with the correct profile and availability metadata in `src/app/routes.ts` and `src/app/router.tsx`
 - [x] T067 [US3] Complete desktop layout, form, sidebar, status, focus, overflow, and reduced-motion styling using Doka tokens in `src/styles/app.css`
-- [x] T068 [US3] Make all US3 unit, integration, and Playwright tests pass and record the verified commands at the US3 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [ ] T068 [US3] Make all US3 unit, integration, and Playwright tests pass and record the verified commands at the US3 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: The shared navigation is usable for all profiles without
 presenting future modules as implemented.
@@ -344,7 +344,7 @@ reused.
 - [x] T074 [P] [US4] Implement the accessible new-password/confirmation form with configured-policy error mapping and invalid-link handling in `src/modules/auth/pages/ResetPasswordPage.tsx`
 - [x] T075 [US4] Route `PASSWORD_RECOVERY` events to the reset flow outside the Auth callback and clear recovery state after success/failure in `src/modules/auth/AuthProvider.tsx`
 - [x] T076 [US4] Register `/recuperar-senha` and guarded `/redefinir-senha` public routes with exact safe-return behavior in `src/app/router.tsx`
-- [x] T077 [US4] Make all US4 unit, integration, and Playwright tests pass and record the verified commands at the US4 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [ ] T077 [US4] Make all US4 unit, integration, and Playwright tests pass and record the verified commands at the US4 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: Recovery is functional without account enumeration or storage of
 password/recovery secrets.
@@ -453,22 +453,29 @@ constitutional validation across all stories.
 - [x] T079 [P] Add a bundle/security assertion that fails if secret/service-role variable names or token/recovery values enter production output in `tests/integration/build-secrets.test.ts`
 - [x] T080 [P] Add Playwright timing assertions for the 3-second login/restoration outcome and protected-content flash detection in `tests/e2e/performance-session.spec.ts`
 - [x] T081 [P] Add automated accessibility checks for public Auth pages, App Shell, feedback states, and neutral destinations in `tests/e2e/accessibility.spec.ts`
-- [x] T082 Verify the migration from a clean database and run `supabase test db supabase/tests/autenticacao_web_auditoria.sql`, recording results in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [ ] T082 Verify the migration from a clean database and run `supabase test db supabase/tests/autenticacao_web_auditoria.sql`, recording results in `specs/005-fundacao-app-autenticacao/tasks.md`
 - [x] T083 Run Supabase security/performance advisors against the approved validation project, resolve any RPC privilege or `search_path` finding, and record evidence in `supabase/policies/autenticacao_web.md`
 
 **T082/T083 evidence (2026-06-27, via Supabase MCP against project `Doka` / `zwxxjbiwpgqjsmaxybbm`, since local Docker was unavailable):**
-- Applied migration `auditoria_autenticacao_web` (matches `supabase/migrations/20260626230929_auditoria_autenticacao_web.sql`) directly to the project; confirmed present in `list_migrations`.
-- Confirmed privileges via SQL: `prosecdef=true`, `proconfig=search_path=public, auth, pg_temp`, `anon` EXECUTE=false, `authenticated` EXECUTE=true.
-- Ran security advisors (`get_advisors type=security`): only two WARNs — (1) `authenticated_security_definer_function_executable` on `registrar_evento_autenticacao`, which is intentional/by-design (the RPC is meant to be called by signed-in users; see threat model in `supabase/policies/autenticacao_web.md`), and (2) `auth_leaked_password_protection` (pre-existing Auth project setting, unrelated to this migration, not introduced by Spec 005).
+- Applied the original audit RPC migration and the hardening migration
+  `20260627172235_endurecer_rpc_auditoria_autenticacao.sql`.
+- Confirmed privileges via SQL: the public RPC is `SECURITY INVOKER`; the
+  `SECURITY DEFINER` writer is in `app_private`, has empty `search_path`,
+  validates `auth.uid()`, denies `anon`, and grants execution only to
+  `authenticated`.
+- Ran security advisors after hardening: no RPC privilege or `search_path`
+  finding remains. The only warning is the pre-existing project setting
+  `auth_leaked_password_protection`.
 - Ran performance advisors (`get_advisors type=performance`): no findings related to `registrar_evento_autenticacao` or `historico_auditoria`.
-- Manually executed the full assertion suite from `supabase/tests/autenticacao_web_auditoria.sql` against the live project (with explicit user authorization, since this writes to a shared audit table): all 7 scenarios passed (anon denial, allowlist enforcement, fixed event shape/actor derivation, unknown-user no-op, inactive-user restriction, direct-insert denial, EXECUTE privilege grants). Result: `TODOS_OS_TESTES_PASSARAM`.
-- **Bug found and fixed in the test file itself** (not in the RPC): the original script asserted event existence in `historico_auditoria` while still under `set role authenticated`, but the SELECT policy on that table restricts what the `authenticated` role can read — so successful inserts were invisible to the verifying `SELECT`, producing false assertion failures. Fixed by moving every verification `SELECT`/`assert_true` after the corresponding `reset role;`, while keeping all `registrar_evento_autenticacao` calls under the impersonated role. The RPC implementation itself required no changes.
-- All test-generated audit rows (6 total, two test runs) were deleted from the live `historico_auditoria` table after verification, with explicit per-batch user confirmation.
+- Executed a transactional remote smoke test for the authenticated wrapper,
+  actor derivation, fixed event metadata and rollback; it passed without
+  leaving an audit row.
+- **Bug found and fixed in the test file itself**: the original script asserted event existence in `historico_auditoria` while still under `set role authenticated`, but the SELECT policy on that table restricts what the `authenticated` role can read — so successful inserts were invisible to the verifying `SELECT`, producing false assertion failures. Fixed by moving every verification `SELECT`/`assert_true` after the corresponding `reset role;`, while keeping all `registrar_evento_autenticacao` calls under the impersonated role.
 - Not yet run: `supabase test db` via local Docker/Supabase CLI (Docker Desktop unavailable in this environment). The corrected SQL file is ready to run there when Docker is available, and should produce the same result.
-- [x] T084 Run all typecheck, lint, unit, integration, SQL, production-build, and Playwright suites and record the final command matrix in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [ ] T084 Run all typecheck, lint, unit, integration, SQL, production-build, and Playwright suites and record the final command matrix in `specs/005-fundacao-app-autenticacao/tasks.md`
 - [x] T085 Validate keyboard operation, focus visibility, Portuguese copy, Poppins/assets, 1440×900 and 1280×720 layouts, and reduced motion against `design-system/readme.md`, recording findings in `specs/005-fundacao-app-autenticacao/quickstart.md`
 - [x] T086 Validate that no final dashboard, cadastro, MMS, assistência, ocorrência, tarefa, custo, deslocamento, produtividade, eficiência, mobile app, external integration, or new permission model was introduced, recording the constitution re-check in `specs/005-fundacao-app-autenticacao/tasks.md`
-- [x] T087 Execute every scenario in `specs/005-fundacao-app-autenticacao/quickstart.md` and record the final acceptance result in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [ ] T087 Execute every scenario in `specs/005-fundacao-app-autenticacao/quickstart.md` and record the final acceptance result in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **T078–T081 evidence (2026-06-27):**
 
@@ -578,9 +585,10 @@ codebase:
   `registrar_evento_autenticacao` RPC from Phase 2 (T019), which itself does
   not change any RLS policy or permission boundary (re-confirmed in
   `supabase/policies/autenticacao_web.md`).
-- `supabase/migrations/` contains exactly one new migration for this
-  feature (`20260626230929_auditoria_autenticacao_web.sql`), adding only the
-  audit RPC — no new table, view, or column.
+- `supabase/migrations/` contains the original audit RPC migration
+  (`20260626230929_auditoria_autenticacao_web.sql`) and its security-hardening
+  migration (`20260627172235_endurecer_rpc_auditoria_autenticacao.sql`);
+  neither adds a table, view, column, RLS policy or new permission model.
 - Conclusion: **no constitutional violation found**; Phase 7 introduces only
   documentation, tests, and polish, and does not add any module
   functionality, permission model, or integration beyond what Phases 1–6
@@ -673,6 +681,37 @@ limitation was worked around by skipping or weakening an assertion; every
 self-skip is explicit (`test.skip` with a named environment-variable guard)
 and every "not executed" item above is stated plainly rather than implied as
 passing.
+
+**Correction audit and manual acceptance (2026-06-27; supersedes stale counts
+and execution claims above):**
+
+- The user manually approved all 10 requested browser scenarios: login/session
+  restoration; logout plus direct URL; Operator, Supervisao and
+  Direcao/Administracao profiles; neutral unavailable module; blocked users;
+  not-found page; password recovery; and visual/keyboard behavior.
+- `npm run typecheck` passed; `npm run lint` completed with 0 errors and 4
+  Fast Refresh warnings; `npm run test` passed with **14 files and 111/111
+  tests**; and `npm run build` passed with split React/Supabase bundles and no
+  chunk-size warning.
+- `navigation-shell.spec.ts` passed **20/20** scenarios in Chromium, covering
+  all three profiles at 1440x900 and 1280x720, unavailable destinations,
+  logout/direct-URL denial and PT-BR not-found behavior.
+- The authentication audit hardening migration
+  `20260627172235_endurecer_rpc_auditoria_autenticacao.sql` was applied to the
+  approved validation project. The public RPC is now `SECURITY INVOKER`; its
+  privileged writer is private, has an empty `search_path`, checks
+  `auth.uid()`, and denies `anon`. The remote transactional smoke test passed.
+  The security advisor no longer reports an RPC privilege/search-path issue;
+  only the project-level leaked-password-protection warning remains.
+- The 3-second login performance assertion did not pass against the remote
+  validation project (observed approximately 5.3-5.6 seconds). This was not
+  hidden by weakening identity confirmation. It remains to be measured in the
+  intended local/deployment environment.
+- Docker, Mailpit and a test-runner `SUPABASE_SERVICE_ROLE_KEY` remain
+  unavailable here. Therefore T041, T055, T068, T077, T082, T084 and T087 are
+  intentionally open until their exact automated commands/scenarios run.
+  Manual acceptance is evidence for T085, not a substitute for those
+  environment-dependent automated checks.
 
 ---
 

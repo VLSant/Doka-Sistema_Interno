@@ -56,7 +56,7 @@ for (const viewport of VIEWPORTS) {
         await login(page, profile.email);
         await page.goto("/app/ocorrencias");
 
-        await expect(page.getByText(/ainda n[aã]o dispon[ií]vel/i)).toBeVisible();
+        await expect(page.getByRole("heading", { name: /Ocorrências ainda não disponível/i })).toBeVisible();
         await expect(page.getByRole("table")).toHaveCount(0);
       });
 

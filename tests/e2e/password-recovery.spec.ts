@@ -38,7 +38,7 @@ test.describe("Recuperacao de senha", () => {
   test("redefinir senha sem link de recuperacao valido mostra falha segura", async ({ page }) => {
     await page.goto("/redefinir-senha");
 
-    await expect(page.getByText(/link.*invalido|nao foi possivel confirmar/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /link.*invalido/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /solicitar novo link/i })).toBeVisible();
   });
 
@@ -89,6 +89,6 @@ test.describe("Recuperacao de senha", () => {
 
     // Reusing the same recovery link a second time must fail safely.
     await page.goto(recoveryLink as string);
-    await expect(page.getByText(/link.*invalido|expirad/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /link.*invalido|expirad/i })).toBeVisible();
   });
 });

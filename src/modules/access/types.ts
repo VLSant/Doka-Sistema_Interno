@@ -43,7 +43,6 @@ export interface OperationalAccessContext {
 export type AccessBlockedReason =
   | "sem_configuracao_operacional"
   | "configuracao_ambigua"
-  | "usuario_inativo_ou_removido"
   | "perfil_invalido"
   | "sem_posto_autorizado";
 

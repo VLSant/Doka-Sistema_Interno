@@ -80,12 +80,6 @@ export const configuracaoAmbiguaResult: OperationalAccessResult = {
   reason: "configuracao_ambigua",
 };
 
-/** Inactive or soft-deleted `usuarios` row. */
-export const usuarioInativoResult: OperationalAccessResult = {
-  status: "bloqueado",
-  reason: "usuario_inativo_ou_removido",
-};
-
 /** Operador/Supervisao with zero eligible postos. */
 export const semPostoAutorizadoResult: OperationalAccessResult = {
   status: "bloqueado",

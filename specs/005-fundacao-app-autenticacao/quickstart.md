@@ -252,13 +252,14 @@ as such rather than claimed as a live visual capture.
   transition-based affordances (sidebar hover, focus ring transition, button
   press) degrade safely for users who request reduced motion, app-wide,
   with no component opting out of this default.
-- **Limitation**: no live screenshot/manual browser capture was produced in
-  this environment because exercising an authenticated route requires a real
-  Supabase session (local stack unavailable here). If/when a local Supabase
-  + Mailpit stack is available, re-run this checklist visually as a
-  follow-up using `npm run dev` plus the seeded test users in
-  `supabase/seed/fundacao_operacional_seed.sql`, and replace this structural
-  validation with direct screenshots if stronger evidence is desired.
+- **Manual acceptance update (2026-06-27)**: the user executed and approved
+  the requested live-browser checklist for login/session restoration,
+  logout/direct URL, all three profiles, unavailable module, blocked users,
+  not-found, password recovery, visual layout and keyboard operation. This
+  replaces the earlier structural-only limitation for T085. Automated
+  Mailpit, service-role permission mutation, local pgTAP and the 3-second
+  deployment performance budget remain separate environment-dependent
+  checks, as recorded in `tasks.md`.
 
 ## Final Security Review
 

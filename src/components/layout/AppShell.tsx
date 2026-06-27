@@ -3,11 +3,9 @@
  * around a route `Outlet`, with desktop responsive constraints
  * (`route-navigation-contract.md` "Desktop Validation").
  *
- * Reads the operational context from `AuthProvider`'s `autorizado` state
- * only; renders nothing of the shell otherwise (the surrounding
- * `ProtectedRoute` in `router.tsx` already guarantees this component is
- * only mounted once the route guard outcome is exactly `autorizado`, but
- * this component defends independently in case it is reused elsewhere).
+ * Reads identity/profile/postos only from the `autorizado` state. The Outlet
+ * remains mounted while a route revalidation temporarily clears that state,
+ * allowing ProtectedRoute to finish the check without a remount loop.
  */
 import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
@@ -19,11 +17,7 @@ export function AppShell() {
   const { state, signOut } = useAuth();
   const navigate = useNavigate();
 
-  if (state.name !== "autorizado") {
-    return null;
-  }
-
-  const { context } = state;
+  const context = state.name === "autorizado" ? state.context : null;
 
   async function handleLogout() {
     await signOut();
@@ -32,11 +26,13 @@ export function AppShell() {
 
   return (
     <div className="doka-app-shell">
-      <Sidebar perfil={context.perfil} />
-      <div className="doka-app-shell__content">
-        <header className="doka-app-shell__header">
-          <UserContextPanel context={context} onLogout={handleLogout} />
-        </header>
+      {context ? <Sidebar key="sidebar" perfil={context.perfil} /> : null}
+      <div key="content" className="doka-app-shell__content">
+        {context ? (
+          <header className="doka-app-shell__header">
+            <UserContextPanel context={context} onLogout={handleLogout} />
+          </header>
+        ) : null}
         <main className="doka-app-shell__main">
           <Outlet />
         </main>

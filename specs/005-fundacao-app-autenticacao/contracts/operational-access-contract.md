@@ -72,9 +72,12 @@ Blocked reason is an internal discriminated value:
 
 - `sem_configuracao_operacional`
 - `configuracao_ambigua`
-- `usuario_inativo_ou_removido`
 - `perfil_invalido`
 - `sem_posto_autorizado`
+
+Usuário inativo ou removido é bloqueado pela própria consulta/RLS e, portanto,
+produz `sem_configuracao_operacional`; o navegador não tenta distinguir a
+existência de um cadastro que não pode visualizar.
 
 The user-facing message groups sensitive reasons into “Configuração operacional
 indisponível. Procure a administração”, except for temporary technical failure.

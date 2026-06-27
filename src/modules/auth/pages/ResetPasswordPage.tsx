@@ -5,7 +5,6 @@
  * reused recovery authorizations must show a safe failure with an option to
  * request a new link.").
  */
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
@@ -16,7 +15,6 @@ import { ResetPasswordForm } from "../components/ResetPasswordForm";
 export function ResetPasswordPage() {
   const { recoveryState, confirmNewPassword } = useAuth();
   const navigate = useNavigate();
-  const [completed, setCompleted] = useState(false);
 
   if (recoveryState !== "valido") {
     return (
@@ -33,21 +31,10 @@ export function ResetPasswordPage() {
     );
   }
 
-  if (completed) {
-    return (
-      <FeedbackState
-        tone="neutral"
-        title="Senha atualizada"
-        description="Sua senha foi atualizada com sucesso. Entre novamente com a nova senha."
-        actions={<Button onClick={() => navigate("/login", { replace: true })}>Ir para o login</Button>}
-      />
-    );
-  }
-
   async function handleSubmit(newPassword: string) {
     const result = await confirmNewPassword(newPassword);
     if (result.ok) {
-      setCompleted(true);
+      navigate("/login", { replace: true });
     }
     return result;
   }

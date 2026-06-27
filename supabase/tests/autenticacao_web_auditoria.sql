@@ -219,4 +219,39 @@ select public.assert_true(
   'authenticated deve executar registrar_evento_autenticacao'
 );
 
+select public.assert_true(
+  exists (
+    select 1
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+      and p.proname = 'registrar_evento_autenticacao'
+      and p.prosecdef = false
+      and p.proconfig @> array['search_path=""']
+  ),
+  'RPC publica deve ser SECURITY INVOKER com search_path vazio'
+);
+
+select public.assert_true(
+  exists (
+    select 1
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'app_private'
+      and p.proname = 'registrar_evento_autenticacao'
+      and p.prosecdef = true
+      and p.proconfig @> array['search_path=""']
+  ),
+  'escritor privilegiado deve permanecer no schema privado com search_path vazio'
+);
+
+select public.assert_true(
+  not has_function_privilege(
+    'anon',
+    'app_private.registrar_evento_autenticacao(text)',
+    'EXECUTE'
+  ),
+  'anon nao deve executar o escritor privado'
+);
+
 drop function public.assert_true(boolean, text);

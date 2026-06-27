@@ -75,20 +75,12 @@ export function createAuthService(
     },
 
     async signOut(): Promise<void> {
-      // Audit before revocation, but never let an audit failure prevent the
-      // session from being cleared (`audit-contract.md` Client Behavior).
-      try {
-        await resolvedAudit.registrarEvento("sessao_encerrada");
-      } catch {
-        // best-effort
-      }
-
-      try {
-        await resolvedClient.auth.signOut({ scope: "local" });
-      } catch {
-        // Logout must still be considered "completed" locally even if the
-        // network call fails; the caller clears local state regardless.
-      }
+      // Start the best-effort authenticated audit and local revocation
+      // together. A slow audit endpoint must never postpone removal of the
+      // browser session (`audit-contract.md` Client Behavior).
+      const auditPromise = resolvedAudit.registrarEvento("sessao_encerrada");
+      const revocationPromise = resolvedClient.auth.signOut({ scope: "local" });
+      await Promise.allSettled([auditPromise, revocationPromise]);
     },
 
     onAuthStateChange(listener: AuthListener): () => void {
