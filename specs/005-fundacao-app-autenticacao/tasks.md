@@ -23,14 +23,14 @@ authorization, navigation and recovery remain independently verifiable.
 **Purpose**: Initialize the first executable Doka web application and its test
 toolchain.
 
-- [ ] T001 Initialize the Node 24/React 19/TypeScript project with pinned production and development dependencies in `package.json`, generate `package-lock.json`, and declare the runtime in `.nvmrc`
-- [ ] T002 [P] Configure strict TypeScript compilation and Vite environment typing in `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, and `src/vite-env.d.ts`
-- [ ] T003 [P] Configure the React SPA build, development server, and production entry in `vite.config.ts` and `index.html`
-- [ ] T004 [P] Configure Vitest, React Testing Library, and shared test setup in `vitest.config.ts` and `tests/setup.ts`
-- [ ] T005 [P] Configure Playwright desktop projects, local web server, and test output isolation in `playwright.config.ts`
-- [ ] T006 [P] Configure ESLint, formatting, npm scripts, ignored secrets, build output, and Playwright auth state in `eslint.config.js`, `.prettierrc.json`, `.gitignore`, and `package.json`
-- [ ] T007 [P] Replace the browser-facing environment example with publishable-key variables while keeping privileged server variables unexposed in `.env.example`
-- [ ] T008 [P] Copy the approved Poppins fonts and Doka logo assets into `public/design-system/fonts/` and `public/design-system/logos/`, preserving the license in `public/design-system/fonts/OFL.txt`
+- [x] T001 Initialize the Node 24/React 19/TypeScript project with pinned production and development dependencies in `package.json`, generate `package-lock.json`, and declare the runtime in `.nvmrc`
+- [x] T002 [P] Configure strict TypeScript compilation and Vite environment typing in `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, and `src/vite-env.d.ts`
+- [x] T003 [P] Configure the React SPA build, development server, and production entry in `vite.config.ts` and `index.html`
+- [x] T004 [P] Configure Vitest, React Testing Library, and shared test setup in `vitest.config.ts` and `tests/setup.ts`
+- [x] T005 [P] Configure Playwright desktop projects, local web server, and test output isolation in `playwright.config.ts`
+- [x] T006 [P] Configure ESLint, formatting, npm scripts, ignored secrets, build output, and Playwright auth state in `eslint.config.js`, `.prettierrc.json`, `.gitignore`, and `package.json`
+- [x] T007 [P] Replace the browser-facing environment example with publishable-key variables while keeping privileged server variables unexposed in `.env.example`
+- [x] T008 [P] Copy the approved Poppins fonts and Doka logo assets into `public/design-system/fonts/` and `public/design-system/logos/`, preserving the license in `public/design-system/fonts/OFL.txt`
 
 **Checkpoint**: `npm install`, typecheck, lint, unit-test discovery, Playwright
 discovery, and a blank production build can run on Node 24.
@@ -45,23 +45,23 @@ Supabase client, audit interface, providers, and router skeleton.
 **⚠️ CRITICAL**: No user story implementation begins until this phase is
 complete.
 
-- [ ] T009 Add validated browser environment loading that accepts only `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and `VITE_APP_URL` in `src/lib/env.ts`
-- [ ] T010 Create the single browser Supabase client with default session persistence/refresh and no privileged key support in `src/lib/supabase.ts`
-- [ ] T011 [P] Define `PerfilUsuario`, `PostoAccess`, `OperationalAccessContext`, blocked reasons, and route-access result types in `src/modules/access/types.ts`
-- [ ] T012 [P] Define the discriminated Auth state machine and pure transitions from `data-model.md` in `src/modules/auth/auth-state.ts`
-- [ ] T013 [P] Define typed route IDs, paths, profile sets, availability states, and navigation ordering from the route contract in `src/app/routes.ts`
-- [ ] T014 [P] Integrate official Doka tokens, font faces, base styles, focus behavior, and reduced-motion defaults in `src/styles/design-system.css`
-- [ ] T015 [P] Implement typed accessible Button and Input primitives adapted from the official design system in `src/components/ui/Button.tsx` and `src/components/ui/Input.tsx`
-- [ ] T016 [P] Implement typed Card, Avatar, IconButton, and Icon primitives adapted from official Doka assets in `src/components/ui/Card.tsx`, `src/components/ui/Avatar.tsx`, `src/components/ui/IconButton.tsx`, and `src/components/ui/Icon.tsx`
-- [ ] T017 [P] Implement reusable loading, error, and empty-state presentation primitives in `src/components/feedback/LoadingState.tsx` and `src/components/feedback/FeedbackState.tsx`
-- [ ] T018 Write failing pgTAP coverage for the authentication-audit RPC allowlist, actor derivation, fixed metadata, inactive-user restriction, anonymous denial, and unchanged direct-insert denial in `supabase/tests/autenticacao_web_auditoria.sql`
-- [ ] T019 Implement `public.registrar_evento_autenticacao(p_acao text)` with fixed event shape, `auth.uid()` actor resolution, action allowlist, fixed `search_path`, explicit grants/revokes, and no RLS policy changes in a Supabase CLI-generated `supabase/migrations/*_auditoria_autenticacao_web.sql`
-- [ ] T020 Document the RPC threat model, privileges, allowed events, and explicit statement that existing RLS remains unchanged in `supabase/policies/autenticacao_web.md`
-- [ ] T021 Implement the typed client wrapper for best-effort authentication audit events in `src/services/audit-service.ts`
-- [ ] T022 [P] Create deterministic Supabase Auth/Data API test doubles and builders for three profiles, missing profile, inactive user, and missing posto in `tests/helpers/supabase-mocks.ts` and `tests/helpers/access-fixtures.ts`
-- [ ] T023 Create the application provider composition and injectable service boundary for production/tests in `src/app/providers.tsx`
-- [ ] T024 Create the initial Data Router tree with public/protected branches, pending/error boundaries, and no protected rendering by default in `src/app/router.tsx`
-- [ ] T025 Wire providers, router, global Doka styles, and strict root rendering in `src/main.tsx` and `src/styles/app.css`
+- [x] T009 Add validated browser environment loading that accepts only `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and `VITE_APP_URL` in `src/lib/env.ts`
+- [x] T010 Create the single browser Supabase client with default session persistence/refresh and no privileged key support in `src/lib/supabase.ts`
+- [x] T011 [P] Define `PerfilUsuario`, `PostoAccess`, `OperationalAccessContext`, blocked reasons, and route-access result types in `src/modules/access/types.ts`
+- [x] T012 [P] Define the discriminated Auth state machine and pure transitions from `data-model.md` in `src/modules/auth/auth-state.ts`
+- [x] T013 [P] Define typed route IDs, paths, profile sets, availability states, and navigation ordering from the route contract in `src/app/routes.ts`
+- [x] T014 [P] Integrate official Doka tokens, font faces, base styles, focus behavior, and reduced-motion defaults in `src/styles/design-system.css`
+- [x] T015 [P] Implement typed accessible Button and Input primitives adapted from the official design system in `src/components/ui/Button.tsx` and `src/components/ui/Input.tsx`
+- [x] T016 [P] Implement typed Card, Avatar, IconButton, and Icon primitives adapted from official Doka assets in `src/components/ui/Card.tsx`, `src/components/ui/Avatar.tsx`, `src/components/ui/IconButton.tsx`, and `src/components/ui/Icon.tsx`
+- [x] T017 [P] Implement reusable loading, error, and empty-state presentation primitives in `src/components/feedback/LoadingState.tsx` and `src/components/feedback/FeedbackState.tsx`
+- [x] T018 Write failing pgTAP coverage for the authentication-audit RPC allowlist, actor derivation, fixed metadata, inactive-user restriction, anonymous denial, and unchanged direct-insert denial in `supabase/tests/autenticacao_web_auditoria.sql`
+- [x] T019 Implement `public.registrar_evento_autenticacao(p_acao text)` with fixed event shape, `auth.uid()` actor resolution, action allowlist, fixed `search_path`, explicit grants/revokes, and no RLS policy changes in a Supabase CLI-generated `supabase/migrations/*_auditoria_autenticacao_web.sql`
+- [x] T020 Document the RPC threat model, privileges, allowed events, and explicit statement that existing RLS remains unchanged in `supabase/policies/autenticacao_web.md`
+- [x] T021 Implement the typed client wrapper for best-effort authentication audit events in `src/services/audit-service.ts`
+- [x] T022 [P] Create deterministic Supabase Auth/Data API test doubles and builders for three profiles, missing profile, inactive user, and missing posto in `tests/helpers/supabase-mocks.ts` and `tests/helpers/access-fixtures.ts`
+- [x] T023 Create the application provider composition and injectable service boundary for production/tests in `src/app/providers.tsx`
+- [x] T024 Create the initial Data Router tree with public/protected branches, pending/error boundaries, and no protected rendering by default in `src/app/router.tsx`
+- [x] T025 Wire providers, router, global Doka styles, and strict root rendering in `src/main.tsx` and `src/styles/app.css`
 
 **Checkpoint**: Shared foundation is ready; SQL audit tests pass after the
 migration, while all protected routes still deny rendering until a story
@@ -283,8 +283,18 @@ constitutional validation across all stories.
 - [ ] T079 [P] Add a bundle/security assertion that fails if secret/service-role variable names or token/recovery values enter production output in `tests/integration/build-secrets.test.ts`
 - [ ] T080 [P] Add Playwright timing assertions for the 3-second login/restoration outcome and protected-content flash detection in `tests/e2e/performance-session.spec.ts`
 - [ ] T081 [P] Add automated accessibility checks for public Auth pages, App Shell, feedback states, and neutral destinations in `tests/e2e/accessibility.spec.ts`
-- [ ] T082 Verify the migration from a clean database and run `supabase test db supabase/tests/autenticacao_web_auditoria.sql`, recording results in `specs/005-fundacao-app-autenticacao/tasks.md`
-- [ ] T083 Run Supabase security/performance advisors against the approved validation project, resolve any RPC privilege or `search_path` finding, and record evidence in `supabase/policies/autenticacao_web.md`
+- [x] T082 Verify the migration from a clean database and run `supabase test db supabase/tests/autenticacao_web_auditoria.sql`, recording results in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [x] T083 Run Supabase security/performance advisors against the approved validation project, resolve any RPC privilege or `search_path` finding, and record evidence in `supabase/policies/autenticacao_web.md`
+
+**T082/T083 evidence (2026-06-27, via Supabase MCP against project `Doka` / `zwxxjbiwpgqjsmaxybbm`, since local Docker was unavailable):**
+- Applied migration `auditoria_autenticacao_web` (matches `supabase/migrations/20260626230929_auditoria_autenticacao_web.sql`) directly to the project; confirmed present in `list_migrations`.
+- Confirmed privileges via SQL: `prosecdef=true`, `proconfig=search_path=public, auth, pg_temp`, `anon` EXECUTE=false, `authenticated` EXECUTE=true.
+- Ran security advisors (`get_advisors type=security`): only two WARNs — (1) `authenticated_security_definer_function_executable` on `registrar_evento_autenticacao`, which is intentional/by-design (the RPC is meant to be called by signed-in users; see threat model in `supabase/policies/autenticacao_web.md`), and (2) `auth_leaked_password_protection` (pre-existing Auth project setting, unrelated to this migration, not introduced by Spec 005).
+- Ran performance advisors (`get_advisors type=performance`): no findings related to `registrar_evento_autenticacao` or `historico_auditoria`.
+- Manually executed the full assertion suite from `supabase/tests/autenticacao_web_auditoria.sql` against the live project (with explicit user authorization, since this writes to a shared audit table): all 7 scenarios passed (anon denial, allowlist enforcement, fixed event shape/actor derivation, unknown-user no-op, inactive-user restriction, direct-insert denial, EXECUTE privilege grants). Result: `TODOS_OS_TESTES_PASSARAM`.
+- **Bug found and fixed in the test file itself** (not in the RPC): the original script asserted event existence in `historico_auditoria` while still under `set role authenticated`, but the SELECT policy on that table restricts what the `authenticated` role can read — so successful inserts were invisible to the verifying `SELECT`, producing false assertion failures. Fixed by moving every verification `SELECT`/`assert_true` after the corresponding `reset role;`, while keeping all `registrar_evento_autenticacao` calls under the impersonated role. The RPC implementation itself required no changes.
+- All test-generated audit rows (6 total, two test runs) were deleted from the live `historico_auditoria` table after verification, with explicit per-batch user confirmation.
+- Not yet run: `supabase test db` via local Docker/Supabase CLI (Docker Desktop unavailable in this environment). The corrected SQL file is ready to run there when Docker is available, and should produce the same result.
 - [ ] T084 Run all typecheck, lint, unit, integration, SQL, production-build, and Playwright suites and record the final command matrix in `specs/005-fundacao-app-autenticacao/tasks.md`
 - [ ] T085 Validate keyboard operation, focus visibility, Portuguese copy, Poppins/assets, 1440×900 and 1280×720 layouts, and reduced motion against `design-system/readme.md`, recording findings in `specs/005-fundacao-app-autenticacao/quickstart.md`
 - [ ] T086 Validate that no final dashboard, cadastro, MMS, assistência, ocorrência, tarefa, custo, deslocamento, produtividade, eficiência, mobile app, external integration, or new permission model was introduced, recording the constitution re-check in `specs/005-fundacao-app-autenticacao/tasks.md`

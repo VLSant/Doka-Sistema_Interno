@@ -40,6 +40,15 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000001', true);
 
 select public.registrar_evento_autenticacao('acesso_interno_concedido');
+select public.registrar_evento_autenticacao('sessao_encerrada');
+select public.registrar_evento_autenticacao('sessao_expirada_detectada');
+
+-- Importante: a policy de SELECT em historico_auditoria restringe o que a
+-- role authenticated pode ler. As asserções de existência abaixo devem
+-- correr OUTSIDE do "set role authenticated" (após reset role), senão a
+-- query de verificação enxerga 0 linhas mesmo com o insert tendo
+-- ocorrido com sucesso.
+reset role;
 
 select public.assert_true(
   exists (
@@ -55,8 +64,6 @@ select public.assert_true(
   'acesso_interno_concedido deve gravar evento com formato fixo e ator derivado de auth.uid()'
 );
 
-select public.registrar_evento_autenticacao('sessao_encerrada');
-
 select public.assert_true(
   exists (
     select 1 from public.historico_auditoria
@@ -66,8 +73,6 @@ select public.assert_true(
   ),
   'sessao_encerrada deve ser uma acao permitida para usuario ativo'
 );
-
-select public.registrar_evento_autenticacao('sessao_expirada_detectada');
 
 select public.assert_true(
   exists (
@@ -82,6 +87,9 @@ select public.assert_true(
 -- ---------------------------------------------------------------------------
 -- 3. Acao fora da allowlist deve ser rejeitada e nao deve gravar nada.
 -- ---------------------------------------------------------------------------
+set role authenticated;
+select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000001', true);
+
 do $$
 begin
   perform public.registrar_evento_autenticacao('acao_inexistente');
@@ -95,6 +103,8 @@ exception
 end
 $$;
 
+reset role;
+
 select public.assert_true(
   not exists (
     select 1 from public.historico_auditoria
@@ -102,8 +112,6 @@ select public.assert_true(
   ),
   'acao fora da allowlist nao deve gravar evento'
 );
-
-reset role;
 
 -- ---------------------------------------------------------------------------
 -- 4. Usuario sem registro operacional (auth.uid sem linha em usuarios) nao
@@ -113,6 +121,8 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', '99999999-9999-9999-9999-999999999999', true);
 
 select public.registrar_evento_autenticacao('acesso_interno_concedido');
+
+reset role;
 
 select public.assert_true(
   not exists (
@@ -142,6 +152,9 @@ set role authenticated;
 select set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000005', true);
 
 select public.registrar_evento_autenticacao('acesso_operacional_bloqueado');
+select public.registrar_evento_autenticacao('acesso_interno_concedido');
+
+reset role;
 
 select public.assert_true(
   exists (
@@ -152,8 +165,6 @@ select public.assert_true(
   ),
   'usuario inativo deve poder gerar acesso_operacional_bloqueado'
 );
-
-select public.registrar_evento_autenticacao('acesso_interno_concedido');
 
 select public.assert_true(
   not exists (
