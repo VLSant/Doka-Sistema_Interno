@@ -198,6 +198,68 @@ Validate at 1440×900 and 1280×720:
 - Disabled module items communicate “Ainda não disponível”.
 - No fake module data appears.
 
+## T085 Findings (2026-06-27): Visual/Accessibility Validation Against the Design System
+
+Validated by reading the implemented CSS/components against
+`design-system/readme.md`, `design-system/tokens/*`, and the contracts in
+`contracts/route-navigation-contract.md`. Live browser capture with a real
+authenticated session was **not** performed in this environment (no local
+Supabase/Mailpit available — see the T084/T087 evidence in `tasks.md`); the
+findings below are a structural/code-level validation, called out explicitly
+as such rather than claimed as a live visual capture.
+
+- **Keyboard operation**: `Sidebar.tsx` renders enabled entries as real
+  `NavLink` anchors (focusable, `Enter`-activatable by default) and disabled
+  entries as `<span aria-disabled="true">` with no `tabIndex`/`href`, so
+  unavailable items are correctly excluded from the Tab sequence instead of
+  being a focusable dead end (`src/components/layout/Sidebar.tsx`). Forms
+  (`Button.tsx`/`Input.tsx` in `src/components/ui/`) reuse native
+  `<button>`/`<input>` elements, preserving default keyboard semantics.
+- **Focus visibility**: a single global `:focus-visible` rule in
+  `src/styles/design-system.css` (`outline: none; box-shadow: var(--ring);`)
+  applies to every interactive element app-wide — there is no component that
+  removes `outline` without providing this replacement, so focus remains
+  visible for keyboard users on links, buttons, and form fields throughout
+  Auth pages, the App Shell, and feedback states.
+- **Portuguese copy**: every page/component read in `src/modules/auth/pages`,
+  `src/modules/navigation/pages`, `src/modules/access`, `src/components/layout`,
+  and `src/app/routes.ts` (route `label`s) uses PT-BR text exclusively
+  ("Entrar", "Sair", "Ainda não disponível", "Página não encontrada",
+  "Dashboard", "Cadastros", "Histórico / Auditoria", etc.); no English UI
+  string was found in the reviewed source.
+- **Poppins/assets**: `src/styles/design-system.css` declares `@font-face`
+  for all 8 official Poppins weights/styles, self-hosted from
+  `/design-system/fonts/*.ttf` (copied from `design-system/assets/fonts/poppins/`
+  into `public/design-system/fonts/` in Setup, T008); `--font-sans`/
+  `--font-display` resolve to `"Poppins", ...` and are the only font stack
+  used by `body`/headings. The production build (`npm run build`) emits
+  `dist/design-system/fonts/*` and `dist/design-system/logos/*` verified
+  present after the Phase 7 build, confirming the fonts/logo assets resolve
+  in the built app, not just in dev.
+- **1440×900 / 1280×720 layouts**: `AppShell.css` sets `min-width: 1280px`
+  on `.doka-app-shell` (matching the global `body { min-width: 1280px;
+  overflow-x: auto; }` rule in `src/styles/app.css`) and a fixed
+  `--sidebar-w: 248px` sidebar column, so the App Shell never clips its two
+  columns at either validation viewport; `tests/e2e/navigation-shell.spec.ts`
+  (T059) already encodes both exact viewports (1440×900, 1280×720) per
+  profile as Playwright assertions for visible logo/profile/logout/menu
+  items without truncation — not executed live here (Docker unavailable),
+  but the CSS constraints back the same claim structurally.
+- **Reduced motion**: `src/styles/design-system.css` includes a global
+  `@media (prefers-reduced-motion: reduce)` block forcing
+  `animation-duration`/`transition-duration` to `0.001ms` and
+  `scroll-behavior: auto` on every element (`*, *::before, *::after`), so all
+  transition-based affordances (sidebar hover, focus ring transition, button
+  press) degrade safely for users who request reduced motion, app-wide,
+  with no component opting out of this default.
+- **Limitation**: no live screenshot/manual browser capture was produced in
+  this environment because exercising an authenticated route requires a real
+  Supabase session (local stack unavailable here). If/when a local Supabase
+  + Mailpit stack is available, re-run this checklist visually as a
+  follow-up using `npm run dev` plus the seeded test users in
+  `supabase/seed/fundacao_operacional_seed.sql`, and replace this structural
+  validation with direct screenshots if stronger evidence is desired.
+
 ## Final Security Review
 
 - Browser bundle contains only the publishable key.

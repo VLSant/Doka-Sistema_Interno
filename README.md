@@ -65,9 +65,16 @@ Ficam fora do MVP:
 
 ### Frontend
 
-O frontend ainda deve ser definido/implementado.
+- **React 19** + **TypeScript** + **Vite 8**, SPA client-side (sem backend
+  próprio), conectando diretamente ao Supabase sob RLS.
+- **React Router** (Data Mode) para roteamento e proteção de rotas.
+- **Vitest** + **React Testing Library** para testes unitários/integração;
+  **Playwright** para testes end-to-end.
+- Design system Doka (Poppins, paleta oficial, componentes) em
+  `design-system/` e `public/design-system/`.
 
-Quando a aplicação for criada, este README deverá ser atualizado com os comandos finais de instalação e execução.
+A primeira aplicação executável (Spec 005 — Fundação, Autenticação e
+Navegação) já está implementada em `src/`.
 
 ## Estado atual do repositório
 
@@ -89,6 +96,22 @@ Ainda pode não existir uma aplicação frontend executável até que a implemen
 
 ## Como rodar localmente
 
+### 0. Pré-requisitos
+
+- **Node.js 24 LTS** (versão pinada em `.nvmrc`). Com `nvm`:
+
+  ```bash
+  nvm install 24.18.0
+  nvm use 24.18.0
+  ```
+
+- **npm** (incluído com o Node 24); o `package-lock.json` é a fonte de
+  verdade das versões instaladas.
+- **Supabase CLI** instalado, para rodar o stack local (Auth, Postgres,
+  Storage e **Mailpit** — usado para visualizar os e-mails de recuperação
+  de senha em `http://localhost:54324` durante o desenvolvimento local).
+  Requer Docker Desktop em execução.
+
 ### 1. Clonar o repositório
 
 ```bash
@@ -99,37 +122,37 @@ cd Doka
 ### 2. Criar arquivo de ambiente
 
 ```bash
-cp .env.example .env
+cp .env.example .env.local
 ```
 
-Preencha as variáveis:
+O app web (Vite) só lê variáveis com o prefixo `VITE_` e **somente valores
+publicáveis** — nunca a chave secreta/`service_role`:
 
 ```env
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-APP_ENV=development
-APP_NAME=Doka
-MMS_IMPORT_BUCKET=mms-importacoes
+VITE_SUPABASE_URL=https://PROJECT_REF.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_REPLACE_ME
+VITE_APP_URL=http://localhost:5173
 ```
 
-### 3. Instalar dependências do app
+Em desenvolvimento local com `supabase start`, `VITE_SUPABASE_URL` e
+`VITE_SUPABASE_PUBLISHABLE_KEY` correspondem à URL/chave publicável (`anon`)
+exibidas por `supabase status`.
 
-Quando o frontend/backend Node for criado, usar:
+As demais variáveis do `.env.example` (`SUPABASE_URL`, `SUPABASE_ANON_KEY`,
+`SUPABASE_SERVICE_ROLE_KEY`, `MMS_IMPORT_BUCKET`, etc.) são para uso
+server-side/scripts (ex.: importação MMS) e **nunca** devem ser prefixadas
+com `VITE_` nem expostas ao navegador. O `service_role` em particular nunca
+deve aparecer no `.env.local` do app web nem em nenhum arquivo versionado.
+
+### 3. Instalar dependências do app
 
 ```bash
 npm install
 ```
 
-ou, se o projeto usar pnpm:
-
-```bash
-pnpm install
-```
-
 ### 4. Rodar Supabase localmente
 
-Pré-requisito: Supabase CLI instalado.
+Pré-requisito: Supabase CLI e Docker Desktop instalados e em execução.
 
 ```bash
 supabase start
@@ -147,23 +170,74 @@ ou, conforme o fluxo adotado:
 supabase migration up
 ```
 
-### 5. Rodar a aplicação
+O `supabase start` local já inclui o **Mailpit**, necessário para o fluxo de
+recuperação de senha (item de UI em `http://localhost:54324`): os e-mails de
+"Recuperar senha" enviados pelo Supabase Auth ficam visíveis ali em vez de
+serem entregues a uma caixa real.
 
-Quando o app frontend for criado:
+### 5. Configurar as URLs de redirect do Auth
+
+No Supabase Auth (local: `supabase/config.toml`; produção: painel do
+projeto), a Site URL e a allowlist de Redirect URLs devem incluir
+exatamente as rotas de login e de definição de nova senha da SPA:
+
+```text
+Site URL (dev):       http://localhost:5173
+Redirect URL (dev):   http://localhost:5173/redefinir-senha
+
+Site URL (prod):      https://SEU_DOMINIO_DE_PRODUCAO
+Redirect URL (prod):  https://SEU_DOMINIO_DE_PRODUCAO/redefinir-senha
+```
+
+Evite redirects com wildcard em produção; o redirect deve ser o caminho
+exato `/redefinir-senha` sobre o domínio HTTPS final, alinhado a
+`VITE_APP_URL`. A rota pública de solicitação de recuperação é
+`/recuperar-senha`.
+
+### 6. Rodar a aplicação
 
 ```bash
 npm run dev
 ```
 
-ou:
+Abre em `http://localhost:5173`.
+
+### 7. Build de produção e deploy como SPA
 
 ```bash
-pnpm dev
+npm run build
+npm run preview
 ```
+
+O build gera uma SPA estática (`dist/`). Como o roteamento é feito no
+cliente (React Router), o servidor/hospedagem de produção precisa
+redirecionar qualquer URL desconhecida para `index.html` (fallback de SPA),
+sem isso a página de "não encontrado" (PT-BR, tratada pelo próprio
+roteador) e o acesso direto a rotas como `/app/dashboard` resultariam em 404
+do servidor em vez de serem resolvidos pela aplicação.
 
 ## Como testar
 
 Como o MVP ainda está em construção, os testes devem ser organizados por camada.
+
+### Testes do app web (frontend)
+
+Comandos npm disponíveis (`package.json`):
+
+```bash
+npm run typecheck   # tsc -b --noEmit
+npm run lint        # eslint .
+npm run format      # prettier --write .
+npm run test        # vitest run (unit + integration)
+npm run test:watch  # vitest (modo watch)
+npm run build       # tsc -b && vite build
+npm run preview     # serve o build de produção localmente
+npm run test:e2e    # playwright test (requer o build/preview ou dev server)
+```
+
+Veja `specs/005-fundacao-app-autenticacao/quickstart.md` para os cenários
+detalhados de autenticação, autorização, navegação e recuperação de senha
+cobertos por esses comandos.
 
 ### Testes de banco
 
