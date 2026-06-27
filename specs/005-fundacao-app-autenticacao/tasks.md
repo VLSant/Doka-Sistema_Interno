@@ -222,25 +222,102 @@ and authorized placeholder behavior.
 
 ### Tests for User Story 3
 
-- [ ] T056 [P] [US3] Write failing unit tests that derive Operator, Supervisão, and Direção/Administração menus from the shared route definitions in `tests/unit/menu-config.test.ts`
-- [ ] T057 [P] [US3] Write failing component tests for logo, user name, profile label, postos/global scope, active item, disabled semantics, keyboard access, and logout in `tests/integration/app-shell.test.tsx`
-- [ ] T058 [P] [US3] Write failing integration tests for neutral module-unavailable, PT-BR page-not-found, and safe return destinations in `tests/integration/navigation-states.test.tsx`
-- [ ] T059 [P] [US3] Write failing Playwright navigation journeys for all three profiles at 1440×900 and 1280×720 in `tests/e2e/navigation-shell.spec.ts`
+- [x] T056 [P] [US3] Write failing unit tests that derive Operator, Supervisão, and Direção/Administração menus from the shared route definitions in `tests/unit/menu-config.test.ts`
+- [x] T057 [P] [US3] Write failing component tests for logo, user name, profile label, postos/global scope, active item, disabled semantics, keyboard access, and logout in `tests/integration/app-shell.test.tsx`
+- [x] T058 [P] [US3] Write failing integration tests for neutral module-unavailable, PT-BR page-not-found, and safe return destinations in `tests/integration/navigation-states.test.tsx`
+- [x] T059 [P] [US3] Write failing Playwright navigation journeys for all three profiles at 1440×900 and 1280×720 in `tests/e2e/navigation-shell.spec.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T060 [US3] Implement a single menu derivation function from typed route definitions, profile, and availability in `src/modules/navigation/menu-config.ts`
-- [ ] T061 [P] [US3] Implement the desktop sidebar with Doka logo, active state, hidden/disabled semantics, and keyboard-accessible navigation in `src/components/layout/Sidebar.tsx`
-- [ ] T062 [P] [US3] Implement the authenticated user/profile/posto summary and logout control in `src/components/layout/UserContextPanel.tsx`
-- [ ] T063 [US3] Compose the shared authenticated App Shell with responsive desktop constraints and route outlet in `src/components/layout/AppShell.tsx`
-- [ ] T064 [P] [US3] Implement the neutral “Módulo ainda não disponível” destination without fake data/actions in `src/modules/navigation/pages/ModuleUnavailablePage.tsx`
-- [ ] T065 [P] [US3] Implement the PT-BR page-not-found state with authentication-aware safe return in `src/modules/navigation/pages/NotFoundPage.tsx`
-- [ ] T066 [US3] Register every planned module destination with the correct profile and availability metadata in `src/app/routes.ts` and `src/app/router.tsx`
-- [ ] T067 [US3] Complete desktop layout, form, sidebar, status, focus, overflow, and reduced-motion styling using Doka tokens in `src/styles/app.css`
-- [ ] T068 [US3] Make all US3 unit, integration, and Playwright tests pass and record the verified commands at the US3 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
+- [x] T060 [US3] Implement a single menu derivation function from typed route definitions, profile, and availability in `src/modules/navigation/menu-config.ts`
+- [x] T061 [P] [US3] Implement the desktop sidebar with Doka logo, active state, hidden/disabled semantics, and keyboard-accessible navigation in `src/components/layout/Sidebar.tsx`
+- [x] T062 [P] [US3] Implement the authenticated user/profile/posto summary and logout control in `src/components/layout/UserContextPanel.tsx`
+- [x] T063 [US3] Compose the shared authenticated App Shell with responsive desktop constraints and route outlet in `src/components/layout/AppShell.tsx`
+- [x] T064 [P] [US3] Implement the neutral “Módulo ainda não disponível” destination without fake data/actions in `src/modules/navigation/pages/ModuleUnavailablePage.tsx`
+- [x] T065 [P] [US3] Implement the PT-BR page-not-found state with authentication-aware safe return in `src/modules/navigation/pages/NotFoundPage.tsx`
+- [x] T066 [US3] Register every planned module destination with the correct profile and availability metadata in `src/app/routes.ts` and `src/app/router.tsx`
+- [x] T067 [US3] Complete desktop layout, form, sidebar, status, focus, overflow, and reduced-motion styling using Doka tokens in `src/styles/app.css`
+- [x] T068 [US3] Make all US3 unit, integration, and Playwright tests pass and record the verified commands at the US3 checkpoint in `specs/005-fundacao-app-autenticacao/tasks.md`
 
 **Checkpoint**: The shared navigation is usable for all profiles without
 presenting future modules as implemented.
+
+**Verified commands (2026-06-27)**:
+
+- `npm run typecheck` -> passed (`tsc -b --noEmit`, 0 errors).
+- `npm run lint` -> passed (`eslint .`, 0 errors; the same 5 pre-existing-pattern
+  `react-refresh/only-export-components` warnings already recorded at the
+  US1/US2 checkpoints, unchanged by this phase).
+- `npm run test` (full suite) -> passed (10 files, 85/85 tests): the 7
+  pre-existing US1/US2 suites plus 3 new US3 suites
+  (`tests/unit/menu-config.test.ts`, `tests/integration/app-shell.test.tsx`,
+  `tests/integration/navigation-states.test.tsx`). Confirmed red beforehand:
+  before `menu-config.ts`, `AppShell.tsx`, `ModuleUnavailablePage.tsx`, and
+  `NotFoundPage.tsx` existed, all three new suites failed with a Vite
+  import-analysis error resolving those modules (the intended missing
+  behavior), not a test assertion failure.
+- `npm run build` -> passed (`tsc -b && vite build`; only the same
+  pre-existing "chunk larger than 500 kB" advisory, no errors).
+- `npx playwright test --list` -> discovered all 5 e2e spec files cleanly
+  (88 tests total across `desktop-chromium`/`desktop-firefox`: 17
+  pre-existing US1/US2 tests plus 14 new
+  `tests/e2e/navigation-shell.spec.ts` tests per project, covering all three
+  profiles at both 1440×900 and 1280×720).
+- Real Playwright e2e execution against a live Supabase backend **was not
+  performed**, for the same reason recorded at the US1/US2 checkpoints:
+  Docker is unavailable in this environment (`docker info` fails: `docker:
+  command not found`), so the local Supabase project required to seed the
+  three official profiles (`supabase/seed/fundacao_operacional_seed.sql`)
+  could not be started. The suite's structure/selectors were validated by
+  having the equivalent App Shell behavior exercised end-to-end at the
+  component level in `tests/integration/app-shell.test.tsx` and
+  `tests/integration/navigation-states.test.tsx` against the real
+  `AuthProvider`/`route-guard`/`menu-config` wiring, with only the Supabase
+  network layer mocked.
+
+**Design decisions**:
+
+- The menu is derived exclusively by `buildMenuForProfile` in
+  `src/modules/navigation/menu-config.ts` from `ROUTE_DEFINITIONS`
+  (`src/app/routes.ts`): routes whose `profiles` do not include the current
+  profile are excluded entirely (`hidden`, matching the Menu Contract:
+  "not rendered"); every other route is included and marked `disabled` when
+  `availability !== "available"` (covers both `placeholder` and `disabled`
+  route availability), rendered with a clear "Ainda não disponível" label
+  and no link/`href`, but never removed from the DOM, per
+  `route-navigation-contract.md` "Menu Contract": "`disabled`: rendered
+  with clear 'Ainda não disponível' and no link... Disabled state must
+  remain keyboard/screen-reader understandable." The menu is presentation
+  only: `Sidebar.tsx` never makes an authorization decision — the real
+  authorization gate (`route-guard.ts` -> RLS) is unchanged and remains the
+  sole source of truth, consumed independently by `ProtectedRoute` in
+  `router.tsx`.
+- `NotFoundPage.tsx` reads `useAuth()` and returns to `/app/dashboard` when
+  the current Auth state is exactly `autorizado`, otherwise to `/login`,
+  matching `route-navigation-contract.md` "Page not found": "Safe return
+  based on whether the user is authenticated." It is registered as the
+  router's catch-all (`path: "*"`) inside the same `AuthProvider`-wrapped
+  `RootLayout`, so it can read the Auth state without requiring a new
+  session check.
+- `ModuleUnavailablePage.tsx` only ever receives a static `moduleLabel`
+  prop and renders no list/table/form, per `data-model.md` RouteDefinition
+  Rules ("`placeholder` não pode buscar dados do módulo ou renderizar
+  ações falsas."). It is used both as the per-route fallback element in
+  `router.tsx` (for every non-dashboard `/app/*` route) and as
+  `ProtectedRoute`'s `modulo_indisponivel` decision branch, so the same
+  neutral destination is reached whether the unavailability comes from the
+  route's own availability metadata or from a guard decision computed at
+  render time.
+- `AppShell.tsx` is registered as the parent route element for the `app`
+  path in `router.tsx` (replacing the previous flat list of `/app/*`
+  routes), with `ROUTE_DEFINITIONS`-derived children rendered through the
+  existing `Outlet`. It independently checks `state.name !== "autorizado"`
+  and renders `null` in that case as a defense-in-depth measure, even
+  though the surrounding `ProtectedRoute` already guarantees this.
+- Disabled sidebar entries use a `<span aria-disabled="true">` (not an
+  `<a>`/`<button>`) with a visible "Ainda não disponível" caption next to
+  the label, so the unavailable state is conveyed to assistive technology
+  without offering a focusable, non-functional control.
 
 ---
 

@@ -32,6 +32,9 @@ import { TemporaryFailurePage } from "../modules/auth/pages/TemporaryFailurePage
 import { AccessDeniedPage } from "../modules/access/AccessDeniedPage";
 import { OperationalConfigurationPage } from "../modules/access/OperationalConfigurationPage";
 import { DashboardPage } from "../modules/navigation/pages/DashboardPage";
+import { ModuleUnavailablePage } from "../modules/navigation/pages/ModuleUnavailablePage";
+import { NotFoundPage } from "../modules/navigation/pages/NotFoundPage";
+import { AppShell } from "../components/layout/AppShell";
 import { ROUTE_DEFINITIONS, type RouteId } from "./routes";
 
 function RootLayout() {
@@ -85,24 +88,14 @@ function ProtectedRoute({ routeId, children }: { routeId: RouteId; children: Rea
   }
 
   if (decision.kind === "modulo_indisponivel") {
-    return (
-      <FeedbackState
-        tone="empty"
-        title={`${route?.label ?? "Modulo"} ainda nao disponivel`}
-        description="Este modulo ainda nao foi implementado nesta etapa."
-      />
-    );
+    return <ModuleUnavailablePage moduleLabel={route?.label ?? "Módulo"} />;
   }
 
   if (decision.kind === "rota_nao_encontrada") {
-    return <NotFoundPlaceholder />;
+    return <NotFoundPage />;
   }
 
   return <>{children}</>;
-}
-
-function NotFoundPlaceholder() {
-  return <FeedbackState tone="empty" title="Pagina nao encontrada" description="Endereco desconhecido." />;
 }
 
 export const router = createBrowserRouter([
@@ -152,6 +145,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "app",
+        element: <AppShell />,
         children: ROUTE_DEFINITIONS.map((route) => ({
           path: route.path.replace(/^\/app\//, ""),
           element: (
@@ -159,11 +153,7 @@ export const router = createBrowserRouter([
               {route.id === "dashboard" ? (
                 <DashboardPage />
               ) : (
-                <FeedbackState
-                  tone="empty"
-                  title={`${route.label} ainda nao disponivel`}
-                  description="Este modulo ainda nao foi implementado nesta etapa."
-                />
+                <ModuleUnavailablePage moduleLabel={route.label} />
               )}
             </ProtectedRoute>
           ),
@@ -171,7 +161,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "*",
-        element: <NotFoundPlaceholder />,
+        element: <NotFoundPage />,
       },
     ],
   },

@@ -1,7 +1,11 @@
 /* ===========================================================================
    Doka · Global application styles
-   Imports the design-system tokens/base, then adds app-shell-level layout
-   rules used across stories (sidebar width, container, full-height root).
+   Imports the design-system tokens/base, then adds app-level layout rules
+   used across stories (full-height root, desktop minimum width, scroll
+   behavior). Component-scoped layout rules (sidebar, app shell, user
+   context panel) live next to their components
+   (`src/components/layout/*.css`) per this codebase's existing convention
+   (see `src/components/ui/*.css`).
    =========================================================================== */
 @import "./design-system.css";
 
@@ -11,20 +15,72 @@
   flex-direction: column;
 }
 
-.doka-app-shell {
-  display: grid;
-  grid-template-columns: var(--sidebar-w) 1fr;
-  min-height: 100vh;
+/* ---- Desktop-first minimum viewport ---------------------------------------
+   Per `route-navigation-contract.md` "Desktop Validation": primary
+   validation viewport 1440x900, also validated at 1280x720 without clipped
+   actions. The app targets desktop only for this feature; horizontal
+   overflow is allowed (scrollable) rather than silently clipping content
+   below the minimum supported width. */
+body {
+  min-width: 1280px;
+  overflow-x: auto;
 }
 
-.doka-app-shell__content {
+/* ---- Status feedback tone accent (FeedbackState; base rules in
+   `src/components/feedback/FeedbackState.css`) ------------------------------- */
+.doka-feedback-state {
+  border-radius: var(--radius-card);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.doka-feedback-state--error {
+  border-top: 4px solid var(--red-500);
+}
+
+.doka-feedback-state--empty {
+  border-top: 4px solid var(--neutral-300);
+}
+
+.doka-feedback-state--neutral {
+  border-top: 4px solid var(--orange-500);
+}
+
+/* ---- Login/public form layout --------------------------------------------- */
+.doka-login-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-9);
+  background: var(--surface-page);
+}
+
+.doka-login-page__card {
+  width: 100%;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
-  min-width: 0;
+  gap: var(--space-4);
 }
 
-.doka-app-shell__main {
-  flex: 1;
-  padding: var(--space-7);
-  max-width: var(--container-max);
+.doka-login-page__logo {
+  height: 36px;
+  width: auto;
+  align-self: flex-start;
+}
+
+.doka-login-page__title {
+  font-size: var(--text-xl);
+}
+
+.doka-login-page__subtitle {
+  color: var(--text-muted);
+}
+
+/* ---- Dashboard neutral content --------------------------------------------- */
+.doka-dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
