@@ -1,5 +1,5 @@
 export type MmsFileExtension = "csv" | "xlsx";
-export type JsonSafeValue = string | number | boolean | null;
+export type JsonSafeValue = string | number | boolean | null | JsonSafeValue[];
 
 export interface ParsedMmsRow {
   sourceRowNumber: number;

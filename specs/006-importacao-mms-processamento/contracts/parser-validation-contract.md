@@ -22,7 +22,8 @@ rejected.
 - Preserve quoted delimiters, escapes and line numbers.
 - Ignore only fully empty leading/trailing rows; a non-empty malformed row is
   retained and classified.
-- Duplicate headers after header normalization are blocking.
+- Duplicate headers are blocking only when they resolve to a field consumed by
+  the import. Repeated unknown/unused headers are accepted.
 
 ### XLSX
 
@@ -67,8 +68,10 @@ Known complementary headers:
 - `Defeito Identificado`
 - `Laudo ou Observação`
 
-Unknown columns are allowed and remain only in `raw_json`. Two original headers
-that map to the same canonical header are a blocking ambiguity.
+Unknown columns are allowed and remain only in `raw_json`. Repeated
+unknown/unused headers preserve all values as an ordered JSON array under the
+original key. Two headers that map to the same consumed canonical field remain
+a blocking ambiguity.
 
 ## File-Level Rules
 

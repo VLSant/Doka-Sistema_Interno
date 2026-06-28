@@ -16,6 +16,34 @@ export const REQUIRED_MMS_HEADERS = [
   "Status da Atividade",
 ] as const;
 
+const CONSUMED_MMS_HEADER_GROUPS = [
+  { canonical: "Data", aliases: ["Data"] },
+  { canonical: "Área de Trabalho", aliases: ["Área de Trabalho"] },
+  { canonical: "Número da Assistência", aliases: ["Número da Assistência"] },
+  { canonical: "Parte do Conjunto", aliases: ["Parte do Conjunto"] },
+  { canonical: "Tipo de Atividade", aliases: ["Tipo de Atividade"] },
+  { canonical: "Status da Atividade", aliases: ["Status da Atividade"] },
+  { canonical: "Recurso", aliases: ["Recurso", "Recurso / Montador"] },
+  { canonical: "Cliente", aliases: ["Cliente"] },
+  { canonical: "Endereço", aliases: ["Endereço"] },
+  { canonical: "Código da Mercadoria", aliases: ["Código da Mercadoria"] },
+  { canonical: "Descrição da Mercadoria", aliases: ["Descrição da Mercadoria"] },
+  { canonical: "Deslocamento", aliases: ["Deslocamento"] },
+  { canonical: "Valor a receber pelo móvel", aliases: ["Valor a receber pelo móvel"] },
+  { canonical: "Atendimento Crítico", aliases: ["Atendimento Crítico"] },
+  { canonical: "Quantidade de Reagendamento", aliases: ["Quantidade de Reagendamento"] },
+  {
+    canonical: "Comentários sobre o local da montagem",
+    aliases: ["Comentários sobre o local da montagem"],
+  },
+  {
+    canonical: "Observação de finalização da montagem",
+    aliases: ["Observação de finalização da montagem"],
+  },
+  { canonical: "Defeito Identificado", aliases: ["Defeito Identificado"] },
+  { canonical: "Laudo ou Observação", aliases: ["Laudo ou Observação"] },
+] as const;
+
 const ALLOWED_MIME_TYPES: Record<MmsFileExtension, string[]> = {
   csv: ["text/csv", "application/csv", "application/vnd.ms-excel", ""],
   xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ""],
@@ -61,8 +89,24 @@ export function validateHeaders(headers: JsonSafeValue[]): string[] {
   if (normalized.some((header) => !header)) {
     throw new MmsParserError("estrutura_incompativel", "Existem cabeçalhos vazios.");
   }
-  if (new Set(normalized).size !== normalized.length) {
-    throw new MmsParserError("cabecalho_duplicado", "Existem cabeçalhos duplicados.");
+
+  const canonicalByAlias = new Map(
+    CONSUMED_MMS_HEADER_GROUPS.flatMap(({ canonical, aliases }) =>
+      aliases.map((alias) => [normalizeHeader(alias), canonical] as const),
+    ),
+  );
+  const consumedOccurrences = new Map<string, number>();
+  for (const header of normalized) {
+    const canonical = canonicalByAlias.get(header);
+    if (canonical) {
+      consumedOccurrences.set(canonical, (consumedOccurrences.get(canonical) ?? 0) + 1);
+    }
+  }
+  if ([...consumedOccurrences.values()].some((count) => count > 1)) {
+    throw new MmsParserError(
+      "cabecalho_duplicado",
+      "Existem cabeçalhos utilizados pela importação duplicados.",
+    );
   }
   const missing = REQUIRED_MMS_HEADERS.filter(
     (required) => !normalized.includes(normalizeHeader(required)),
@@ -74,6 +118,20 @@ export function validateHeaders(headers: JsonSafeValue[]): string[] {
     );
   }
   return original;
+}
+
+function mapRawValues(headers: string[], values: JsonSafeValue[]): Record<string, JsonSafeValue> {
+  const rawValues: Record<string, JsonSafeValue> = {};
+  headers.forEach((header, columnIndex) => {
+    const value = values[columnIndex] ?? null;
+    if (!Object.prototype.hasOwnProperty.call(rawValues, header)) {
+      rawValues[header] = value;
+      return;
+    }
+    const previous = rawValues[header];
+    rawValues[header] = Array.isArray(previous) ? [...previous, value] : [previous, value];
+  });
+  return rawValues;
 }
 
 export function toJsonSafeCell(value: unknown): JsonSafeValue {
@@ -103,9 +161,7 @@ export function mapTabularRows(
   const bodyRows = safeRows.slice(firstNonEmpty + 1);
   const parsedRows: ParsedMmsRow[] = bodyRows.flatMap((values, index) => {
     if (isEmptyRow(values)) return [];
-    const rawValuesByOriginalHeader = Object.fromEntries(
-      headers.map((header, columnIndex) => [header, values[columnIndex] ?? null]),
-    );
+    const rawValuesByOriginalHeader = mapRawValues(headers, values);
     return [{
       sourceRowNumber: firstNonEmpty + index + 2,
       rawValuesByOriginalHeader,

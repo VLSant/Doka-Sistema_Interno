@@ -217,8 +217,9 @@ conferir o resumo com os registros efetivamente afetados.
 
 - CSV ou XLSX com extensão válida, mas conteúdo ilegível, vazio, corrompido ou
   protegido por senha.
-- Arquivo com cabeçalhos duplicados, desconhecidos, escritos com variação não
-  suportada ou sem uma coluna obrigatória.
+- Arquivo com cabeçalhos consumidos pela importação duplicados, cabeçalhos
+  escritos com variação não suportada ou sem uma coluna obrigatória;
+  duplicidades em colunas desconhecidas/não utilizadas são permitidas.
 - Arquivo com mais de uma área de trabalho ou mais de uma data operacional.
 - Área de Trabalho ausente, vazia, correspondente a posto inexistente, inativo
   ou removido logicamente.
