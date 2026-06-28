@@ -46,7 +46,7 @@ begin
     jsonb_build_array(jsonb_build_object(
       'numero_linha_origem', 2,
       'raw_json', jsonb_build_object(
-        'Data', '27/06/2026',
+        'Data', '27/06/26',
         'Área de Trabalho', 'Posto A',
         'Número da Assistência', 'AST-WORKFLOW-006',
         'Parte do Conjunto', 'PARTE-A',

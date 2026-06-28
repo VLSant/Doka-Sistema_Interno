@@ -27,6 +27,17 @@ select pg_temp.assert_true(
   to_regprocedure('app_private.mms_preservar_cancelamento_spec006()') is not null,
   'cancelamento terminal deve ser protegido no banco'
 );
+select pg_temp.assert_true(
+  app_private.mms_data_texto('29/06/26') = date '2026-06-29'
+  and app_private.mms_data_texto('29/06/2026') = date '2026-06-29'
+  and app_private.mms_data_texto('2026-06-29') = date '2026-06-29',
+  'datas MMS curtas, completas e ISO devem convergir'
+);
+select pg_temp.assert_true(
+  app_private.mms_data_texto('31/02/26') is null
+  and app_private.mms_data_texto('31/02/2026') is null,
+  'datas calendarias invalidas devem permanecer bloqueadas'
+);
 
 select set_config(
   'request.jwt.claim.sub',

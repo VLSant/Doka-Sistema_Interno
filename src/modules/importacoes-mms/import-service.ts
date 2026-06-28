@@ -76,6 +76,23 @@ function mapPreview(payload: Record<string, unknown>, issues?: { erros: ImportIs
   };
 }
 
+function issueSourceLine(value: unknown): number | null {
+  const relation = Array.isArray(value) ? value[0] : value;
+  if (!relation || typeof relation !== "object") return null;
+  const line = (relation as { numero_linha_origem?: unknown }).numero_linha_origem;
+  return typeof line === "number" && Number.isInteger(line) ? line : null;
+}
+
+export function mapImportIssueRows(rows: Array<Record<string, unknown>>): ImportIssue[] {
+  return rows.map((row) => ({
+    id: String(row.id),
+    codigo: String(row.codigo),
+    mensagem: String(row.mensagem),
+    campo: typeof row.campo === "string" ? row.campo : null,
+    linha: issueSourceLine(row.mms_linhas_importacao),
+  }));
+}
+
 export function mapImportResult(payload: Record<string, unknown>): ImportResult {
   if (typeof payload.lote_id !== "string" || typeof payload.processado !== "boolean") {
     throw new Error("Resultado de importação inválido.");
@@ -142,13 +159,7 @@ export function createImportService(client: SupabaseClient = getSupabaseClient()
         .order("created_at")
         .range(0, 99);
       if (error) throw error;
-      return (data ?? []).map((row) => ({
-        id: String(row.id),
-        codigo: String(row.codigo),
-        mensagem: String(row.mensagem),
-        campo: typeof row.campo === "string" ? row.campo : null,
-        linha: null,
-      }));
+      return mapImportIssueRows((data ?? []) as Array<Record<string, unknown>>);
     };
     const [erros, alertas] = await Promise.all([
       load("mms_erros_importacao"),

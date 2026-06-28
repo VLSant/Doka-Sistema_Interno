@@ -253,7 +253,7 @@ advisors and full quickstart evidence across the complete feature.
 
 ### Automated validation evidence — 2026-06-28
 
-- `npm test`: 27 test files and 150 tests passed; the script is
+- `npm test`: 27 test files and 151 tests passed; the script is
   `vitest run` and no browser automation was invoked.
 - `npm run typecheck`: passed.
 - `npm run lint`: passed with 5 pre-existing Fast Refresh warnings and 0 errors.
@@ -267,9 +267,10 @@ advisors and full quickstart evidence across the complete feature.
   006. The repository's historical `test:e2e` script remains untouched and is
   not called by `npm test`.
 - Remote project inspection: `Doka` (`zwxxjbiwpgqjsmaxybbm`) is `ACTIVE_HEALTHY`, PostgreSQL 17.6; existing migrations through Spec 005/assistências are present.
-- Migrations `20260628001445_importacao_mms_processamento.sql` and
-  `20260628005835_guard_cancelled_mms_analysis.sql` were applied to Doka and
-  recorded as applied in the remote migration history.
+- Migrations `20260628001445_importacao_mms_processamento.sql`,
+  `20260628005835_guard_cancelled_mms_analysis.sql` and
+  `20260628203047_aceitar_data_curta_mms.sql` were applied to Doka and recorded
+  as applied in the remote migration history.
 - All five `importacao_mms_processamento_*.sql` suites passed remotely inside
   `BEGIN`/`ROLLBACK`: structure/RLS/Storage, RPC/cancellation, atomicity,
   result/reimportation, and end-to-end database workflow.
@@ -300,6 +301,10 @@ advisors and full quickstart evidence across the complete feature.
   row while preserving the original file. Batch preview/confirmation,
   cancellation, inaccessible-posto preflight and partial-result truthfulness
   are covered by Vitest.
+- Follow-up correction for the real MMS `DD/MM/YY` format passed remotely:
+  `29/06/26` resolves to `2026-06-29`, invalid calendar dates remain blocked,
+  RPC/workflow SQL tests passed with rollback, and embedded PostgREST issue
+  relations now expose `numero_linha_origem` in the UI.
 
 ---
 
