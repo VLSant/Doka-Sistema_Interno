@@ -7,7 +7,7 @@ begin
 end $$;
 
 select pg_temp.assert_true(
-  to_regprocedure('public.iniciar_importacao_mms(text,text,text,bigint,text,date,integer)') is not null,
+  to_regprocedure('public.iniciar_importacao_mms(text,text,text,bigint,date,integer)') is not null,
   'RPC iniciar deve existir'
 );
 select pg_temp.assert_true(
@@ -62,7 +62,6 @@ begin
     'csv',
     'text/csv',
     321,
-    'Posto A',
     date '2099-06-26',
     1
   );

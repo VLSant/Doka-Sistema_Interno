@@ -1,5 +1,15 @@
 # Research: Importação MMS — Upload, Parser, Validação e Processamento
 
+## Amendment 2026-06-28: upload e lote únicos
+
+**Decision**: Um arquivo com uma ou mais Áreas de Trabalho produz um único lote
+e um único objeto no Storage. O banco resolve o posto de cada linha no staging.
+Os três perfis podem executar a ingestão global por RPC, sem ampliar as RLS do
+espelho operacional.
+
+**Rationale**: Elimina upload, reserva, validação, consulta de problemas e
+confirmação repetidos por posto. Um erro em qualquer posto bloqueia todo o lote.
+
 ## Decisão 1 — Executar parsing e prévia no navegador
 
 **Decision**: Usar Papa Parse 5.5.4 para CSV e `read-excel-file` 9.2.0 para

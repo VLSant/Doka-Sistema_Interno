@@ -102,9 +102,9 @@ the lot ineligible.
 
 - Anonymous insert/select denied.
 - Authenticated user cannot upload outside their reserved path.
-- Operador cannot read/upload a lot from another posto.
-- Supervisão cannot access outside scope.
-- Direção/Administração can access every authorized lot but cannot overwrite.
+- Operador and Supervisão can upload only the multi-posto lot they reserved.
+- Importers cannot read/upload another user's multi-posto lot.
+- Direção/Administração can review every authorized lot but cannot overwrite.
 - MIME, extension, size and owner mismatch blocked.
 - Second upload to same path fails.
 - Cancelled/processed lot rejects upload.

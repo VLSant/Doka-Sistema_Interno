@@ -75,9 +75,9 @@ a blocking ambiguity.
 
 ## File-Level Rules
 
-- One or more non-empty Área de Trabalho values may exist. Rows are
-  partitioned by their exact area value into independent lots while retaining
-  original source row numbers.
+- One or more non-empty Área de Trabalho values may exist. All rows remain in
+  one atomic lot while retaining original source row numbers; each row receives
+  its own resolved `posto_id`.
 - Rows with no Área de Trabalho, Tipo de Atividade and Status de Atividade are
   treated as auxiliary export rows: they are reported and excluded from
   staging, while the uploaded original file remains unchanged.
@@ -86,8 +86,8 @@ a blocking ambiguity.
 - Dates in `DD/MM/YY` are interpreted as `20YY`, matching the MMS export.
 - Name equivalence for postos is forbidden. Matching may ignore only Unicode
   composition, surrounding whitespace and case.
-- Every resolved posto must exist, be active and be in the actor scope before
-  the first lot is reserved.
+- Every resolved posto must exist and be active. Import permission is global
+  for the three official profiles and does not expand operational read scope.
 - The file must contain at least one non-empty data row.
 - Every non-empty row must reach a final validation state.
 - The received row count must equal `total_linhas_esperadas`.
@@ -170,7 +170,7 @@ cryptographic equivalence between file and rows is introduced in the MVP.
 - XLSX valid, encrypted/corrupt, multiple non-empty sheets and typed date.
 - Missing/duplicate required header.
 - Multiple dates/areas.
-- Unknown posto and posto outside scope.
+- Unknown or inactive posto.
 - Every status/type mapping and unknown value.
 - Multiple parts for one assistance.
 - Duplicate equivalent and conflicting complete keys.

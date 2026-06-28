@@ -6,7 +6,7 @@ All public functions:
 
 - require a valid `auth.uid()`;
 - resolve exactly one active operational user;
-- revalidate profile, posto and lot scope;
+- revalidate active profile, lot ownership and active postos resolved per row;
 - derive actor fields instead of accepting actor IDs;
 - use explicit, fully qualified relations and fixed/empty `search_path`;
 - reject unknown JSON keys and oversized arrays;
@@ -26,7 +26,6 @@ p_nome_origem text
 p_extensao text
 p_mime_type text
 p_tamanho_bytes bigint
-p_area_trabalho text
 p_data_atividade date
 p_total_linhas_esperadas integer
 ```
@@ -34,10 +33,9 @@ p_total_linhas_esperadas integer
 ### Behavior
 
 1. Validate file metadata and limits.
-2. Resolve Área de Trabalho to one active posto using exact normalized
-   name/code matching, without equivalence table.
-3. Validate actor scope.
-4. Create a received lot with status null.
+2. Create one multi-posto received lot with status null.
+3. Associate the lot with the authenticated importer.
+4. Defer authoritative posto resolution to row staging.
 5. Reserve immutable bucket/path.
 6. Audit `criado`.
 
@@ -51,8 +49,7 @@ p_total_linhas_esperadas integer
 }
 ```
 
-Generic error `posto_nao_encontrado_ou_inacessivel` avoids disclosing
-out-of-scope postos.
+All three active profiles may reserve the global ingestion lot.
 
 ## `public.registrar_arquivo_importacao_mms`
 
@@ -103,7 +100,8 @@ p_linhas jsonb
 
 1. Require verified file and processable lot.
 2. Validate payload shape and unique row numbers inside the block.
-3. For each row, resolve canonical headers/values from `raw_json`.
+3. For each row, resolve canonical headers/values and one active posto from
+   `Área de Trabalho`, without consulting user/post links.
 4. Insert line with candidates, `json_normalizado` and final line state.
 5. Insert errors/alerts with stable codes.
 6. Recalculate totals.
@@ -153,7 +151,10 @@ p_lote_id uuid
 {
   "lote_id": "uuid",
   "arquivo": "original.xlsx",
-  "posto": { "id": "uuid", "nome": "Posto A" },
+  "postos": [
+    { "id": "uuid", "nome": "Posto A" },
+    { "id": "uuid", "nome": "Posto B" }
+  ],
   "data_atividade": "2026-06-27",
   "status": "importado",
   "total_linhas": 1000,
@@ -205,7 +206,7 @@ p_lote_id uuid
 
 1. Lock lot with `FOR UPDATE`.
 2. If already processed, return the immutable stored result.
-3. Revalidate Auth actor, profile/posto, object, status, totals, candidates,
+3. Revalidate Auth actor, lot ownership, every active posto, object, status, totals, candidates,
    line states and absence of active errors.
 4. Record confirmation request.
 5. Run `app_private.mms_processar_lote_assistencias` inside protected
@@ -240,6 +241,8 @@ mirror subtransaction.
 - maintains original evidence from `raw_json`;
 - counts created, materially updated, preserved, removed and reactivated
   assistances/parts;
+- processes every distinct posto in the lot atomically and applies removal only
+  inside the posto/date scopes represented by that lot;
 - does not emit material-update audit for identical reprocessing;
 - remains inaccessible to `anon` and direct ordinary API calls.
 

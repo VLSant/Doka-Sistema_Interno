@@ -61,7 +61,10 @@ export function buildImportPreview(overrides: Partial<ImportPreview> = {}): Impo
   return {
     loteId: "61000000-0000-0000-0000-000000000001",
     arquivo: "valido.csv",
-    posto: { id: "40000000-0000-0000-0000-000000000001", nome: "Posto A" },
+    postos: [
+      { id: "40000000-0000-0000-0000-000000000001", nome: "Posto A" },
+      { id: "40000000-0000-0000-0000-000000000002", nome: "Posto B" },
+    ],
     dataAtividade: "2026-06-27",
     status: "importado",
     totalLinhas: 1,
@@ -83,7 +86,7 @@ export function buildImportResult(overrides: Partial<ImportResult> = {}): Import
   return {
     loteId: "61000000-0000-0000-0000-000000000001",
     arquivo: "valido.csv",
-    posto: "Posto A",
+    postos: ["Posto A", "Posto B"],
     dataAtividade: "2026-06-27",
     processado: true,
     status: "importado",

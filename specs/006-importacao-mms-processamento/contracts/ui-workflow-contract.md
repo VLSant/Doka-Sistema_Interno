@@ -99,8 +99,8 @@ Errors and warnings are textual and icon-supported; color alone is insufficient.
 - Requires a deliberate button action after preview.
 - Confirmation text names all postos, date and impact on each current mirror.
 - Explain that absent records may become `removido`.
-- Each area remains an independent lot and persisted result; the UI confirms
-  the eligible lots sequentially and shows every resulting summary.
+- All areas remain in one persisted lot; the UI performs one atomic
+  confirmation and shows one aggregated result.
 - Revalidation failure returns to a safe state.
 - Double click is prevented locally but correctness relies on server lock/result.
 

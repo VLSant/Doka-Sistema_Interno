@@ -14,9 +14,9 @@ import "./NewImportPage.css";
 type PageState =
   | { name: "idle" }
   | { name: "working"; progress: ImportProgress }
-  | { name: "preview"; previews: ImportPreviewModel[]; ignoredSourceRows: number[] }
-  | { name: "confirming"; previews: ImportPreviewModel[]; ignoredSourceRows: number[] }
-  | { name: "result"; results: ImportResultModel[] }
+  | { name: "preview"; preview: ImportPreviewModel; ignoredSourceRows: number[] }
+  | { name: "confirming"; preview: ImportPreviewModel; ignoredSourceRows: number[] }
+  | { name: "result"; result: ImportResultModel }
   | { name: "cancelled" }
   | { name: "failure"; message: string };
 
@@ -40,14 +40,14 @@ export default function NewImportPage({ service: injectedService }: NewImportPag
     });
     try {
       const parsed = await service.parse(file);
-      const previews = await service.prepare(
+      const preview = await service.prepare(
         parsed,
         context,
         (progress) => setState({ name: "working", progress }),
       );
       setState({
         name: "preview",
-        previews,
+        preview,
         ignoredSourceRows: parsed.ignoredAuxiliarySourceRows,
       });
     } catch (error) {
@@ -70,42 +70,40 @@ export default function NewImportPage({ service: injectedService }: NewImportPag
     }
   }
 
-  async function handleConfirm(previews: ImportPreviewModel[], ignoredSourceRows: number[]) {
-    if (!context || previews.some((preview) => !preview.podeConfirmar)) return;
-    setState({ name: "confirming", previews, ignoredSourceRows });
-    const results: ImportResultModel[] = [];
-    for (const preview of previews) {
-      try {
-        results.push(await service.confirm(preview.loteId, context));
-      } catch (error) {
-        results.push({
-          loteId: preview.loteId,
-          arquivo: preview.arquivo,
-          posto: preview.posto.nome,
-          dataAtividade: preview.dataAtividade,
-          processado: false,
-          status: "falha",
-          assistenciasCriadas: 0,
-          assistenciasAtualizadas: 0,
-          assistenciasPreservadas: 0,
-          assistenciasRemovidas: 0,
-          assistenciasReativadas: 0,
-          partesCriadas: 0,
-          partesAtualizadas: 0,
-          partesPreservadas: 0,
-          partesRemovidas: 0,
-          partesReativadas: 0,
-          linhasInvalidas: preview.linhasInvalidas,
-          linhasComAlerta: preview.linhasComAlerta,
-          processadoEm: null,
-          codigo: "falha_temporaria",
-          mensagem: error instanceof Error
-            ? error.message
-            : "Não foi possível concluir esta área. Tente novamente.",
-        });
-      }
+  async function handleConfirm(preview: ImportPreviewModel, ignoredSourceRows: number[]) {
+    if (!context || !preview.podeConfirmar) return;
+    setState({ name: "confirming", preview, ignoredSourceRows });
+    let result: ImportResultModel;
+    try {
+      result = await service.confirm(preview.loteId, context);
+    } catch (error) {
+      result = {
+        loteId: preview.loteId,
+        arquivo: preview.arquivo,
+        postos: preview.postos.map((posto) => posto.nome),
+        dataAtividade: preview.dataAtividade,
+        processado: false,
+        status: "falha",
+        assistenciasCriadas: 0,
+        assistenciasAtualizadas: 0,
+        assistenciasPreservadas: 0,
+        assistenciasRemovidas: 0,
+        assistenciasReativadas: 0,
+        partesCriadas: 0,
+        partesAtualizadas: 0,
+        partesPreservadas: 0,
+        partesRemovidas: 0,
+        partesReativadas: 0,
+        linhasInvalidas: preview.linhasInvalidas,
+        linhasComAlerta: preview.linhasComAlerta,
+        processadoEm: null,
+        codigo: "falha_temporaria",
+        mensagem: error instanceof Error
+          ? error.message
+          : "Não foi possível concluir o lote. Tente novamente.",
+      };
     }
-    setState({ name: "result", results });
+    setState({ name: "result", result });
   }
 
   const reset = async () => {
@@ -113,11 +111,9 @@ export default function NewImportPage({ service: injectedService }: NewImportPag
     setState({ name: "idle" });
   };
   const working = state.name === "working" || state.name === "confirming";
-  const previews = state.name === "preview" || state.name === "confirming"
-    ? state.previews
-    : [];
-  const allPreviewsEligible = previews.length > 0
-    && previews.every((preview) => preview.podeConfirmar);
+  const preview = state.name === "preview" || state.name === "confirming"
+    ? state.preview
+    : null;
   const ignoredSourceRows = state.name === "preview" || state.name === "confirming"
     ? state.ignoredSourceRows
     : [];
@@ -129,8 +125,8 @@ export default function NewImportPage({ service: injectedService }: NewImportPag
           <span className="mms-import-page__eyebrow">Importações MMS</span>
           <h1>Nova Importação MMS</h1>
           <p>
-            Selecione um retrato CSV ou XLSX de uma única data. Áreas de Trabalho
-            diferentes serão separadas automaticamente.
+            Selecione um retrato CSV ou XLSX de uma única data. Todos os postos
+            identificados serão processados em um único lote.
           </p>
         </div>
       </header>
@@ -148,9 +144,9 @@ export default function NewImportPage({ service: injectedService }: NewImportPag
 
         {(state.name === "preview" || state.name === "confirming") ? (
           <div className="mms-import-page__preview">
-            {previews.length > 1 ? (
+            {preview && preview.postos.length > 1 ? (
               <p role="status">
-                O arquivo foi separado automaticamente em <strong>{previews.length} áreas de trabalho</strong>.
+                Foram identificados <strong>{preview.postos.length} postos em um único lote</strong>.
               </p>
             ) : null}
             {ignoredSourceRows.length > 0 ? (
@@ -162,26 +158,22 @@ export default function NewImportPage({ service: injectedService }: NewImportPag
                 {ignoredSourceRows.join(", ")}). O arquivo original permanece preservado.
               </p>
             ) : null}
-            {previews.map((preview) => (
-              <ImportPreview key={preview.loteId} preview={preview} />
-            ))}
-            {allPreviewsEligible ? (
+            {preview ? <ImportPreview preview={preview} /> : null}
+            {preview?.podeConfirmar ? (
               <div className="mms-confirmation" role="region" aria-labelledby="mms-confirm-title">
                 <h2 id="mms-confirm-title">Confirmar atualização do espelho</h2>
                 <p>
-                  Você confirma {previews.length === 1 ? "o posto" : "os postos"}{" "}
-                  <strong>{previews.map((preview) => preview.posto.nome).join(", ")}</strong> em{" "}
-                  <strong>{previews[0].dataAtividade}</strong>. Registros ausentes podem ser marcados como removidos.
+                  Você confirma {preview.postos.length === 1 ? "o posto" : "os postos"}{" "}
+                  <strong>{preview.postos.map((posto) => posto.nome).join(", ")}</strong> em{" "}
+                  <strong>{preview.dataAtividade}</strong>. Registros ausentes podem ser marcados como removidos.
                 </p>
                 <div className="mms-import-page__actions">
                   <Button variant="outline" disabled={state.name === "confirming"} onClick={handleCancel}>Cancelar</Button>
                   <Button
                     loading={state.name === "confirming"}
-                    onClick={() => handleConfirm(previews, ignoredSourceRows)}
+                    onClick={() => handleConfirm(preview, ignoredSourceRows)}
                   >
-                    {previews.length === 1
-                      ? "Confirmar importação"
-                      : `Confirmar ${previews.length} importações`}
+                    Confirmar importação
                   </Button>
                 </div>
               </div>
@@ -196,9 +188,7 @@ export default function NewImportPage({ service: injectedService }: NewImportPag
 
         {state.name === "result" ? (
           <div className="mms-import-page__result">
-            {state.results.map((result) => (
-              <ImportResult key={result.loteId} result={result} />
-            ))}
+            <ImportResult result={state.result} />
             <div className="mms-import-page__actions">
               <Button variant="outline" onClick={() => navigate("/app/dashboard")}>Voltar ao Dashboard</Button>
               <Button onClick={() => void reset()}>Nova importação</Button>

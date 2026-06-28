@@ -14,7 +14,7 @@
 
 Um usuário autenticado dos perfis Operador, Supervisão ou
 Direção/Administração precisa acessar Nova Importação MMS e selecionar uma
-planilha CSV ou XLSX compatível para um posto de seu escopo.
+planilha CSV ou XLSX compatível contendo um ou mais postos ativos.
 
 **Why this priority**: A entrada segura e a seleção do arquivo são necessárias
 para iniciar qualquer importação manual sem expor dados ou ações fora do escopo
@@ -26,11 +26,11 @@ antes de qualquer alteração no espelho.
 
 **Acceptance Scenarios**:
 
-1. **Given** um Operador ativo com posto vinculado, **When** acessa Importações
-   MMS, **Then** encontra a entrada funcional para Nova Importação MMS e pode
-   selecionar um arquivo para seus postos.
-2. **Given** uma Supervisão ativa, **When** acessa a mesma entrada, **Then** pode
-   iniciar importação somente para postos de seu escopo.
+1. **Given** um Operador ativo, **When** acessa Importações MMS, **Then**
+   encontra a entrada funcional e pode selecionar um arquivo com qualquer
+   posto ativo cadastrado.
+2. **Given** uma Supervisão ativa, **When** acessa a mesma entrada, **Then**
+   possui a mesma permissão global de ingestão.
 3. **Given** Direção/Administração ativa, **When** acessa a entrada, **Then** pode
    iniciar importação para qualquer posto ativo identificado.
 4. **Given** um usuário sem autorização operacional válida, **When** tenta abrir
@@ -62,8 +62,8 @@ impossibilidade de confirmação.
 **Acceptance Scenarios**:
 
 1. **Given** uma planilha válida com uma ou mais Áreas de Trabalho e uma única
-   data, **When** a análise termina, **Then** o arquivo é separado
-   automaticamente por área e cada prévia mostra arquivo, posto, data, total
+   data, **When** a análise termina, **Then** um único lote e uma única prévia
+   mostram arquivo, todos os postos, data, total
    de linhas, assistências principais, partes, linhas válidas, linhas válidas
    com alerta, linhas inválidas, erros bloqueantes e alertas.
 2. **Given** uma planilha completa com apenas alertas não bloqueantes, **When** a
@@ -78,9 +78,9 @@ impossibilidade de confirmação.
 5. **Given** várias linhas com o mesmo número de assistência e partes
    diferentes, **When** os totais são calculados, **Then** a prévia conta uma
    assistência principal e todas as partes distintas.
-6. **Given** o posto identificado pela Área de Trabalho está fora do escopo do
-   usuário, **When** a validação de acesso ocorre, **Then** a importação é
-   bloqueada sem revelar dados operacionais adicionais desse posto.
+6. **Given** um posto ativo não vinculado ao usuário, **When** a validação
+   ocorre, **Then** a ingestão controlada permanece permitida sem liberar a
+   consulta operacional daquele posto.
 
 ---
 
@@ -312,10 +312,10 @@ Esta feature não inclui:
   MMS para os três perfis oficiais e uma ação de Nova Importação MMS.
 - **FR-002**: Toda entrada na rota MUST reutilizar autenticação, restauração de
   sessão, autorização de rota e contexto operacional definidos na Spec 005.
-- **FR-003**: Operador MUST poder iniciar importações somente para postos ativos
-  vinculados ao seu escopo.
-- **FR-004**: Supervisão MUST poder iniciar importações somente para postos
-  ativos de seu escopo.
+- **FR-003**: Operador MUST poder iniciar importações para qualquer posto ativo
+  cadastrado, independentemente de vínculo.
+- **FR-004**: Supervisão MUST poder iniciar importações para qualquer posto
+  ativo cadastrado, independentemente de vínculo.
 - **FR-005**: Direção/Administração MUST poder iniciar importações para qualquer
   posto ativo, sem exigir vínculo individual.
 - **FR-006**: Usuário sem perfil operacional ativo ou sem escopo obrigatório
@@ -326,26 +326,25 @@ Esta feature não inclui:
   cabeçalhos e presença das colunas obrigatórias antes de permitir confirmação.
 - **FR-009**: O sistema MUST rejeitar arquivos vazios, corrompidos, protegidos,
   incompatíveis ou que não possam ser interpretados integralmente.
-- **FR-010**: O arquivo original aceito para análise MUST ser preservado de
-  forma segura e vinculado à tentativa/lote, ao usuário importador, ao posto e à
-  data identificados.
+- **FR-010**: O arquivo original aceito para análise MUST ser preservado uma
+  única vez e vinculado à tentativa/lote, ao usuário importador, aos postos
+  resolvidos nas linhas e à data identificada.
 - **FR-011**: Falha ao preservar ou vincular o arquivo MUST bloquear a
   confirmação e MUST NOT alterar o espelho.
 - **FR-012**: O sistema MUST identificar o posto pelo valor da coluna Área de
   Trabalho e MUST NOT solicitar escolha manual para substituir esse valor.
 - **FR-012A**: Quando um arquivo contiver múltiplas Áreas de Trabalho, o sistema
-  MUST particionar as linhas automaticamente e criar um lote independente por
-  área, preservando os números de linha de origem e o arquivo original.
-- **FR-012B**: Antes de reservar qualquer lote do arquivo composto, o sistema
-  MUST validar que todas as áreas correspondem a postos ativos visíveis no
-  escopo atual; falha nessa validação MUST NOT deixar lotes parciais ativos.
+  MUST criar um único lote, resolver o `posto_id` de cada linha e preservar os
+  números de linha de origem e o arquivo original.
+- **FR-012B**: O banco MUST resolver cada área para um posto ativo durante o
+  staging; área desconhecida ou inativa torna o lote inteiro inelegível.
 - **FR-013**: A correspondência de Área de Trabalho MUST usar um posto existente
   e ativo; posto ausente, inativo, removido ou sem correspondência MUST bloquear
   a confirmação.
 - **FR-014**: O sistema MUST NOT aplicar equivalência automática de nomes de
   postos nesta feature.
-- **FR-015**: O sistema MUST bloquear a importação quando o posto identificado
-  estiver fora do escopo atual do usuário.
+- **FR-015**: A permissão global de ingestão MUST NOT ampliar as RLS de
+  assistências, partes, relatórios ou demais dados operacionais.
 - **FR-016**: O sistema MUST identificar a data operacional pelos dados da
   planilha e exigir uma única data válida para o lote.
 - **FR-017**: Data ausente, inválida ou múltiplas datas operacionais MUST ser
@@ -395,8 +394,8 @@ Esta feature não inclui:
 - **FR-034**: Assistências principais MUST ser contadas pela identidade
   `posto_id + data_atividade + numero_assistencia`; partes MUST ser contadas
   pela chave operacional completa.
-- **FR-035**: Antes da confirmação, o sistema MUST apresentar prévia com arquivo,
-  posto, data, todos os totais, erros, alertas e indicação explícita de
+- **FR-035**: Antes da confirmação, o sistema MUST apresentar uma única prévia
+  com arquivo, postos, data, todos os totais, erros, alertas e indicação de
   elegibilidade.
 - **FR-036**: A prévia MUST distinguir valor original de valor normalizado
   sempre que a diferença for relevante para o entendimento do usuário.
@@ -404,13 +403,13 @@ Esta feature não inclui:
   estiver em andamento ou quando a tentativa for inelegível.
 - **FR-038**: O sistema MUST exigir confirmação explícita do usuário depois da
   prévia e MUST NOT interpretar seleção/upload como confirmação.
-- **FR-039**: No momento da confirmação, o sistema MUST revalidar sessão, perfil,
-  escopo do posto, estado do posto, integridade da tentativa e elegibilidade do
-  lote.
+- **FR-039**: No momento da confirmação, o sistema MUST revalidar sessão,
+  propriedade do lote, estado de todos os postos, objeto, integridade da
+  tentativa e elegibilidade do lote.
 - **FR-040**: A confirmação elegível MUST criar ou atualizar o lote e suas
   linhas segundo a Spec 003 e acionar o processamento definido na Spec 004.
 - **FR-041**: Somente lote com `estado_processamento = validado`, status
-  `importado` ou `importado_com_alertas`, posto/data resolvidos, linhas ativas
+  `importado` ou `importado_com_alertas`, postos por linha e data resolvidos, linhas ativas
   transformáveis, totais consistentes e nenhum erro bloqueante MUST poder
   atualizar o espelho.
 - **FR-042**: Lote `erro`, `cancelado`, com status nulo, incompleto, parcial,
@@ -553,8 +552,8 @@ Esta feature não inclui:
 ## Assumptions
 
 - O formato suportado representa um único retrato MMS de uma data por arquivo.
-  Arquivos com múltiplos postos são divididos automaticamente em lotes
-  independentes; arquivos com múltiplas datas permanecem bloqueados.
+  Arquivos com múltiplos postos permanecem em um único lote atômico; arquivos
+  com múltiplas datas permanecem bloqueados.
 - Linhas auxiliares do export sem Área de Trabalho, Tipo de Atividade e Status
   de Atividade não representam atividades, são informadas e ignoradas no
   staging; o arquivo original continua preservado.

@@ -15,6 +15,7 @@ export type ImportStableErrorCode =
   | "multiplas_datas"
   | "data_invalida"
   | "area_trabalho_ausente"
+  | "posto_nao_encontrado"
   | "posto_nao_encontrado_ou_inacessivel"
   | "numero_assistencia_ausente"
   | "parte_conjunto_invalida"
@@ -36,12 +37,13 @@ export interface ImportIssue {
   mensagem: string;
   valorOriginal?: unknown;
   valorNormalizado?: unknown;
+  areaTrabalho?: string | null;
 }
 
 export interface ImportPreview {
   loteId: string;
   arquivo: string;
-  posto: { id: string; nome: string };
+  postos: Array<{ id: string; nome: string }>;
   dataAtividade: string;
   status: "importado" | "importado_com_alertas" | "erro";
   totalLinhas: number;
@@ -60,7 +62,7 @@ export interface ImportPreview {
 export interface ImportResult {
   loteId: string;
   arquivo: string;
-  posto: string;
+  postos: string[];
   dataAtividade: string;
   processado: boolean;
   status: "importado" | "importado_com_alertas" | "falha";

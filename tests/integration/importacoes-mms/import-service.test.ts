@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  chunkStagingRows,
-  findUnavailableMmsAreas,
-} from "../../../src/modules/importacoes-mms/import-service";
+import { chunkStagingRows } from "../../../src/modules/importacoes-mms/import-service";
 
 describe("MMS staging orchestration", () => {
   it("splits 10.000 rows into authoritative blocks of at most 250", () => {
@@ -18,13 +15,13 @@ describe("MMS staging orchestration", () => {
     expect(() => chunkStagingRows([1], 251)).toThrow();
   });
 
-  it("preflights every partition against postos visible under RLS", () => {
-    const groups = [
-      { areaTrabalhoOriginal: "CARPINA - 845", rows: [], totalDataRows: 0 },
-      { areaTrabalhoOriginal: "KING-RECIFE - 847", rows: [], totalDataRows: 0 },
-    ];
-    expect(findUnavailableMmsAreas(groups, [
-      { nome: "Carpina - 845", codigo: "CARPINA" },
-    ])).toEqual(["KING-RECIFE - 847"]);
+  it("keeps all rows in one authoritative staging sequence", () => {
+    const rows = Array.from({ length: 501 }, (_, index) => ({
+      sourceRowNumber: index + 2,
+      area: index % 2 === 0 ? "Posto A" : "Posto B",
+    }));
+    const chunks = chunkStagingRows(rows);
+    expect(chunks).toHaveLength(3);
+    expect(chunks.flat()).toEqual(rows);
   });
 });

@@ -19,7 +19,7 @@ A migration estenderá as entidades da Spec 003 com metadados do arquivo,
 confirmação/processamento, sem criar entidades de domínio duplicadas. RPCs
 públicas estreitas, com ator derivado de `auth.uid()`, substituirão escrita
 direta nas tabelas de staging. A confirmação bloqueará o lote, revalidará
-sessão, perfil, posto, Storage e completude e chamará o processamento da Spec
+sessão, propriedade do lote, postos por linha, Storage e completude e chamará o processamento da Spec
 004 dentro de uma subtransação; falhas revertem toda alteração do espelho,
 permanecem auditáveis e permitem nova tentativa segura. Chamadas repetidas
 depois do sucesso devolvem o resultado persistido sem reaplicar efeitos.
@@ -60,7 +60,7 @@ parsing sem congelar a interface; envio de staging paginado; consultas e
 processamento por índices de lote, posto/data e chave operacional.
 
 **Constraints**: Português brasileiro; desktop-first; Poppins e design system
-Doka; um posto e uma data por arquivo; CSV/XLSX somente; `raw_json` imutável com
+Doka; um ou mais postos e uma data por arquivo; CSV/XLSX somente; `raw_json` imutável com
 cabeçalhos e valores originais; normalização separada em `json_normalizado`;
 sem `file_hash`; sem chave secreta/service role no navegador; sem equivalência
 automática de postos; nenhum lote parcial altera o espelho; confirmação
@@ -87,8 +87,9 @@ linhas.
 - PASS: A mudança reutiliza tabelas em português `snake_case`, acrescenta
   somente campos necessários e mantém ações críticas em
   `historico_auditoria`.
-- PASS: Operador e Supervisão ficam restritos ao posto autorizado;
-  Direção/Administração mantém escopo global. Menu e rota não substituem RLS.
+- PASS: Os três perfis podem executar a ingestão global controlada; as RLS do
+  espelho operacional continuam restringindo Operador e Supervisão aos postos
+  vinculados. Menu e rota não substituem RLS.
 - PASS: `raw_json` preserva o original e `json_normalizado` recebe os valores
   canônicos; a chave completa continua
   `posto_id + data_atividade + numero_assistencia + parte_conjunto`.

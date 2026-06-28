@@ -6,7 +6,7 @@ import { buildImportPreview } from "../../helpers/importacao-mms-fixtures";
 describe("ImportPreview", () => {
   it("shows authoritative totals and confirmation eligibility", () => {
     render(<ImportPreview preview={buildImportPreview()} />);
-    expect(screen.getByText("Posto A")).toBeInTheDocument();
+    expect(screen.getByText("Posto A, Posto B")).toBeInTheDocument();
     expect(screen.getByText(/Pronta para confirmação/)).toBeInTheDocument();
     expect(screen.getByText("Assistências")).toBeInTheDocument();
   });

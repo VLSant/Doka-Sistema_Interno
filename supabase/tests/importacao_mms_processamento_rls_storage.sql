@@ -82,8 +82,8 @@ select pg_temp.assert_true(
   'raw_json e json_normalizado devem ser imutaveis'
 );
 select pg_temp.assert_true(
-  not has_function_privilege('anon', 'public.iniciar_importacao_mms(text,text,text,bigint,text,date,integer)', 'EXECUTE')
-  and has_function_privilege('authenticated', 'public.iniciar_importacao_mms(text,text,text,bigint,text,date,integer)', 'EXECUTE'),
+  not has_function_privilege('anon', 'public.iniciar_importacao_mms(text,text,text,bigint,date,integer)', 'EXECUTE')
+  and has_function_privilege('authenticated', 'public.iniciar_importacao_mms(text,text,text,bigint,date,integer)', 'EXECUTE'),
   'somente authenticated pode iniciar importacao'
 );
 

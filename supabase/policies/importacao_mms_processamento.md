@@ -1,5 +1,15 @@
 # Segurança da Importação MMS — Spec 006
 
+## Lote único multi-posto
+
+- Cada arquivo novo reserva um lote com `multiplos_postos = true` e
+  `posto_id = null`.
+- A Área de Trabalho é resolvida no servidor e o `posto_id` fica em cada linha.
+- Os três perfis podem importar qualquer posto ativo; somente o importador e a
+  Direção podem ler o lote multi-posto.
+- As RLS de assistências, partes e demais dados operacionais continuam por
+  vínculo de posto.
+
 ## Storage
 
 - Bucket privado `mms-importacoes`, limitado a 25 MiB e aos MIME types CSV/XLSX.

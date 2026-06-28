@@ -11,7 +11,7 @@ describe("mapImportResult", () => {
       processado: true,
       status: "importado",
       arquivo: "mms.csv",
-      posto: "Posto A",
+      postos: ["Posto A", "Posto B"],
       data_atividade: "2026-06-27",
       partes_preservadas: 3,
       processado_em: "2026-06-27T12:00:00Z",

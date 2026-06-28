@@ -253,7 +253,7 @@ advisors and full quickstart evidence across the complete feature.
 
 ### Automated validation evidence — 2026-06-28
 
-- `npm test`: 27 test files and 151 tests passed; the script is
+- `npm test`: 27 test files and 154 tests passed; the script is
   `vitest run` and no browser automation was invoked.
 - `npm run typecheck`: passed.
 - `npm run lint`: passed with 5 pre-existing Fast Refresh warnings and 0 errors.
@@ -468,3 +468,21 @@ After Foundational:
   accepted manually by the user; historical E2E files from other specs remain
   untouched.
 - Commit only logical task groups and preserve unrelated user changes.
+
+## Phase 9: Simplificação — lote único multi-posto
+
+- [X] T079 Atualizar spec, plano, pesquisa, modelo e contratos para lote único
+  e ingestão global controlada
+- [X] T080 Escrever testes de frontend para uma única prévia, confirmação e
+  resultado multi-posto
+- [X] T081 Criar teste SQL transacional com Operador importando dois postos,
+  incluindo um sem vínculo
+- [X] T082 Criar migrations para lote multi-posto, helpers RLS, resolução por
+  linha e privilégios mínimos
+- [X] T083 Alterar o serviço para uma reserva, um upload, um staging e uma
+  análise por arquivo
+- [X] T084 Alterar prévia, confirmação e resultado para representar todos os
+  postos em um único lote
+- [X] T085 Executar Vitest, typecheck, lint, build e testes SQL remotos sem
+  Docker nem automação de navegador
+- [X] T086 Revisar advisors e publicar as mudanças no PR

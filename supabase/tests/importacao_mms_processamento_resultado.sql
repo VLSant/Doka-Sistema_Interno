@@ -62,7 +62,6 @@ begin
     'csv',
     'text/csv',
     321,
-    'Posto A',
     date '2099-06-25',
     jsonb_array_length(linhas)
   );

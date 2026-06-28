@@ -1,5 +1,17 @@
 # Data Model: Importação MMS — Upload, Parser, Validação e Processamento
 
+## Amendment 2026-06-28: lote único multi-posto
+
+Cada arquivo passa a gerar um único `mms_lotes_importacao`, com
+`multiplos_postos = true` e `posto_id = null`. O `posto_id` autoritativo fica em
+cada `mms_linhas_importacao`, resolvido no servidor pela Área de Trabalho. O
+arquivo é enviado uma única vez e confirmação, rollback e resultado abrangem
+atomicamente todos os postos do lote. Lotes legados continuam com
+`multiplos_postos = false` e `posto_id` preenchido.
+
+A ingestão é global para os três perfis, mas as RLS dos dados operacionais
+continuam filtradas por posto.
+
 ## Model Strategy
 
 A feature não cria novas entidades de domínio. Ela estende o lote e a linha da
@@ -219,7 +231,7 @@ Sem nova tabela ou novo ciclo de vida.
 - `multiplas_areas_trabalho`
 - `data_invalida`
 - `area_trabalho_ausente`
-- `posto_nao_encontrado_ou_inacessivel`
+- `posto_nao_encontrado`
 - `numero_assistencia_ausente`
 - `parte_conjunto_invalida`
 - `status_atividade_nao_reconhecido`

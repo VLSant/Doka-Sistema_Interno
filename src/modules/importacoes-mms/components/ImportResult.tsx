@@ -18,7 +18,7 @@ export function ImportResult({ result }: { result: ImportResultModel }) {
     <section className={`mms-result mms-result--${result.processado ? "success" : "failure"}`} aria-live="polite">
       <h2>{result.processado ? "Importação concluída" : "Importação não concluída"}</h2>
       <p><strong>Espelho atualizado:</strong> {result.processado ? "Sim" : "Não"}</p>
-      <p>Lote {result.loteId} · {result.arquivo} · {result.posto} · {result.dataAtividade}</p>
+      <p>Lote {result.loteId} · {result.arquivo} · {result.postos.join(", ")} · {result.dataAtividade}</p>
       {result.processado ? (
         <dl className="mms-result__grid">
           {counters.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}

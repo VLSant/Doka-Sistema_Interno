@@ -21,7 +21,6 @@ begin
     'csv',
     'text/csv',
     123,
-    'Posto A',
     date '2026-06-27',
     1
   );
