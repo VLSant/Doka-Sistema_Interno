@@ -75,11 +75,19 @@ a blocking ambiguity.
 
 ## File-Level Rules
 
-- Exactly one non-empty Área de Trabalho value must exist.
+- One or more non-empty Área de Trabalho values may exist. Rows are
+  partitioned by their exact area value into independent lots while retaining
+  original source row numbers.
+- Rows with no Área de Trabalho, Tipo de Atividade and Status de Atividade are
+  treated as auxiliary export rows: they are reported and excluded from
+  staging, while the uploaded original file remains unchanged.
+- A non-auxiliary activity row without Área de Trabalho is blocking.
 - Exactly one valid operational date must exist.
+- Dates in `DD/MM/YY` are interpreted as `20YY`, matching the MMS export.
 - Name equivalence for postos is forbidden. Matching may ignore only Unicode
   composition, surrounding whitespace and case.
-- The resolved posto must exist, be active and be in the actor scope.
+- Every resolved posto must exist, be active and be in the actor scope before
+  the first lot is reserved.
 - The file must contain at least one non-empty data row.
 - Every non-empty row must reach a final validation state.
 - The received row count must equal `total_linhas_esperadas`.

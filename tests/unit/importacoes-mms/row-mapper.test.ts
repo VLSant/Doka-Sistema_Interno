@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   mapTabularRows,
+  normalizeDate,
   normalizeHeader,
   toJsonSafeCell,
 } from "../../../src/modules/importacoes-mms/parser/row-mapper";
@@ -32,5 +33,51 @@ describe("MMS row mapper", () => {
     );
     expect(parsed.totalDataRows).toBe(1);
     expect(parsed.rows[0].sourceRowNumber).toBe(3);
+  });
+
+  it("partitions one file into independent area groups", () => {
+    const file = new File(["x"], "mms.csv", { type: "text/csv" });
+    const parsed = mapTabularRows(
+      [
+        header,
+        ["21/05/26", "Posto A", "AST-1", "P-1", "Montagem em Conjunto", "Concluído"],
+        ["21/05/26", "Posto B", "AST-2", "P-2", "Montagem em Conjunto", "Concluído"],
+        ["21/05/26", "Posto A", "AST-3", "P-3", "Montagem em Conjunto", "Concluído"],
+      ],
+      file,
+      "csv",
+    );
+
+    expect(parsed.dataAtividade).toBe("2026-05-21");
+    expect(parsed.areaGroups.map((group) => [group.areaTrabalhoOriginal, group.totalDataRows]))
+      .toEqual([["Posto A", 2], ["Posto B", 1]]);
+    expect(normalizeDate("21/05/26")).toBe("2026-05-21");
+  });
+
+  it("ignores auxiliary export rows without area, type and status", () => {
+    const file = new File(["x"], "mms.csv", { type: "text/csv" });
+    const parsed = mapTabularRows(
+      [
+        header,
+        ["21/05/26", "Posto A", "AST-1", "P-1", "Montagem em Conjunto", "Concluído"],
+        ["A - Sim", "", "A - Sim", "A - Não", "", ""],
+      ],
+      file,
+      "csv",
+    );
+    expect(parsed.totalDataRows).toBe(1);
+    expect(parsed.ignoredAuxiliarySourceRows).toEqual([3]);
+  });
+
+  it("reports source lines with activity content that cannot be assigned to an area", () => {
+    const file = new File(["x"], "mms.csv", { type: "text/csv" });
+    expect(() => mapTabularRows(
+      [
+        header,
+        ["21/05/26", "", "AST-1", "P-1", "Montagem em Conjunto", "Concluído"],
+      ],
+      file,
+      "csv",
+    )).toThrow("Área de Trabalho ausente nas linhas: 2.");
   });
 });

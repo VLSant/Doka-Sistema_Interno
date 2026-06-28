@@ -42,14 +42,15 @@ No lot history list, error editor or undo action appears.
 
 ### `staging`
 
-- Show rows sent/expected.
+- Show current area, partition index and overall progress.
 - Confirm is disabled.
 - Session/context revalidation failure clears protected preview.
 
 ### `preview_ready`
 
-- Show authoritative database preview.
-- Confirm appears only when `pode_confirmar = true`.
+- Show one authoritative database preview per identified area.
+- Report auxiliary export rows ignored from staging.
+- Confirm appears only when every preview has `pode_confirmar = true`.
 - Invalid lot offers Cancel and select-a-corrected-file guidance, not editing.
 
 ### `confirming`
@@ -96,8 +97,10 @@ Errors and warnings are textual and icon-supported; color alone is insufficient.
 ## Confirmation
 
 - Requires a deliberate button action after preview.
-- Confirmation text names posto, date and impact on the current mirror.
+- Confirmation text names all postos, date and impact on each current mirror.
 - Explain that absent records may become `removido`.
+- Each area remains an independent lot and persisted result; the UI confirms
+  the eligible lots sequentially and shows every resulting summary.
 - Revalidation failure returns to a safe state.
 - Double click is prevented locally but correctness relies on server lock/result.
 

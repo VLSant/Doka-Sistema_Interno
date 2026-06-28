@@ -1,6 +1,7 @@
 export type {
   JsonSafeValue,
   MmsFileExtension,
+  ParsedMmsAreaGroup,
   ParsedMmsFile,
   ParsedMmsRow,
   ParserErrorCode,
@@ -12,7 +13,6 @@ export type ImportStableErrorCode =
   | "coluna_obrigatoria_ausente"
   | "cabecalho_duplicado"
   | "multiplas_datas"
-  | "multiplas_areas_trabalho"
   | "data_invalida"
   | "area_trabalho_ausente"
   | "posto_nao_encontrado_ou_inacessivel"

@@ -39,6 +39,7 @@ export function buildFakeFile(
 
 export function buildParsedFile(overrides: Partial<ParsedMmsFile> = {}): ParsedMmsFile {
   const file = buildFakeFile();
+  const rows = [buildParsedRow()];
   return {
     file,
     extension: "csv",
@@ -46,8 +47,10 @@ export function buildParsedFile(overrides: Partial<ParsedMmsFile> = {}): ParsedM
     originalName: file.name,
     sizeBytes: file.size,
     headersOriginal: [...MMS_HEADERS],
-    rows: [buildParsedRow()],
+    rows,
     totalDataRows: 1,
+    ignoredAuxiliarySourceRows: [],
+    areaGroups: [{ areaTrabalhoOriginal: "Posto A", rows, totalDataRows: 1 }],
     areaTrabalhoOriginal: "Posto A",
     dataAtividade: "2026-06-27",
     ...overrides,

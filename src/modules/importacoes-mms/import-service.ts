@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { loadAppEnv } from "../../lib/env";
 import { getSupabaseClient } from "../../lib/supabase";
 import type { OperationalAccessContext } from "../access/types";
+import { normalizeHeader } from "./parser/row-mapper";
 import { parseMmsFile } from "./parser/xlsx-parser";
 import { uploadOriginalMmsFile } from "./storage-upload";
 import type {
@@ -10,11 +11,26 @@ import type {
   ImportProgress,
   ImportReservation,
   ImportResult,
+  ParsedMmsAreaGroup,
   ParsedMmsFile,
   StagingSummary,
 } from "./types";
 
 const STAGING_CHUNK_SIZE = 250;
+
+export function findUnavailableMmsAreas(
+  groups: ParsedMmsAreaGroup[],
+  postos: Array<{ nome: string; codigo: string | null }>,
+): string[] {
+  const accessibleNames = new Set(
+    postos.flatMap((posto) => [posto.nome, posto.codigo])
+      .filter((value): value is string => typeof value === "string" && value.trim() !== "")
+      .map(normalizeHeader),
+  );
+  return groups
+    .map((group) => group.areaTrabalhoOriginal)
+    .filter((area) => !accessibleNames.has(normalizeHeader(area)));
+}
 
 export function chunkStagingRows<T>(rows: T[], size = STAGING_CHUNK_SIZE): T[][] {
   if (!Number.isInteger(size) || size < 1 || size > STAGING_CHUNK_SIZE) {
@@ -103,14 +119,14 @@ export interface ImportService {
     context: OperationalAccessContext,
     onProgress?: (progress: ImportProgress) => void,
     signal?: AbortSignal,
-  ): Promise<ImportPreview>;
+  ): Promise<ImportPreview[]>;
   confirm(loteId: string, context: OperationalAccessContext): Promise<ImportResult>;
   cancel(loteId?: string): Promise<void>;
 }
 
 export function createImportService(client: SupabaseClient = getSupabaseClient()): ImportService {
   let currentController: AbortController | null = null;
-  let currentLoteId: string | null = null;
+  let currentLoteIds: string[] = [];
 
   async function rpc<T>(name: string, args: Record<string, unknown>): Promise<T> {
     return requireData(await client.rpc(name, args) as RpcResponse<T>, "Falha temporária na importação.");
@@ -141,85 +157,157 @@ export function createImportService(client: SupabaseClient = getSupabaseClient()
     return { erros, alertas };
   }
 
+  async function cancelLots(loteIds: string[], bestEffort = false): Promise<void> {
+    for (const loteId of loteIds) {
+      try {
+        await rpc("cancelar_importacao_mms", { p_lote_id: loteId });
+      } catch (error) {
+        if (!bestEffort) throw error;
+      }
+    }
+    currentLoteIds = currentLoteIds.filter((loteId) => !loteIds.includes(loteId));
+  }
+
+  async function assertAreasAccessible(groups: ParsedMmsAreaGroup[]): Promise<void> {
+    const { data, error } = await client
+      .from("postos")
+      .select("nome,codigo")
+      .eq("ativo", true)
+      .is("deleted_at", null);
+    if (error) throw new Error("Não foi possível validar os postos do arquivo.");
+
+    const unavailable = findUnavailableMmsAreas(
+      groups,
+      (data ?? []) as Array<{ nome: string; codigo: string | null }>,
+    );
+    if (unavailable.length > 0) {
+      throw new Error(
+        `Postos não encontrados ou fora do seu acesso: ${unavailable.join(", ")}.`,
+      );
+    }
+  }
+
+  async function prepareAreaGroup(
+    parsed: ParsedMmsFile,
+    group: ParsedMmsAreaGroup,
+    groupIndex: number,
+    groupCount: number,
+    onProgress: ((progress: ImportProgress) => void) | undefined,
+    signal: AbortSignal,
+  ): Promise<ImportPreview> {
+    const label = `${group.areaTrabalhoOriginal} (${groupIndex + 1}/${groupCount})`;
+    const reservationPayload = await rpc<Record<string, unknown>>("iniciar_importacao_mms", {
+      p_nome_origem: parsed.originalName,
+      p_extensao: parsed.extension,
+      p_mime_type: parsed.mimeType,
+      p_tamanho_bytes: parsed.sizeBytes,
+      p_area_trabalho: group.areaTrabalhoOriginal,
+      p_data_atividade: parsed.dataAtividade,
+      p_total_linhas_esperadas: group.totalDataRows,
+    });
+    const reservation: ImportReservation = {
+      loteId: String(reservationPayload.lote_id),
+      bucket: "mms-importacoes",
+      caminho: String(reservationPayload.caminho),
+    };
+    currentLoteIds.push(reservation.loteId);
+
+    const { data: sessionData } = await client.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) throw new Error("Sua sessão expirou. Entre novamente.");
+    const env = loadAppEnv();
+    await uploadOriginalMmsFile({
+      supabaseUrl: env.supabaseUrl,
+      accessToken,
+      reservation,
+      file: parsed.file,
+      signal,
+      onProgress: (percentage) => {
+        const overall = ((groupIndex + percentage / 100) / groupCount) * 100;
+        onProgress?.({
+          phase: "uploading",
+          current: overall,
+          total: 100,
+          percentage: overall,
+          message: `Enviando ${label}...`,
+        });
+      },
+    });
+    await rpc("registrar_arquivo_importacao_mms", { p_lote_id: reservation.loteId });
+
+    let sent = 0;
+    for (const parsedChunk of chunkStagingRows(group.rows)) {
+      if (signal.aborted) throw new DOMException("Importação cancelada.", "AbortError");
+      const rows = parsedChunk.map((row) => ({
+        numero_linha_origem: row.sourceRowNumber,
+        raw_json: row.rawValuesByOriginalHeader,
+      }));
+      await rpc<StagingSummary>("registrar_linhas_importacao_mms", {
+        p_lote_id: reservation.loteId,
+        p_linhas: rows,
+      });
+      sent += rows.length;
+      const groupProgress = sent / group.totalDataRows;
+      const overall = ((groupIndex + groupProgress) / groupCount) * 100;
+      onProgress?.({
+        phase: "staging",
+        current: overall,
+        total: 100,
+        percentage: overall,
+        message: `Validando ${label}: ${sent} de ${group.totalDataRows} linhas...`,
+      });
+    }
+    const previewPayload = await rpc<Record<string, unknown>>("concluir_analise_importacao_mms", {
+      p_lote_id: reservation.loteId,
+    });
+    return mapPreview(previewPayload, await fetchIssues(reservation.loteId));
+  }
+
   return {
     parse: parseMmsFile,
     async prepare(parsed, context, onProgress, signal) {
       if (!context.usuarioId) throw new Error("Contexto operacional inválido.");
       currentController?.abort();
+      if (currentLoteIds.length > 0) {
+        await cancelLots([...currentLoteIds], true);
+      }
       currentController = new AbortController();
       const combinedSignal = signal ?? currentController.signal;
-
-      const reservationPayload = await rpc<Record<string, unknown>>("iniciar_importacao_mms", {
-        p_nome_origem: parsed.originalName,
-        p_extensao: parsed.extension,
-        p_mime_type: parsed.mimeType,
-        p_tamanho_bytes: parsed.sizeBytes,
-        p_area_trabalho: parsed.areaTrabalhoOriginal,
-        p_data_atividade: parsed.dataAtividade,
-        p_total_linhas_esperadas: parsed.totalDataRows,
-      });
-      const reservation: ImportReservation = {
-        loteId: String(reservationPayload.lote_id),
-        bucket: "mms-importacoes",
-        caminho: String(reservationPayload.caminho),
-      };
-      currentLoteId = reservation.loteId;
-
-      const { data: sessionData } = await client.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      if (!accessToken) throw new Error("Sua sessão expirou. Entre novamente.");
-      const env = loadAppEnv();
-      await uploadOriginalMmsFile({
-        supabaseUrl: env.supabaseUrl,
-        accessToken,
-        reservation,
-        file: parsed.file,
-        signal: combinedSignal,
-        onProgress: (percentage) =>
-          onProgress?.({ phase: "uploading", current: percentage, total: 100, percentage, message: "Enviando arquivo..." }),
-      });
-      await rpc("registrar_arquivo_importacao_mms", { p_lote_id: reservation.loteId });
-
-      let sent = 0;
-      for (const parsedChunk of chunkStagingRows(parsed.rows)) {
-        if (combinedSignal.aborted) throw new DOMException("Importação cancelada.", "AbortError");
-        const rows = parsedChunk.map((row) => ({
-          numero_linha_origem: row.sourceRowNumber,
-          raw_json: row.rawValuesByOriginalHeader,
-        }));
-        await rpc<StagingSummary>("registrar_linhas_importacao_mms", {
-          p_lote_id: reservation.loteId,
-          p_linhas: rows,
-        });
-        sent += rows.length;
-        onProgress?.({
-          phase: "staging",
-          current: sent,
-          total: parsed.totalDataRows,
-          percentage: (sent / parsed.totalDataRows) * 100,
-          message: `Validando ${sent} de ${parsed.totalDataRows} linhas...`,
-        });
+      const previews: ImportPreview[] = [];
+      try {
+        await assertAreasAccessible(parsed.areaGroups);
+        for (const [index, group] of parsed.areaGroups.entries()) {
+          previews.push(await prepareAreaGroup(
+            parsed,
+            group,
+            index,
+            parsed.areaGroups.length,
+            onProgress,
+            combinedSignal,
+          ));
+        }
+        return previews;
+      } catch (error) {
+        await cancelLots([...currentLoteIds], true);
+        throw error;
       }
-      const previewPayload = await rpc<Record<string, unknown>>("concluir_analise_importacao_mms", {
-        p_lote_id: reservation.loteId,
-      });
-      return mapPreview(previewPayload, await fetchIssues(reservation.loteId));
     },
     async confirm(loteId, context) {
       if (!context.usuarioId) throw new Error("Contexto operacional inválido.");
       const payload = await rpc<Record<string, unknown>>("confirmar_importacao_mms", {
         p_lote_id: loteId,
       });
-      return mapImportResult(payload);
+      const result = mapImportResult(payload);
+      if (result.processado) {
+        currentLoteIds = currentLoteIds.filter((current) => current !== loteId);
+      }
+      return result;
     },
     async cancel(loteId) {
       currentController?.abort();
       currentController = null;
-      const targetLoteId = loteId ?? currentLoteId;
-      if (targetLoteId) {
-        await rpc("cancelar_importacao_mms", { p_lote_id: targetLoteId });
-      }
-      currentLoteId = null;
+      const targetLoteIds = loteId ? [loteId] : [...currentLoteIds];
+      await cancelLots(targetLoteIds);
     },
   };
 }

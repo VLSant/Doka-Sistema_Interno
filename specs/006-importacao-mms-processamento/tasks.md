@@ -253,7 +253,7 @@ advisors and full quickstart evidence across the complete feature.
 
 ### Automated validation evidence — 2026-06-28
 
-- `npm test`: 27 test files and 141 tests passed; the script is
+- `npm test`: 27 test files and 150 tests passed; the script is
   `vitest run` and no browser automation was invoked.
 - `npm run typecheck`: passed.
 - `npm run lint`: passed with 5 pre-existing Fast Refresh warnings and 0 errors.
@@ -294,6 +294,12 @@ advisors and full quickstart evidence across the complete feature.
   separation, audit boundaries, original `raw_json`, complete operational key,
   `removido`/reactivation, desktop-first implementation and Spec 007
   exclusions. T078 remains open only for the user's manual browser acceptance.
+- Follow-up validation with `Atividades-KING_PE_21_05_26.csv`: parser accepted
+  108 unique headers, partitioned 51 activity rows into 8 area groups,
+  interpreted `21/05/26` as `2026-05-21`, and reported one auxiliary export
+  row while preserving the original file. Batch preview/confirmation,
+  cancellation, inaccessible-posto preflight and partial-result truthfulness
+  are covered by Vitest.
 
 ---
 

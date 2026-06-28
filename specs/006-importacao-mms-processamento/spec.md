@@ -61,10 +61,11 @@ impossibilidade de confirmação.
 
 **Acceptance Scenarios**:
 
-1. **Given** uma planilha válida de um único posto e uma única data, **When** a
-   análise termina, **Then** a prévia mostra arquivo, posto, data, total de
-   linhas, assistências principais, partes, linhas válidas, linhas válidas com
-   alerta, linhas inválidas, erros bloqueantes e alertas.
+1. **Given** uma planilha válida com uma ou mais Áreas de Trabalho e uma única
+   data, **When** a análise termina, **Then** o arquivo é separado
+   automaticamente por área e cada prévia mostra arquivo, posto, data, total
+   de linhas, assistências principais, partes, linhas válidas, linhas válidas
+   com alerta, linhas inválidas, erros bloqueantes e alertas.
 2. **Given** uma planilha completa com apenas alertas não bloqueantes, **When** a
    prévia é exibida, **Then** cada alerta é compreensível, as linhas afetadas são
    contabilizadas e a confirmação permanece disponível.
@@ -220,7 +221,8 @@ conferir o resumo com os registros efetivamente afetados.
 - Arquivo com cabeçalhos consumidos pela importação duplicados, cabeçalhos
   escritos com variação não suportada ou sem uma coluna obrigatória;
   duplicidades em colunas desconhecidas/não utilizadas são permitidas.
-- Arquivo com mais de uma área de trabalho ou mais de uma data operacional.
+- Arquivo com mais de uma área de trabalho, que deve ser particionado em lotes
+  independentes, ou com mais de uma data operacional, que permanece bloqueante.
 - Área de Trabalho ausente, vazia, correspondente a posto inexistente, inativo
   ou removido logicamente.
 - Variação do nome do posto sem correspondência exata; não deve haver
@@ -331,6 +333,12 @@ Esta feature não inclui:
   confirmação e MUST NOT alterar o espelho.
 - **FR-012**: O sistema MUST identificar o posto pelo valor da coluna Área de
   Trabalho e MUST NOT solicitar escolha manual para substituir esse valor.
+- **FR-012A**: Quando um arquivo contiver múltiplas Áreas de Trabalho, o sistema
+  MUST particionar as linhas automaticamente e criar um lote independente por
+  área, preservando os números de linha de origem e o arquivo original.
+- **FR-012B**: Antes de reservar qualquer lote do arquivo composto, o sistema
+  MUST validar que todas as áreas correspondem a postos ativos visíveis no
+  escopo atual; falha nessa validação MUST NOT deixar lotes parciais ativos.
 - **FR-013**: A correspondência de Área de Trabalho MUST usar um posto existente
   e ativo; posto ausente, inativo, removido ou sem correspondência MUST bloquear
   a confirmação.
@@ -544,9 +552,12 @@ Esta feature não inclui:
 
 ## Assumptions
 
-- O formato suportado representa um único retrato MMS de um posto e uma data por
-  arquivo; arquivos que misturem posto ou data são bloqueados, não divididos
-  automaticamente.
+- O formato suportado representa um único retrato MMS de uma data por arquivo.
+  Arquivos com múltiplos postos são divididos automaticamente em lotes
+  independentes; arquivos com múltiplas datas permanecem bloqueados.
+- Linhas auxiliares do export sem Área de Trabalho, Tipo de Atividade e Status
+  de Atividade não representam atividades, são informadas e ignoradas no
+  staging; o arquivo original continua preservado.
 - CSV e XLSX compatíveis contêm uma única tabela lógica MMS; escolha manual de
   aba, intervalo ou cabeçalho não faz parte desta feature.
 - Os campos obrigatórios e candidatos continuam sendo os aprovados nas Specs

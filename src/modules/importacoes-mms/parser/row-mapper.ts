@@ -175,20 +175,45 @@ export function mapTabularRows(
     headers.map((header) => [normalizeHeader(header), header] as const),
   );
   const areaHeader = headerByCanonical.get(normalizeHeader("Área de Trabalho"))!;
+  const typeHeader = headerByCanonical.get(normalizeHeader("Tipo de Atividade"))!;
+  const statusHeader = headerByCanonical.get(normalizeHeader("Status da Atividade"))!;
   const dateHeader = headerByCanonical.get(normalizeHeader("Data"))!;
-  const areas = new Set(
-    parsedRows
-      .map((row) => String(row.rawValuesByOriginalHeader[areaHeader] ?? "").trim())
-      .filter(Boolean),
+  const isAuxiliaryRow = (row: ParsedMmsRow) =>
+    !String(row.rawValuesByOriginalHeader[areaHeader] ?? "").trim()
+    && !String(row.rawValuesByOriginalHeader[typeHeader] ?? "").trim()
+    && !String(row.rawValuesByOriginalHeader[statusHeader] ?? "").trim();
+  const ignoredAuxiliaryRows = parsedRows.filter(isAuxiliaryRow);
+  const activityRows = parsedRows.filter((row) => !isAuxiliaryRow(row));
+  if (activityRows.length === 0) {
+    throw new MmsParserError("arquivo_vazio", "O arquivo não contém linhas de atividade.");
+  }
+
+  const rowsWithoutArea = activityRows.filter(
+    (row) => !String(row.rawValuesByOriginalHeader[areaHeader] ?? "").trim(),
   );
-  if (areas.size !== 1) {
+  if (rowsWithoutArea.length > 0) {
+    const lines = rowsWithoutArea.map((row) => row.sourceRowNumber).join(", ");
     throw new MmsParserError(
-      "multiplas_areas_trabalho",
-      "O arquivo deve conter uma única Área de Trabalho.",
+      "area_trabalho_ausente",
+      `Área de Trabalho ausente nas linhas: ${lines}.`,
     );
   }
+
+  const rowsByArea = new Map<string, ParsedMmsRow[]>();
+  for (const row of activityRows) {
+    const area = String(row.rawValuesByOriginalHeader[areaHeader]).trim();
+    const group = rowsByArea.get(area) ?? [];
+    group.push(row);
+    rowsByArea.set(area, group);
+  }
+  const areaGroups = [...rowsByArea.entries()].map(([areaTrabalhoOriginal, rows]) => ({
+    areaTrabalhoOriginal,
+    rows,
+    totalDataRows: rows.length,
+  }));
+
   const dates = new Set(
-    parsedRows
+    activityRows
       .map((row) => normalizeDate(row.rawValuesByOriginalHeader[dateHeader]))
       .filter((value): value is string => Boolean(value)),
   );
@@ -203,9 +228,11 @@ export function mapTabularRows(
     originalName: file.name,
     sizeBytes: file.size,
     headersOriginal: headers,
-    rows: parsedRows,
-    totalDataRows: parsedRows.length,
-    areaTrabalhoOriginal: [...areas][0],
+    rows: activityRows,
+    totalDataRows: activityRows.length,
+    ignoredAuxiliarySourceRows: ignoredAuxiliaryRows.map((row) => row.sourceRowNumber),
+    areaGroups,
+    areaTrabalhoOriginal: areaGroups[0].areaTrabalhoOriginal,
     dataAtividade: [...dates][0],
   };
 }
@@ -214,8 +241,15 @@ export function normalizeDate(value: unknown): string | null {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
   const text = String(value ?? "").trim();
   const br = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text);
+  const brShort = /^(\d{2})\/(\d{2})\/(\d{2})$/.exec(text);
   const iso = /^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/.exec(text);
-  const parts = br ? [br[3], br[2], br[1]] : iso ? [iso[1], iso[2], iso[3]] : null;
+  const parts = br
+    ? [br[3], br[2], br[1]]
+    : brShort
+      ? [`20${brShort[3]}`, brShort[2], brShort[1]]
+      : iso
+        ? [iso[1], iso[2], iso[3]]
+        : null;
   if (!parts) return null;
   const candidate = `${parts[0]}-${parts[1]}-${parts[2]}`;
   const parsed = new Date(`${candidate}T00:00:00Z`);

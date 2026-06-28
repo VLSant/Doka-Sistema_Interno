@@ -6,6 +6,12 @@ export interface ParsedMmsRow {
   rawValuesByOriginalHeader: Record<string, JsonSafeValue>;
 }
 
+export interface ParsedMmsAreaGroup {
+  areaTrabalhoOriginal: string;
+  rows: ParsedMmsRow[];
+  totalDataRows: number;
+}
+
 export interface ParsedMmsFile {
   file: File;
   extension: MmsFileExtension;
@@ -15,6 +21,9 @@ export interface ParsedMmsFile {
   headersOriginal: string[];
   rows: ParsedMmsRow[];
   totalDataRows: number;
+  ignoredAuxiliarySourceRows: number[];
+  areaGroups: ParsedMmsAreaGroup[];
+  /** Compatibility value for single-area consumers; batch code uses areaGroups. */
   areaTrabalhoOriginal: string;
   dataAtividade: string;
 }
@@ -28,6 +37,7 @@ export type ParserErrorCode =
   | "cabecalho_duplicado"
   | "multiplas_datas"
   | "multiplas_areas_trabalho"
+  | "area_trabalho_ausente"
   | "data_invalida";
 
 export class MmsParserError extends Error {

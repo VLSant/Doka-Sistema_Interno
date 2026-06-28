@@ -324,8 +324,13 @@ Esses totais são calculados na transação, retornados e persistidos no lote.
 - `headersOriginal`
 - `rows`
 - `totalDataRows`
-- `areaTrabalhoOriginal`
+- `areaGroups` (`areaTrabalhoOriginal`, `rows`, `totalDataRows`)
+- `ignoredAuxiliarySourceRows`
 - `dataAtividade`
+
+Um arquivo com múltiplas áreas continua sendo um único artefato local, mas
+origina um lote persistente independente por item de `areaGroups`. Cada lote
+recebe somente suas linhas e preserva uma cópia privada do arquivo original.
 
 ### `ParsedMmsRow`
 

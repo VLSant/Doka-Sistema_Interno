@@ -33,7 +33,7 @@ describe("MMS confirmation flow", () => {
     const preview = buildImportPreview();
     const service: ImportService = {
       parse: vi.fn().mockResolvedValue(buildParsedFile()),
-      prepare: vi.fn().mockResolvedValue(preview),
+      prepare: vi.fn().mockResolvedValue([preview]),
       confirm: vi.fn().mockResolvedValue(buildImportResult()),
       cancel: vi.fn().mockResolvedValue(undefined),
     };
@@ -51,7 +51,7 @@ describe("MMS confirmation flow", () => {
   it("keeps an ineligible preview without a confirmation action", async () => {
     const service: ImportService = {
       parse: vi.fn().mockResolvedValue(buildParsedFile()),
-      prepare: vi.fn().mockResolvedValue(buildImportPreview({ podeConfirmar: false, status: "erro" })),
+      prepare: vi.fn().mockResolvedValue([buildImportPreview({ podeConfirmar: false, status: "erro" })]),
       confirm: vi.fn(),
       cancel: vi.fn().mockResolvedValue(undefined),
     };
@@ -60,5 +60,91 @@ describe("MMS confirmation flow", () => {
     await userEvent.upload(screen.getByLabelText("Arquivo MMS"), new File(["x"], "mms.csv", { type: "text/csv" }));
     await screen.findByText(/Corrija o arquivo/);
     expect(screen.queryByRole("button", { name: "Confirmar importação" })).not.toBeInTheDocument();
+  });
+
+  it("shows and confirms one independent preview per area", async () => {
+    const previews = [
+      buildImportPreview(),
+      buildImportPreview({
+        loteId: "61000000-0000-0000-0000-000000000002",
+        posto: { id: "posto-b", nome: "Posto B" },
+      }),
+    ];
+    const service: ImportService = {
+      parse: vi.fn().mockResolvedValue(buildParsedFile()),
+      prepare: vi.fn().mockResolvedValue(previews),
+      confirm: vi.fn()
+        .mockResolvedValueOnce(buildImportResult())
+        .mockResolvedValueOnce(buildImportResult({
+          loteId: previews[1].loteId,
+          posto: "Posto B",
+        })),
+      cancel: vi.fn().mockResolvedValue(undefined),
+    };
+    const access = renderPage(service);
+    await waitFor(() => expect(access.resolveInitialContext).toHaveBeenCalled());
+
+    await userEvent.upload(
+      screen.getByLabelText("Arquivo MMS"),
+      new File(["x"], "mms.csv", { type: "text/csv" }),
+    );
+    expect(await screen.findByText(/separado automaticamente em/)).toHaveTextContent("2 áreas");
+    await userEvent.click(screen.getByRole("button", { name: "Confirmar 2 importações" }));
+    await screen.findAllByText("Importação concluída");
+    expect(service.confirm).toHaveBeenCalledTimes(2);
+  });
+
+  it("cancels every pending area from a batch preview", async () => {
+    const service: ImportService = {
+      parse: vi.fn().mockResolvedValue(buildParsedFile()),
+      prepare: vi.fn().mockResolvedValue([
+        buildImportPreview(),
+        buildImportPreview({
+          loteId: "61000000-0000-0000-0000-000000000002",
+          posto: { id: "posto-b", nome: "Posto B" },
+        }),
+      ]),
+      confirm: vi.fn(),
+      cancel: vi.fn().mockResolvedValue(undefined),
+    };
+    const access = renderPage(service);
+    await waitFor(() => expect(access.resolveInitialContext).toHaveBeenCalled());
+    await userEvent.upload(
+      screen.getByLabelText("Arquivo MMS"),
+      new File(["x"], "mms.csv", { type: "text/csv" }),
+    );
+
+    await userEvent.click(await screen.findByRole("button", { name: "Cancelar" }));
+    expect(service.cancel).toHaveBeenCalledWith();
+    expect(await screen.findByText("Tentativa cancelada")).toBeInTheDocument();
+  });
+
+  it("shows successful and failed area results without false batch success", async () => {
+    const previews = [
+      buildImportPreview(),
+      buildImportPreview({
+        loteId: "61000000-0000-0000-0000-000000000002",
+        posto: { id: "posto-b", nome: "Posto B" },
+      }),
+    ];
+    const service: ImportService = {
+      parse: vi.fn().mockResolvedValue(buildParsedFile()),
+      prepare: vi.fn().mockResolvedValue(previews),
+      confirm: vi.fn()
+        .mockResolvedValueOnce(buildImportResult())
+        .mockRejectedValueOnce(new Error("Falha temporária no Posto B.")),
+      cancel: vi.fn().mockResolvedValue(undefined),
+    };
+    const access = renderPage(service);
+    await waitFor(() => expect(access.resolveInitialContext).toHaveBeenCalled());
+    await userEvent.upload(
+      screen.getByLabelText("Arquivo MMS"),
+      new File(["x"], "mms.csv", { type: "text/csv" }),
+    );
+    await userEvent.click(await screen.findByRole("button", { name: "Confirmar 2 importações" }));
+
+    expect(await screen.findByText("Falha temporária no Posto B.")).toBeInTheDocument();
+    expect(screen.getAllByText(/espelho atualizado:/i)[0].closest("p")).toHaveTextContent("Sim");
+    expect(screen.getAllByText(/espelho atualizado:/i)[1].closest("p")).toHaveTextContent("Não");
   });
 });
