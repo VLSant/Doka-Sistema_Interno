@@ -1,0 +1,7 @@
+.mms-validation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--space-3); margin: var(--space-4) 0; }
+.mms-validation-grid div { padding: var(--space-3); border-radius: var(--radius-md); background: var(--surface-sunken); }
+.mms-validation-grid dt { color: var(--text-muted); font-size: var(--text-xs); }
+.mms-validation-grid dd { margin: 0; color: var(--text-strong); font-size: var(--text-xl); font-weight: var(--fw-bold); }
+.mms-eligibility { padding: var(--space-3); border-radius: var(--radius-md); font-weight: var(--fw-semibold); }
+.mms-eligibility--ok { color: var(--green-600); background: var(--green-50); }
+.mms-eligibility--blocked { color: var(--red-600); background: var(--red-50); }

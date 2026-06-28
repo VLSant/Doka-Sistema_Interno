@@ -1,0 +1,24 @@
+import { describe, expect, it } from "vitest";
+import { mapImportResult } from "../../../src/modules/importacoes-mms/import-service";
+
+describe("mapImportResult", () => {
+  it("maps the immutable server payload", () => {
+    const result = mapImportResult({
+      lote_id: "lote-1",
+      processado: true,
+      status: "importado",
+      arquivo: "mms.csv",
+      posto: "Posto A",
+      data_atividade: "2026-06-27",
+      partes_preservadas: 3,
+      processado_em: "2026-06-27T12:00:00Z",
+    });
+    expect(result.partesPreservadas).toBe(3);
+    expect(result.processado).toBe(true);
+  });
+
+  it("rejects malformed or negative counters", () => {
+    expect(() => mapImportResult({ processado: true })).toThrow();
+    expect(() => mapImportResult({ lote_id: "x", processado: true, partes_criadas: -1 })).toThrow();
+  });
+});

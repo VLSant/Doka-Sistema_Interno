@@ -69,7 +69,7 @@ Ficam fora do MVP:
   próprio), conectando diretamente ao Supabase sob RLS.
 - **React Router** (Data Mode) para roteamento e proteção de rotas.
 - **Vitest** + **React Testing Library** para testes unitários/integração;
-  **Playwright** para testes end-to-end.
+  os testes Playwright existentes pertencem à fundação da Spec 005.
 - Design system Doka (Poppins, paleta oficial, componentes) em
   `design-system/` e `public/design-system/`.
 
@@ -219,6 +219,13 @@ do servidor em vez de serem resolvidos pela aplicação.
 ## Como testar
 
 Como o MVP ainda está em construção, os testes devem ser organizados por camada.
+
+Para a Spec 006, execute `npm test`, typecheck, lint e build localmente. Os
+testes SQL da importação são executados no projeto remoto de desenvolvimento,
+cada arquivo dentro de `BEGIN`/`ROLLBACK`. A Spec 006 não usa Docker nem cria
+testes de automação de navegador; navegação, responsividade e acessibilidade
+real são homologadas manualmente pelo usuário conforme
+`specs/006-importacao-mms-processamento/quickstart.md`.
 
 ### Testes do app web (frontend)
 

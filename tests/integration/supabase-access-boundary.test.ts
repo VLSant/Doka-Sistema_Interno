@@ -100,4 +100,20 @@ describe("Supabase access boundary (frontend-only, publishable key, existing RLS
     expect(content).not.toMatch(/user_metadata/);
     expect(content).not.toMatch(/localStorage|sessionStorage/);
   });
+
+  it("the MMS client uses workflow RPCs instead of direct staging writes or public file URLs", () => {
+    const service = readFileSync(
+      path.join(REPO_ROOT, "src/modules/importacoes-mms/import-service.ts"),
+      "utf8",
+    );
+    const upload = readFileSync(
+      path.join(REPO_ROOT, "src/modules/importacoes-mms/storage-upload.ts"),
+      "utf8",
+    );
+    expect(service).toContain("iniciar_importacao_mms");
+    expect(service).toContain("registrar_linhas_importacao_mms");
+    expect(service).not.toMatch(/\.from\(\s*["'`]mms_linhas_importacao["'`]\s*\)\s*\.insert/);
+    expect(upload).toContain('"x-upsert": "false"');
+    expect(upload).not.toContain("getPublicUrl");
+  });
 });

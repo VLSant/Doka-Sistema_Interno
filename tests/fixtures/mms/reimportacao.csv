@@ -1,0 +1,4 @@
+Data;Área de Trabalho;Número da Assistência;Parte do Conjunto;Tipo de Atividade;Status da Atividade;Cliente;Descrição da Mercadoria
+27/06/2026;Posto A;AST-001;PARTE-A;Montagem em Conjunto;Concluído;Cliente A;Armário atualizado
+27/06/2026;Posto A;AST-001;PARTE-B;Montagem em Conjunto;Iniciado;Cliente A;Painel novo
+27/06/2026;Posto A;AST-003;PARTE-A;Assistência Técnica;Pendente;Cliente C;Cadeira nova
