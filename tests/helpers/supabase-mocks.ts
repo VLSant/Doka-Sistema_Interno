@@ -140,6 +140,7 @@ export interface MockSupabaseAuth {
   }>;
   signOut: (options?: { scope?: "local" | "global" | "others" }) => Promise<{ error: { message: string } | null }>;
   getUser: () => Promise<{ data: { user: User | null }; error: { message: string } | null }>;
+  getSession: () => Promise<{ data: { session: Session | null }; error: { message: string } | null }>;
   onAuthStateChange: (callback: AuthChangeListener) => {
     data: { subscription: { unsubscribe: () => void } };
   };
@@ -193,6 +194,9 @@ export function createMockSupabaseClient(options: CreateMockSupabaseClientOption
     },
     async getUser() {
       return { data: { user: currentUser }, error: null };
+    },
+    async getSession() {
+      return { data: { session: options.initialSession ?? null }, error: null };
     },
     onAuthStateChange(callback: AuthChangeListener) {
       listeners.add(callback);

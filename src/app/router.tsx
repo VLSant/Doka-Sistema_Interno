@@ -19,6 +19,7 @@ import {
   Outlet,
   useNavigation,
 } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { LoadingState } from "../components/feedback/LoadingState";
 import { FeedbackState } from "../components/feedback/FeedbackState";
 import { AuthProvider } from "../modules/auth/AuthProvider";
@@ -35,6 +36,8 @@ import { ModuleUnavailablePage } from "../modules/navigation/pages/ModuleUnavail
 import { NotFoundPage } from "../modules/navigation/pages/NotFoundPage";
 import { AppShell } from "../components/layout/AppShell";
 import { ROUTE_DEFINITIONS } from "./routes";
+
+const NewImportPage = lazy(() => import("../modules/importacoes-mms/pages/NewImportPage"));
 
 function RootLayout() {
   const navigation = useNavigation();
@@ -120,6 +123,10 @@ export const router = createBrowserRouter([
             <ProtectedRoute routeId={route.id}>
               {route.id === "dashboard" ? (
                 <DashboardPage />
+              ) : route.id === "importacoes-mms" ? (
+                <Suspense fallback={<LoadingState message="Carregando importação..." />}>
+                  <NewImportPage />
+                </Suspense>
               ) : (
                 <ModuleUnavailablePage moduleLabel={route.label} />
               )}

@@ -77,7 +77,7 @@ export const ROUTE_DEFINITIONS: RouteDefinition[] = [
     label: "Importações MMS",
     icon: "upload",
     profiles: ALL_OFFICIAL_PROFILES,
-    availability: "placeholder",
+    availability: "available",
     navigationOrder: 5,
   },
   {

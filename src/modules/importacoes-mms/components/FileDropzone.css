@@ -1,0 +1,9 @@
+.mms-file-section { display: grid; gap: var(--space-4); }
+.mms-file-dropzone { display: grid; min-height: 180px; place-content: center; gap: var(--space-2); padding: var(--space-6); text-align: center; border: 2px dashed var(--border-default); border-radius: var(--radius-lg); background: var(--surface-sunken); cursor: pointer; }
+.mms-file-dropzone:hover, .mms-file-dropzone--dragging { border-color: var(--brand-primary); background: var(--surface-brand-soft); }
+.mms-file-dropzone[aria-disabled="true"] { cursor: not-allowed; opacity: .65; }
+.mms-file-dropzone__input { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.mms-file-dropzone span, .mms-progress span { color: var(--text-muted); font-size: var(--text-sm); }
+.mms-progress { display: grid; gap: var(--space-2); }
+.mms-progress progress { inline-size: 100%; accent-color: var(--brand-primary); }
+.mms-file-error { color: var(--red-600); }
