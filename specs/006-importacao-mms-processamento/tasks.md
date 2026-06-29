@@ -486,3 +486,7 @@ After Foundational:
 - [X] T085 Executar Vitest, typecheck, lint, build e testes SQL remotos sem
   Docker nem automação de navegador
 - [X] T086 Revisar advisors e publicar as mudanças no PR
+- [X] T087 Tratar duplicatas equivalentes com deduplicação e alerta, e
+  duplicatas conflitantes com erro bloqueante, em migration incremental
+- [X] T088 Validar deduplicação, reenvio idempotente e conflito no Supabase
+  remoto com transação e rollback

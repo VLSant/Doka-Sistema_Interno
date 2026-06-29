@@ -9,6 +9,9 @@
   Direção podem ler o lote multi-posto.
 - As RLS de assistências, partes e demais dados operacionais continuam por
   vínculo de posto.
+- Chaves repetidas com `raw_json` idêntico são deduplicadas com alerta e
+  evidência preservada por soft delete; a mesma chave com conteúdo diferente
+  gera erro bloqueante.
 
 ## Storage
 
