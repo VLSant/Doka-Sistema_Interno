@@ -24,6 +24,16 @@ select pg_temp.assert_true(
 
 select pg_temp.assert_true(
   pg_get_functiondef(
+    'public.corrigir_campo_assistencia_mms(text,uuid,text,text,text,bigint)'::regprocedure
+  ) ilike '%v_assistencia.versao_registro is distinct from p_versao_esperada%'
+  and pg_get_functiondef(
+    'public.corrigir_campo_assistencia_mms(text,uuid,text,text,text,bigint)'::regprocedure
+  ) ilike '%v_parte.versao_registro is distinct from p_versao_esperada%',
+  'versao nula deve ser tratada como conflito em assistencia e parte'
+);
+
+select pg_temp.assert_true(
+  pg_get_functiondef(
     'app_private.mms_incrementar_versao_registro()'::regprocedure
   ) ilike '%old.versao_registro + 1%',
   'trigger deve incrementar versao exatamente uma vez'

@@ -487,7 +487,7 @@ begin
       raise exception 'registro_removido' using errcode = '55000';
     end if;
 
-    if v_assistencia.versao_registro <> p_versao_esperada then
+    if v_assistencia.versao_registro is distinct from p_versao_esperada then
       raise exception 'correcao_desatualizada' using errcode = '40001';
     end if;
 
@@ -563,7 +563,7 @@ begin
       raise exception 'registro_removido' using errcode = '55000';
     end if;
 
-    if v_parte.versao_registro <> p_versao_esperada then
+    if v_parte.versao_registro is distinct from p_versao_esperada then
       raise exception 'correcao_desatualizada' using errcode = '40001';
     end if;
 

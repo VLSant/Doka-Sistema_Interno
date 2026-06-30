@@ -35,11 +35,15 @@ export function AssistanceListPage({ service: injected }: { service?: Assistance
         setItems((current) => (append ? [...current, ...page.itens] : page.itens));
         setCursor(page.proximo_cursor);
       } catch (cause) {
-        setError(
+        const nextError: PageError =
           cause instanceof Error
             ? (cause as PageError)
-            : new Error("Não foi possível carregar as assistências."),
-        );
+            : (new Error("Não foi possível carregar as assistências.") as PageError);
+        setError(nextError);
+        if (!append || nextError.code === "acesso_negado") {
+          setItems([]);
+          setCursor(null);
+        }
       } finally {
         setLoading(false);
       }

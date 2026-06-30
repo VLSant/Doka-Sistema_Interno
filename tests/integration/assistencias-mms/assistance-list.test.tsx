@@ -50,4 +50,24 @@ describe("assistance list", () => {
     expect(await screen.findByText("Acesso negado")).toBeVisible();
     expect(screen.queryByRole("button", { name: "Tentar novamente" })).not.toBeInTheDocument();
   });
+
+  it("removes stale rows when a filtered reload is denied", async () => {
+    const error = Object.assign(new Error("Você não possui acesso."), {
+      code: "acesso_negado",
+    });
+    const service = {
+      list: vi
+        .fn()
+        .mockResolvedValueOnce(assistancePage([assistanceItem]))
+        .mockRejectedValueOnce(error),
+    };
+    renderList(service);
+    expect(await screen.findByText("ASS-008")).toBeVisible();
+
+    await userEvent.type(screen.getByLabelText("Número da assistência"), "restrito");
+    await userEvent.click(screen.getByRole("button", { name: "Aplicar filtros" }));
+
+    expect(await screen.findByText("Acesso negado")).toBeVisible();
+    expect(screen.queryByText("ASS-008")).not.toBeInTheDocument();
+  });
 });
