@@ -8,6 +8,7 @@ import { ReprocessDialog } from "../components/ReprocessDialog";
 import { createLotService, type LotService } from "../lot-service";
 import { createTreatmentService, type TreatmentService } from "../treatment-service";
 import type { JsonSafeValue, LotDetail, LotItem } from "../types";
+import { canonicalCorrectionField } from "../correction-fields";
 import "./ImportListPage.css";
 
 export function ImportTreatmentPage({ lotService: injectedLot, treatmentService: injectedTreatment }: {
@@ -41,21 +42,25 @@ export function ImportTreatmentPage({ lotService: injectedLot, treatmentService:
     {message ? <p role="alert">{message}</p> : null}
     <Card padding="lg"><h2>Erros e correções</h2>
       {errors.length === 0 ? <p>Nenhum erro pendente.</p> : <div className="mms-treatment-errors">
-        {errors.map((error) => <section key={error.id} aria-labelledby={`error-${error.id}`}>
-          <h3 id={`error-${error.id}`}>{String(error.campo ?? "Linha")} — {String(error.codigo ?? "erro_validacao")}</h3>
-          <p>{String(error.mensagem ?? "Erro de validação")}</p>
-          {lot.capacidades.corrigir && error.linha_importacao_id && error.campo ? <CorrectionEditor
-            lotId={lot.lote_id}
-            lineId={String(error.linha_importacao_id)}
-            field={String(error.campo)}
-            original={(error.valor_original ?? null) as JsonSafeValue}
-            normalized={(error.valor_normalizado ?? null) as JsonSafeValue}
-            current={(error.valor_efetivo ?? "") as JsonSafeValue}
-            version={Number(error.versao_correcao ?? 0)}
-            service={treatment}
-            onSaved={load}
-          /> : null}
-        </section>)}
+        {errors.map((error) => {
+          const correctionField = String(error.campo_correcao ?? "")
+            || canonicalCorrectionField(error.campo, error.codigo);
+          return <section key={error.id} aria-labelledby={`error-${error.id}`}>
+            <h3 id={`error-${error.id}`}>{String(error.campo ?? "Linha")} — {String(error.codigo ?? "erro_validacao")}</h3>
+            <p>{String(error.mensagem ?? "Erro de validação")}</p>
+            {lot.capacidades.corrigir && error.linha_importacao_id && correctionField ? <CorrectionEditor
+              lotId={lot.lote_id}
+              lineId={String(error.linha_importacao_id)}
+              field={correctionField}
+              original={(error.valor_original ?? null) as JsonSafeValue}
+              normalized={(error.valor_normalizado ?? null) as JsonSafeValue}
+              current={(error.valor_efetivo ?? "") as JsonSafeValue}
+              version={Number(error.versao_correcao ?? 0)}
+              service={treatment}
+              onSaved={load}
+            /> : null}
+          </section>;
+        })}
       </div>}
     </Card>
     <div>{lot.capacidades.concluir_tratamento ? <Button onClick={conclude}>Concluir tratamento</Button> : null}

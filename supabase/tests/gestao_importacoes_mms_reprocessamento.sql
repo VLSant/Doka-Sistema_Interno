@@ -14,4 +14,13 @@ select pg_temp.assert_true(
     and indexdef like '%created_by, chave_idempotencia%'),
   'ledger garante idempotência por ator'
 );
+select pg_temp.assert_true(
+  pg_get_functiondef('public.reprocessar_lote_importacao_mms(uuid,integer,uuid)'::regprocedure)
+    like '%set_config(''app.mms_replay'',''on'',true)%'
+  and pg_get_functiondef('public.reprocessar_lote_importacao_mms(uuid,integer,uuid)'::regprocedure)
+    like '%resultado_operacao->>''processado''%'
+  and pg_get_functiondef('app_private.mms_processar_lote_assistencias(uuid)'::regprocedure)
+    like '%erro_pendente.resolvido_em is null%',
+  'reprocessamento ignora guarda antiga, inclui linhas corrigidas e rejeita falso sucesso'
+);
 rollback;

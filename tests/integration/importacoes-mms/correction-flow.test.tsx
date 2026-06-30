@@ -2,9 +2,18 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { CorrectionEditor } from "../../../src/modules/importacoes-mms/components/CorrectionEditor";
+import { canonicalCorrectionField } from "../../../src/modules/importacoes-mms/correction-fields";
 import { correctionResult, lotDetail } from "../../helpers/importacao-mms-management-fixtures";
 
 describe("correction flow", () => {
+  it("maps staging display labels and codes to canonical correction fields", () => {
+    expect(canonicalCorrectionField("Número da Assistência")).toBe("numero_assistencia");
+    expect(canonicalCorrectionField("Status da Atividade")).toBe("status_atividade");
+    expect(canonicalCorrectionField("qualquer rótulo", "tipo_atividade_nao_reconhecido"))
+      .toBe("tipo_atividade");
+    expect(canonicalCorrectionField("campo desconhecido")).toBeNull();
+  });
+
   it("sends the expected version and refreshes after success", async () => {
     const saveCorrection = vi.fn().mockResolvedValue(correctionResult);
     const onSaved = vi.fn();

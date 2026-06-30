@@ -149,6 +149,29 @@ as $$
   end
 $$;
 
+create or replace function app_private.mms_campo_correcao(p_campo text)
+returns text language sql immutable set search_path = ''
+as $$
+  select case app_private.mms_normalizar_texto(p_campo)
+    when 'area de trabalho' then 'area_trabalho'
+    when 'area_trabalho' then 'area_trabalho'
+    when 'data' then 'data_atividade'
+    when 'data da atividade' then 'data_atividade'
+    when 'data_atividade' then 'data_atividade'
+    when 'numero da assistencia' then 'numero_assistencia'
+    when 'numero_assistencia' then 'numero_assistencia'
+    when 'parte do conjunto' then 'parte_conjunto'
+    when 'parte_conjunto' then 'parte_conjunto'
+    when 'status da atividade' then 'status_atividade'
+    when 'status_atividade' then 'status_atividade'
+    when 'tipo de atividade' then 'tipo_atividade'
+    when 'tipo_atividade' then 'tipo_atividade'
+    when 'descricao' then 'descricao'
+    when 'laudo ou observacao' then 'laudo_ou_observacao'
+    when 'laudo_ou_observacao' then 'laudo_ou_observacao'
+  end
+$$;
+
 -- Refatora o processador da Spec 006 no próprio catálogo para consumir a
 -- projeção efetiva, mantendo raw_json/json_normalizado fisicamente imutáveis.
 do $migration$
@@ -208,6 +231,23 @@ begin
     )',
     'gi'
   );
+  definicao := regexp_replace(
+    definicao,
+    'and\s+estado_validacao\s+in\s*\(''valida''\s*,\s*''valida_com_alerta''\)',
+    'and (
+      estado_validacao in (''valida'',''valida_com_alerta'')
+      or (
+        coalesce(current_setting(''app.mms_replay'',true),''off'')=''on''
+        and not exists (
+          select 1 from public.mms_erros_importacao erro_pendente
+          where erro_pendente.linha_importacao_id=mms_linhas_importacao.id
+            and erro_pendente.deleted_at is null
+            and erro_pendente.resolvido_em is null
+        )
+      )
+    )',
+    'gi'
+  );
   execute definicao;
 end
 $migration$;
@@ -242,6 +282,32 @@ as $$
         and up.deleted_at is null
         and li.lote_importacao_id = lote_uuid and li.deleted_at is null
     )
+$$;
+
+create or replace function app_private.mms_usuario_pode_corrigir_posto(p_posto_id uuid)
+returns boolean language sql stable security definer set search_path = ''
+as $$
+  select coalesce(
+    app_private.usuario_e_direcao_admin()
+    or (
+      app_private.usuario_e_supervisao()
+      and app_private.usuario_tem_acesso_posto(p_posto_id)
+    )
+    or exists (
+      select 1
+      from public.usuarios u
+      join public.usuarios_postos up on up.usuario_id=u.id
+      join public.postos p on p.id=up.posto_id
+      where u.id=app_private.usuario_atual_id()
+        and u.perfil='operador'::public.perfil_usuario
+        and u.ativo and u.deleted_at is null
+        and up.posto_id=p_posto_id
+        and up.nivel_acesso='operacional'::public.nivel_acesso_posto
+        and up.deleted_at is null
+        and p.ativo and p.deleted_at is null
+    ),
+    false
+  )
 $$;
 
 create or replace function app_private.mms_capacidades_lote(lote_uuid uuid)
@@ -284,6 +350,14 @@ begin
   with visiveis as (
     select l.*,
       count(distinct li.id)::int total_visivel,
+      count(distinct (li.posto_id,li.data_atividade,li.numero_assistencia))
+        filter (where nullif(btrim(li.numero_assistencia),'') is not null)::int
+        assistencias_visiveis,
+      count(distinct (li.posto_id,li.data_atividade,li.numero_assistencia,li.parte_conjunto))
+        filter (
+          where nullif(btrim(li.numero_assistencia),'') is not null
+            and nullif(btrim(li.parte_conjunto),'') is not null
+        )::int partes_visiveis,
       count(distinct e.id)::int erros_visiveis,
       count(distinct a.id)::int alertas_visiveis,
       coalesce(jsonb_agg(distinct jsonb_build_object('id', p.id, 'nome', p.nome))
@@ -321,8 +395,12 @@ begin
       'usuario_importador', jsonb_build_object('id', u.id, 'nome', u.nome),
       'arquivo', case when app_private.mms_cobertura_integral(i.id) then i.nome_origem end,
       'status', i.status, 'estado_processamento', i.estado_processamento,
-      'total_linhas', i.total_visivel, 'total_assistencias', i.total_assistencias,
-      'total_partes', i.total_partes, 'total_erros_pendentes', i.erros_visiveis,
+      'total_linhas', i.total_visivel,
+      'total_assistencias', case when i.total_visivel < i.total_linhas
+        then i.assistencias_visiveis else i.total_assistencias end,
+      'total_partes', case when i.total_visivel < i.total_linhas
+        then i.partes_visiveis else i.total_partes end,
+      'total_erros_pendentes', i.erros_visiveis,
       'total_alertas', i.alertas_visiveis, 'precisa_tratamento', i.erros_visiveis > 0,
       'capacidades', app_private.mms_capacidades_lote(i.id)
     ) order by i.created_at desc,i.id desc) filter(where i.rn <= p_limite), '[]'::jsonb),
@@ -393,11 +471,17 @@ begin
     ) x;
   elsif p_colecao='erros' then
     select coalesce(jsonb_agg(to_jsonb(x) order by x.created_at desc,x.id desc),'[]'::jsonb) into itens from (
-      select e.id,e.linha_importacao_id,e.campo,e.codigo,e.mensagem,e.resolvido_em,
+      select e.id,e.linha_importacao_id,e.campo,
+        app_private.mms_campo_correcao(e.campo) campo_correcao,
+        e.codigo,e.mensagem,e.resolvido_em,
         li.versao_correcao,
         case when e.campo is not null then li.raw_json->e.campo end as valor_original,
-        case when e.campo is not null then li.json_normalizado->e.campo end as valor_normalizado,
-        case when e.campo is not null then app_private.mms_json_efetivo(li.id)->e.campo end as valor_efetivo,
+        case when e.campo is not null then
+          li.json_normalizado->app_private.mms_campo_correcao(e.campo)
+        end as valor_normalizado,
+        case when e.campo is not null then
+          app_private.mms_json_efetivo(li.id)->app_private.mms_campo_correcao(e.campo)
+        end as valor_efetivo,
         e.created_at
       from public.mms_erros_importacao e join public.mms_linhas_importacao li on li.id=e.linha_importacao_id
       where e.lote_importacao_id=p_lote_id and e.deleted_at is null
@@ -451,7 +535,7 @@ begin
     or not app_private.mms_correcao_valida(p_campo,p_valor)
     then raise exception 'correcao_invalida' using errcode='22023'; end if;
   select * into linha from public.mms_linhas_importacao where id=p_linha_id and lote_importacao_id=p_lote_id and deleted_at is null for update;
-  if linha.id is null or not (app_private.usuario_e_direcao_admin() or app_private.usuario_tem_acesso_posto(linha.posto_id))
+  if linha.id is null or not app_private.mms_usuario_pode_corrigir_posto(linha.posto_id)
     then raise exception 'acesso_negado' using errcode='42501'; end if;
   if linha.versao_correcao<>p_versao_esperada then raise exception 'correcao_desatualizada' using errcode='40001'; end if;
   anterior:=app_private.mms_json_efetivo(linha.id)->p_campo; nova_versao:=linha.versao_correcao+1;
@@ -464,7 +548,9 @@ begin
   update public.mms_lotes_importacao set versao_tratamento=versao_tratamento+1,
     tratamento_concluido_em=null,tratamento_concluido_por=null,updated_at=now(),updated_by=ator where id=p_lote_id;
   update public.mms_erros_importacao set resolvido_em=now(),resolvido_por=ator,correcao_importacao_id=correcao_uuid
-    where linha_importacao_id=linha.id and campo=p_campo and deleted_at is null and resolvido_em is null;
+    where linha_importacao_id=linha.id
+      and app_private.mms_campo_correcao(campo)=p_campo
+      and deleted_at is null and resolvido_em is null;
   select count(*) into pendentes from public.mms_erros_importacao where lote_importacao_id=p_lote_id and deleted_at is null and resolvido_em is null;
   if exists (
     select 1 from public.mms_linhas_importacao li
@@ -530,7 +616,17 @@ begin
     values(p_lote_id,'reprocessamento',p_chave_idempotencia,hash,p_versao_esperada,ator) returning * into op;
   -- O processador existente permanece autoritativo. A projeção efetiva é selada
   -- por versão antes da chamada, permitindo retomada idempotente.
-  resultado_operacao:=app_private.mms_processar_lote_assistencias(p_lote_id);
+  perform set_config('app.mms_replay','on',true);
+  begin
+    resultado_operacao:=app_private.mms_processar_lote_assistencias(p_lote_id);
+    perform set_config('app.mms_replay','off',true);
+  exception when others then
+    perform set_config('app.mms_replay','off',true);
+    raise;
+  end;
+  if not coalesce((resultado_operacao->>'processado')::boolean,false) then
+    raise exception 'falha_processamento' using errcode='P0001';
+  end if;
   update public.mms_lotes_importacao set versao_processada=p_versao_esperada,
     resultado_processamento=resultado_operacao,espelho_processado_em=now(),updated_at=now(),updated_by=ator where id=p_lote_id;
   update public.mms_operacoes_lote o set estado='concluida',
@@ -790,7 +886,8 @@ grant execute on function
 to authenticated;
 revoke all on function
   app_private.mms_json_efetivo(uuid),app_private.mms_cobertura_integral(uuid),
-  app_private.mms_pode_corrigir(uuid),app_private.mms_capacidades_lote(uuid),
+  app_private.mms_pode_corrigir(uuid),app_private.mms_usuario_pode_corrigir_posto(uuid),
+  app_private.mms_campo_correcao(text),app_private.mms_capacidades_lote(uuid),
   app_private.mms_bloquear_correcao_mutacao()
 from public,anon,authenticated;
 
