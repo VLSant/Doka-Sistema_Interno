@@ -68,7 +68,7 @@ export const ROUTE_DEFINITIONS: RouteDefinition[] = [
     label: "Assistências / MMS",
     icon: "life-buoy",
     profiles: ALL_OFFICIAL_PROFILES,
-    availability: "placeholder",
+    availability: "available",
     navigationOrder: 4,
   },
   {

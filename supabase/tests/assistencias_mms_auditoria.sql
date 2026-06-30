@@ -43,11 +43,13 @@ select app_private.mms_recalcular_totais_lote('97000000-0000-0000-0000-000000000
 select app_private.mms_processar_lote_assistencias('97000000-0000-0000-0000-000000000001');
 select app_private.mms_processar_lote_assistencias('97000000-0000-0000-0000-000000000002');
 
-select app_private.mms_corrigir_assistencia(
+select public.corrigir_campo_assistencia_mms(
+  'assistencia',
   (select id from public.mms_assistencias where numero_assistencia_normalizado = 'AUD-100'),
   'cliente_nome',
   'Cliente corrigido',
-  'teste auditoria correcao'
+  'teste auditoria correcao',
+  (select versao_registro from public.mms_assistencias where numero_assistencia_normalizado = 'AUD-100')
 );
 
 select app_private.mms_processar_lote_assistencias('97000000-0000-0000-0000-000000000003');
@@ -79,14 +81,16 @@ select pg_temp.assert_true(
 
 do $$
 begin
-  perform app_private.mms_corrigir_assistencia(
+  perform public.corrigir_campo_assistencia_mms(
+    'assistencia',
     (select id from public.mms_assistencias where numero_assistencia_normalizado = 'AUD-100'),
     'campo_invalido',
     'x',
-    'bloqueado'
+    'bloqueado',
+    (select versao_registro from public.mms_assistencias where numero_assistencia_normalizado = 'AUD-100')
   );
 exception
-  when raise_exception then
+  when invalid_parameter_value then
     null;
 end
 $$;

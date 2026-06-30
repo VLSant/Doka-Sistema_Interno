@@ -60,17 +60,21 @@ select pg_temp.assert_true(
   'partes devem ter campos minimos e raw_json'
 );
 
-select app_private.mms_corrigir_assistencia(
+select public.corrigir_campo_assistencia_mms(
+  'assistencia',
   (select id from public.mms_assistencias where numero_assistencia_normalizado = 'RAW-100'),
   'cliente_nome',
   'Cliente Corrigido',
-  'teste correcao'
+  'teste correcao',
+  (select versao_registro from public.mms_assistencias where numero_assistencia_normalizado = 'RAW-100')
 );
-select app_private.mms_corrigir_parte_assistencia(
+select public.corrigir_campo_assistencia_mms(
+  'parte',
   (select p.id from public.mms_partes_assistencia p join public.mms_assistencias a on a.id = p.assistencia_id where a.numero_assistencia_normalizado = 'RAW-100' and p.parte_conjunto_normalizada = 'PC-01'),
   'descricao_mercadoria',
   'Mercadoria Corrigida',
-  'teste correcao parte'
+  'teste correcao parte',
+  (select p.versao_registro from public.mms_partes_assistencia p join public.mms_assistencias a on a.id = p.assistencia_id where a.numero_assistencia_normalizado = 'RAW-100' and p.parte_conjunto_normalizada = 'PC-01')
 );
 
 select app_private.mms_processar_lote_assistencias('98000000-0000-0000-0000-000000000002');
@@ -163,15 +167,17 @@ $$;
 
 do $$
 begin
-  perform app_private.mms_corrigir_parte_assistencia(
+  perform public.corrigir_campo_assistencia_mms(
+    'parte',
     (select p.id from public.mms_partes_assistencia p join public.mms_assistencias a on a.id = p.assistencia_id where a.numero_assistencia_normalizado = 'RAW-100' limit 1),
     'codigo_mercadoria',
     'X',
-    'fora allowlist'
+    'fora allowlist',
+    (select p.versao_registro from public.mms_partes_assistencia p join public.mms_assistencias a on a.id = p.assistencia_id where a.numero_assistencia_normalizado = 'RAW-100' limit 1)
   );
   raise exception 'ASSERTION FAILED: campo fora da allowlist deveria falhar';
 exception
-  when raise_exception then
+  when invalid_parameter_value then
     null;
 end
 $$;
