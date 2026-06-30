@@ -157,12 +157,44 @@ Com lote de 10.000 linhas:
 
 ## 7. Evidências de conclusão
 
-Registrar:
+### Execução automatizada — 2026-06-29/30
 
-- typecheck, lint, Vitest e build;
-- dry-run e migration aplicada no ambiente correto;
-- testes SQL transacionais;
-- advisors e revisão de grants/RLS;
-- medições de desempenho;
-- aceite manual por perfil;
-- prova de preservação de `raw_json`, arquivo e histórico.
+- Projeto remoto: `Doka` (`zwxxjbiwpgqjsmaxybbm`), saudável, PostgreSQL 17.
+- Migration principal `20260629231841_gestao_importacoes_mms` aplicada e
+  registrada, seguida das migrations corretivas de hash, variável de resultado,
+  índices de FKs e download de arquivo inexistente.
+- `supabase db lint --linked --schema public --level error`: zero erros.
+- Nove arquivos `gestao_importacoes_mms_*.sql` executados individualmente em
+  transação com rollback: todos aprovados.
+- Advisors: FKs introduzidas pela feature foram indexadas. Permanecem warnings
+  preexistentes e o warning esperado para RPCs públicas `SECURITY DEFINER`;
+  todas as RPCs da feature revalidam ator/escopo, usam `search_path=''` e grants
+  explícitos.
+- Planos inspecionados: predecessor usa
+  `mms_lotes_espelho_processado_idx`; lote alvo usa a chave primária.
+- `npm run typecheck`: aprovado.
+- `npm run lint`: aprovado, com oito warnings preexistentes de Fast Refresh.
+- `vitest run --maxWorkers=2`: 34 arquivos e 167 testes aprovados no escopo
+  isolado da Spec 007.
+- `npm run build`: aprovado.
+- Teste unitário de mapeamento com 10.000 itens: aprovado.
+
+### Matriz manual a registrar pelo usuário
+
+- [ ] URL direta protegida redireciona sessão anônima sem expor lote.
+- [ ] Menu, central, nova importação, detalhe e tratamento funcionam por perfil.
+- [ ] Filtros combinados, limpar e carregar mais preservam cursor/ordem.
+- [ ] 1280×720 e 1440×900 não produzem overflow da página; tabela rola
+  horizontalmente dentro do próprio contêiner.
+- [ ] Navegação completa por teclado, foco visível e retorno de foco dos
+  diálogos.
+- [ ] Status, erro e alerta possuem texto/ícone e não dependem apenas de cor.
+- [ ] Operador consulta não corrige; Operador operacional corrige somente seu
+  posto.
+- [ ] Supervisão exige cobertura integral para concluir, reprocessar e desfazer.
+- [ ] Direção/Administração possui projeção global.
+- [ ] Conflito entre dois editores preserva o valor digitado e exige revisão.
+- [ ] Clique repetido/rede incerta recupera a mesma operação idempotente.
+- [ ] Desfazer exige justificativa, rejeita análise desatualizada e restaura o
+  predecessor correto por posto/data.
+- [ ] Lote Cancelado preserva arquivo, staging, correções e auditoria.

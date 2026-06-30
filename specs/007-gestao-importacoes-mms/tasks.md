@@ -23,11 +23,11 @@ defined by the specification; US5 is the P2 desfazer increment.
 
 **Purpose**: Prepare feature-owned files without changing runtime behavior.
 
-- [ ] T001 Run `npx supabase migration new gestao_importacoes_mms` and retain the CLI-generated file as `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T002 [P] Create the policy design skeleton and capability matrix in `supabase/policies/gestao_importacoes_mms.md`
-- [ ] T003 [P] Create deterministic multi-profile, multi-posto, correction, reprocessing and undo seed scenarios in `supabase/seed/gestao_importacoes_mms.sql`
-- [ ] T004 [P] Add reusable list/detail/correction/operation fixtures and RPC mocks in `tests/helpers/importacao-mms-management-fixtures.ts`
-- [ ] T005 [P] Add empty feature test suites with setup helpers in `tests/integration/importacoes-mms/management-test-utils.ts`
+- [X] T001 Run `npx supabase migration new gestao_importacoes_mms` and retain the CLI-generated file as `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T002 [P] Create the policy design skeleton and capability matrix in `supabase/policies/gestao_importacoes_mms.md`
+- [X] T003 [P] Create deterministic multi-profile, multi-posto, correction, reprocessing and undo seed scenarios in `supabase/seed/gestao_importacoes_mms.sql`
+- [X] T004 [P] Add reusable list/detail/correction/operation fixtures and RPC mocks in `tests/helpers/importacao-mms-management-fixtures.ts`
+- [X] T005 [P] Add empty feature test suites with setup helpers in `tests/integration/importacoes-mms/management-test-utils.ts`
 
 ---
 
@@ -40,19 +40,19 @@ boundaries required by every story.
 
 ### Tests first
 
-- [ ] T006 [P] Write failing schema/constraint/backfill tests for lot, line, error, `mms_correcoes_importacao` and `mms_operacoes_lote` in `supabase/tests/gestao_importacoes_mms_schema.sql`
-- [ ] T007 [P] Write failing baseline tests for `anon`, inactive users, direct writes, private helpers, RLS and grants in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
-- [ ] T008 [P] Write failing centralized-audit tests covering safe payloads and absence of false success in `supabase/tests/gestao_importacoes_mms_auditoria.sql`
+- [X] T006 [P] Write failing schema/constraint/backfill tests for lot, line, error, `mms_correcoes_importacao` and `mms_operacoes_lote` in `supabase/tests/gestao_importacoes_mms_schema.sql`
+- [X] T007 [P] Write failing baseline tests for `anon`, inactive users, direct writes, private helpers, RLS and grants in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
+- [X] T008 [P] Write failing centralized-audit tests covering safe payloads and absence of false success in `supabase/tests/gestao_importacoes_mms_auditoria.sql`
 
 ### Shared implementation
 
-- [ ] T009 Implement enums, entity extensions, `mms_correcoes_importacao`, `mms_operacoes_lote`, constraints, indexes and compatible backfills in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T010 Implement shared actor/profile/posto coverage helpers, correction allowlist, version checks and `json_efetivo` projection without mutating evidence in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T011 Implement RLS policies, explicit grants/revokes, private-function isolation and multi-posto child access hardening in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T012 Implement audit triggers/helpers for corrections, treatment and operation state while excluding secrets and full `raw_json` in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T013 [P] Define paginated summaries, detail collections, corrections, capabilities, operations and error-code TypeScript models in `src/modules/importacoes-mms/types.ts`
-- [ ] T014 [P] Create the shared authenticated RPC adapter, cursor validation and safe error mapping in `src/modules/importacoes-mms/management-service.ts`
-- [ ] T015 Move the existing Spec 006 page boundary to `/app/importacoes-mms/nova` while preserving its behavior in `src/app/router.tsx`
+- [X] T009 Implement enums, entity extensions, `mms_correcoes_importacao`, `mms_operacoes_lote`, constraints, indexes and compatible backfills in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T010 Implement shared actor/profile/posto coverage helpers, correction allowlist, version checks and `json_efetivo` projection without mutating evidence in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T011 Implement RLS policies, explicit grants/revokes, private-function isolation and multi-posto child access hardening in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T012 Implement audit triggers/helpers for corrections, treatment and operation state while excluding secrets and full `raw_json` in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T013 [P] Define paginated summaries, detail collections, corrections, capabilities, operations and error-code TypeScript models in `src/modules/importacoes-mms/types.ts`
+- [X] T014 [P] Create the shared authenticated RPC adapter, cursor validation and safe error mapping in `src/modules/importacoes-mms/management-service.ts`
+- [X] T015 Move the existing Spec 006 page boundary to `/app/importacoes-mms/nova` while preserving its behavior in `src/app/router.tsx`
 
 **Checkpoint**: Shared schema, RLS, audit, types and new-import route are ready.
 
@@ -69,19 +69,19 @@ no-result, denied and temporary-failure states remain distinct.
 
 ### Tests for User Story 1
 
-- [ ] T016 [P] [US1] Write failing SQL contract tests for filtered cursor pagination, partial multi-posto totals and capability projection in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
-- [ ] T017 [P] [US1] Write failing service tests for filter payloads, cursor mapping and safe error states in `tests/integration/importacoes-mms/lot-list-service.test.ts`
-- [ ] T018 [P] [US1] Write failing UI tests for loading, empty, no-result, filtered and paginated list states in `tests/integration/importacoes-mms/lot-list.test.tsx`
+- [X] T016 [P] [US1] Write failing SQL contract tests for filtered cursor pagination, partial multi-posto totals and capability projection in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
+- [X] T017 [P] [US1] Write failing service tests for filter payloads, cursor mapping and safe error states in `tests/integration/importacoes-mms/lot-list-service.test.ts`
+- [X] T018 [P] [US1] Write failing UI tests for loading, empty, no-result, filtered and paginated list states in `tests/integration/importacoes-mms/lot-list.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T019 [US1] Implement `public.listar_lotes_importacao_mms` with indexed cursor pagination, authorized aggregates and capability flags in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T020 [US1] Implement list request/response mapping and cursor recovery in `src/modules/importacoes-mms/lot-service.ts`
-- [ ] T021 [P] [US1] Implement combined accessible filters in `src/modules/importacoes-mms/components/LotFilters.tsx`
-- [ ] T022 [P] [US1] Implement the desktop-first status/total/action table in `src/modules/importacoes-mms/components/LotsTable.tsx`
-- [ ] T023 [US1] Compose loading, empty, no-result, failure and pagination states in `src/modules/importacoes-mms/pages/ImportListPage.tsx`
-- [ ] T024 [US1] Add list/table/filter design-system styles and 1280×720 overflow behavior in `src/modules/importacoes-mms/pages/ImportListPage.css`
-- [ ] T025 [US1] Route `/app/importacoes-mms` to the central and keep Nova importação linked to `/app/importacoes-mms/nova` in `src/app/router.tsx`
+- [X] T019 [US1] Implement `public.listar_lotes_importacao_mms` with indexed cursor pagination, authorized aggregates and capability flags in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T020 [US1] Implement list request/response mapping and cursor recovery in `src/modules/importacoes-mms/lot-service.ts`
+- [X] T021 [P] [US1] Implement combined accessible filters in `src/modules/importacoes-mms/components/LotFilters.tsx`
+- [X] T022 [P] [US1] Implement the desktop-first status/total/action table in `src/modules/importacoes-mms/components/LotsTable.tsx`
+- [X] T023 [US1] Compose loading, empty, no-result, failure and pagination states in `src/modules/importacoes-mms/pages/ImportListPage.tsx`
+- [X] T024 [US1] Add list/table/filter design-system styles and 1280×720 overflow behavior in `src/modules/importacoes-mms/pages/ImportListPage.css`
+- [X] T025 [US1] Route `/app/importacoes-mms` to the central and keep Nova importação linked to `/app/importacoes-mms/nova` in `src/app/router.tsx`
 
 **Checkpoint**: US1 is independently deployable as a read-only operational
 central.
@@ -99,19 +99,19 @@ full-scope file access for every profile.
 
 ### Tests for User Story 2
 
-- [ ] T026 [P] [US2] Write failing SQL tests for authorized detail projection, paginated collections and inaccessible-ID neutrality in `supabase/tests/gestao_importacoes_mms_detalhe.sql`
-- [ ] T027 [P] [US2] Write failing Storage/RLS tests proving partial-scope users cannot obtain the original file in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
-- [ ] T028 [P] [US2] Write failing page tests for summary, tabs, result, failure, cancellation and direct-URL denial in `tests/integration/importacoes-mms/lot-detail.test.tsx`
+- [X] T026 [P] [US2] Write failing SQL tests for authorized detail projection, paginated collections and inaccessible-ID neutrality in `supabase/tests/gestao_importacoes_mms_detalhe.sql`
+- [X] T027 [P] [US2] Write failing Storage/RLS tests proving partial-scope users cannot obtain the original file in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
+- [X] T028 [P] [US2] Write failing page tests for summary, tabs, result, failure, cancellation and direct-URL denial in `tests/integration/importacoes-mms/lot-detail.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T029 [US2] Implement `public.obter_detalhe_lote_importacao_mms` and `public.listar_itens_lote_importacao_mms` with safe collection projections in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T030 [US2] Enforce full-lot posto coverage for Storage object select/download without weakening Spec 006 uploads in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T031 [US2] Implement detail, collection pagination and original-file download methods in `src/modules/importacoes-mms/lot-service.ts`
-- [ ] T032 [P] [US2] Implement lot origin, status, totals, capabilities and result summary in `src/modules/importacoes-mms/components/LotSummary.tsx`
-- [ ] T033 [P] [US2] Implement lazy paginated tabs for lines, errors, alerts, corrections, operations and audit in `src/modules/importacoes-mms/components/LotItemsTabs.tsx`
-- [ ] T034 [US2] Compose accessible detail/download/denied/failure states in `src/modules/importacoes-mms/pages/ImportDetailPage.tsx`
-- [ ] T035 [US2] Register `/app/importacoes-mms/:loteId` under the existing protected route boundary in `src/app/router.tsx`
+- [X] T029 [US2] Implement `public.obter_detalhe_lote_importacao_mms` and `public.listar_itens_lote_importacao_mms` with safe collection projections in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T030 [US2] Enforce full-lot posto coverage for Storage object select/download without weakening Spec 006 uploads in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T031 [US2] Implement detail, collection pagination and original-file download methods in `src/modules/importacoes-mms/lot-service.ts`
+- [X] T032 [P] [US2] Implement lot origin, status, totals, capabilities and result summary in `src/modules/importacoes-mms/components/LotSummary.tsx`
+- [X] T033 [P] [US2] Implement lazy paginated tabs for lines, errors, alerts, corrections, operations and audit in `src/modules/importacoes-mms/components/LotItemsTabs.tsx`
+- [X] T034 [US2] Compose accessible detail/download/denied/failure states in `src/modules/importacoes-mms/pages/ImportDetailPage.tsx`
+- [X] T035 [US2] Register `/app/importacoes-mms/:loteId` under the existing protected route boundary in `src/app/router.tsx`
 
 **Checkpoint**: US2 independently explains and audits any authorized lot.
 
@@ -129,20 +129,20 @@ affect line/error state while `raw_json` and `json_normalizado` remain identical
 
 ### Tests for User Story 3
 
-- [ ] T036 [P] [US3] Write failing SQL tests for append-only corrections, allowlist validators, error resolution/reopen and evidence immutability in `supabase/tests/gestao_importacoes_mms_correcao.sql`
-- [ ] T037 [P] [US3] Write failing SQL race tests for expected versions, row locks and stale-write rejection in `supabase/tests/gestao_importacoes_mms_concorrencia.sql`
-- [ ] T038 [P] [US3] Write failing permission tests for Operador `consulta`, Operador `operacional`, Supervisão and Direção/Administração in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
-- [ ] T039 [P] [US3] Write failing UI/service tests for valid, invalid and stale correction responses in `tests/integration/importacoes-mms/correction-flow.test.tsx`
+- [X] T036 [P] [US3] Write failing SQL tests for append-only corrections, allowlist validators, error resolution/reopen and evidence immutability in `supabase/tests/gestao_importacoes_mms_correcao.sql`
+- [X] T037 [P] [US3] Write failing SQL race tests for expected versions, row locks and stale-write rejection in `supabase/tests/gestao_importacoes_mms_concorrencia.sql`
+- [X] T038 [P] [US3] Write failing permission tests for Operador `consulta`, Operador `operacional`, Supervisão and Direção/Administração in `supabase/tests/gestao_importacoes_mms_consulta_rls.sql`
+- [X] T039 [P] [US3] Write failing UI/service tests for valid, invalid and stale correction responses in `tests/integration/importacoes-mms/correction-flow.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T040 [US3] Implement per-field deterministic validation and error recalculation over `json_efetivo` in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T041 [US3] Implement `public.salvar_correcao_importacao_mms` with lot/line locks, expected version, append-only history and conclusion invalidation in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T042 [US3] Add correction/error audit events and block direct mutation or false-success events in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T043 [US3] Implement correction/history RPC mapping and stale-version recovery in `src/modules/importacoes-mms/treatment-service.ts`
-- [ ] T044 [US3] Implement the field editor with original/normalized/current values and deterministic suggestions in `src/modules/importacoes-mms/components/CorrectionEditor.tsx`
-- [ ] T045 [US3] Compose grouped errors, pending counts, correction history and profile capabilities in `src/modules/importacoes-mms/pages/ImportTreatmentPage.tsx`
-- [ ] T046 [US3] Register `/app/importacoes-mms/:loteId/tratamento` and preserve typed direct-URL guards in `src/app/router.tsx`
+- [X] T040 [US3] Implement per-field deterministic validation and error recalculation over `json_efetivo` in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T041 [US3] Implement `public.salvar_correcao_importacao_mms` with lot/line locks, expected version, append-only history and conclusion invalidation in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T042 [US3] Add correction/error audit events and block direct mutation or false-success events in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T043 [US3] Implement correction/history RPC mapping and stale-version recovery in `src/modules/importacoes-mms/treatment-service.ts`
+- [X] T044 [US3] Implement the field editor with original/normalized/current values and deterministic suggestions in `src/modules/importacoes-mms/components/CorrectionEditor.tsx`
+- [X] T045 [US3] Compose grouped errors, pending counts, correction history and profile capabilities in `src/modules/importacoes-mms/pages/ImportTreatmentPage.tsx`
+- [X] T046 [US3] Register `/app/importacoes-mms/:loteId/tratamento` and preserve typed direct-URL guards in `src/app/router.tsx`
 
 **Checkpoint**: US3 independently allows safe treatment; Operador still cannot
 conclude or reprocess.
@@ -160,19 +160,19 @@ counter without partial effects.
 
 ### Tests for User Story 4
 
-- [ ] T047 [P] [US4] Write failing SQL tests for full revalidation, role coverage, treatment-version invalidation and completion status in `supabase/tests/gestao_importacoes_mms_reprocessamento.sql`
-- [ ] T048 [US4] Write failing SQL tests for operation-ledger idempotency, conflicting keys, uncertain-response lookup and retry after failure in `supabase/tests/gestao_importacoes_mms_reprocessamento.sql`
-- [ ] T049 [P] [US4] Write failing fault-injection tests proving subtransaction rollback and no false success in `supabase/tests/gestao_importacoes_mms_atomicidade.sql`
-- [ ] T050 [P] [US4] Write failing UI/service tests for impact confirmation, repeated click, stored result and uncertain response in `tests/integration/importacoes-mms/reprocess-flow.test.tsx`
+- [X] T047 [P] [US4] Write failing SQL tests for full revalidation, role coverage, treatment-version invalidation and completion status in `supabase/tests/gestao_importacoes_mms_reprocessamento.sql`
+- [X] T048 [US4] Write failing SQL tests for operation-ledger idempotency, conflicting keys, uncertain-response lookup and retry after failure in `supabase/tests/gestao_importacoes_mms_reprocessamento.sql`
+- [X] T049 [P] [US4] Write failing fault-injection tests proving subtransaction rollback and no false success in `supabase/tests/gestao_importacoes_mms_atomicidade.sql`
+- [X] T050 [P] [US4] Write failing UI/service tests for impact confirmation, repeated click, stored result and uncertain response in `tests/integration/importacoes-mms/reprocess-flow.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T051 [US4] Implement `public.concluir_tratamento_importacao_mms` with integral scope/evidence/error revalidation and version sealing in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T052 [US4] Refactor the private Spec 004/006 processor to consume `json_efetivo` while preserving key, `removido`, reactivation and raw evidence in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T053 [US4] Implement idempotency-key resolution, `public.reprocessar_lote_importacao_mms` and `public.obter_operacao_lote_mms` in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T054 [US4] Implement treatment completion, impact, reprocess and operation-status methods in `src/modules/importacoes-mms/treatment-service.ts`
-- [ ] T055 [US4] Implement accessible impact confirmation and uncertain-response recovery in `src/modules/importacoes-mms/components/ReprocessDialog.tsx`
-- [ ] T056 [US4] Integrate conclusion/reprocess capabilities and reconciled result refresh into `src/modules/importacoes-mms/pages/ImportTreatmentPage.tsx`
+- [X] T051 [US4] Implement `public.concluir_tratamento_importacao_mms` with integral scope/evidence/error revalidation and version sealing in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T052 [US4] Refactor the private Spec 004/006 processor to consume `json_efetivo` while preserving key, `removido`, reactivation and raw evidence in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T053 [US4] Implement idempotency-key resolution, `public.reprocessar_lote_importacao_mms` and `public.obter_operacao_lote_mms` in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T054 [US4] Implement treatment completion, impact, reprocess and operation-status methods in `src/modules/importacoes-mms/treatment-service.ts`
+- [X] T055 [US4] Implement accessible impact confirmation and uncertain-response recovery in `src/modules/importacoes-mms/components/ReprocessDialog.tsx`
+- [X] T056 [US4] Integrate conclusion/reprocess capabilities and reconciled result refresh into `src/modules/importacoes-mms/pages/ImportTreatmentPage.tsx`
 
 **Checkpoint**: US1–US4 satisfy the minimum MVP explicitly defined by the spec.
 
@@ -189,21 +189,21 @@ failure in the final scope and repeat the idempotency key.
 
 ### Tests for User Story 5
 
-- [ ] T057 [P] [US5] Write failing eligibility tests for latest-effective lot, complete scope, manual edits and stable blocker codes in `supabase/tests/gestao_importacoes_mms_desfazer.sql`
-- [ ] T058 [US5] Write failing reconstruction tests for different predecessors and no-predecessor removal without physical delete in `supabase/tests/gestao_importacoes_mms_desfazer.sql`
-- [ ] T059 [US5] Write failing stale-analysis, dependency, idempotency and second-undo tests in `supabase/tests/gestao_importacoes_mms_desfazer.sql`
-- [ ] T060 [P] [US5] Extend fault-injection tests to prove failure in one scope rolls back every scope and preserves lot status in `supabase/tests/gestao_importacoes_mms_atomicidade.sql`
-- [ ] T061 [P] [US5] Write failing UI/service tests for blocked reasons, justification, stale analysis and final result in `tests/integration/importacoes-mms/undo-flow.test.tsx`
+- [X] T057 [P] [US5] Write failing eligibility tests for latest-effective lot, complete scope, manual edits and stable blocker codes in `supabase/tests/gestao_importacoes_mms_desfazer.sql`
+- [X] T058 [US5] Write failing reconstruction tests for different predecessors and no-predecessor removal without physical delete in `supabase/tests/gestao_importacoes_mms_desfazer.sql`
+- [X] T059 [US5] Write failing stale-analysis, dependency, idempotency and second-undo tests in `supabase/tests/gestao_importacoes_mms_desfazer.sql`
+- [X] T060 [P] [US5] Extend fault-injection tests to prove failure in one scope rolls back every scope and preserves lot status in `supabase/tests/gestao_importacoes_mms_atomicidade.sql`
+- [X] T061 [P] [US5] Write failing UI/service tests for blocked reasons, justification, stale analysis and final result in `tests/integration/importacoes-mms/undo-flow.test.tsx`
 
 ### Implementation for User Story 5
 
-- [ ] T062 [US5] Implement latest-effective/predecessor selection and dependency blocker helpers per posto/data in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T063 [US5] Implement `public.analisar_desfazer_importacao_mms` with safe blocker aggregation, impact and opaque state signature in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T064 [US5] Implement `app_private.mms_reconstruir_espelho_escopo` for predecessor replay or no-predecessor withdrawal without delete in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T065 [US5] Implement `public.desfazer_importacao_mms` with deterministic locks, full revalidation, idempotent ledger, atomic cancellation and audit in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T066 [US5] Implement analyze/execute/status response mapping in `src/modules/importacoes-mms/treatment-service.ts`
-- [ ] T067 [US5] Implement accessible blocker, impact, justification, confirmation and stale-analysis flows in `src/modules/importacoes-mms/components/UndoImportDialog.tsx`
-- [ ] T068 [US5] Integrate analyze/desfazer capabilities and Cancelado result refresh into `src/modules/importacoes-mms/pages/ImportDetailPage.tsx`
+- [X] T062 [US5] Implement latest-effective/predecessor selection and dependency blocker helpers per posto/data in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T063 [US5] Implement `public.analisar_desfazer_importacao_mms` with safe blocker aggregation, impact and opaque state signature in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T064 [US5] Implement `app_private.mms_reconstruir_espelho_escopo` for predecessor replay or no-predecessor withdrawal without delete in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T065 [US5] Implement `public.desfazer_importacao_mms` with deterministic locks, full revalidation, idempotent ledger, atomic cancellation and audit in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T066 [US5] Implement analyze/execute/status response mapping in `src/modules/importacoes-mms/treatment-service.ts`
+- [X] T067 [US5] Implement accessible blocker, impact, justification, confirmation and stale-analysis flows in `src/modules/importacoes-mms/components/UndoImportDialog.tsx`
+- [X] T068 [US5] Integrate analyze/desfazer capabilities and Cancelado result refresh into `src/modules/importacoes-mms/pages/ImportDetailPage.tsx`
 
 **Checkpoint**: US5 adds the approved P2 reversal journey without weakening the
 MVP.
@@ -215,14 +215,14 @@ MVP.
 **Purpose**: Validate the integrated feature, documentation, performance,
 security and constitutional gates.
 
-- [ ] T069 [P] Document the manual browser acceptance matrix for protected direct URLs, keyboard, focus, profiles, destructive dialogs and desktop layouts in `specs/007-gestao-importacoes-mms/quickstart.md`
-- [ ] T070 [P] Add 10,000-line cursor/query mapping performance coverage in `tests/unit/importacoes-mms/management-performance.test.ts`
-- [ ] T071 [P] Finalize RLS, RPC, grants, audit events and future occurrence/cost dependency notes in `supabase/policies/gestao_importacoes_mms.md`
-- [ ] T072 [P] Finalize deterministic acceptance data and document cleanup order in `supabase/seed/gestao_importacoes_mms.sql`
-- [ ] T073 Run all SQL files transactionally against the approved remote development project and record evidence in `specs/007-gestao-importacoes-mms/quickstart.md`
-- [ ] T074 Run Supabase lint/advisors, inspect query plans for list/detail/undo and resolve findings in `supabase/migrations/*_gestao_importacoes_mms.sql`
-- [ ] T075 Run `npm run typecheck`, `npm run lint`, `npm test` and `npm run build`, recording outcomes in `specs/007-gestao-importacoes-mms/quickstart.md`
-- [ ] T076 Validate Constitution gates for RLS/profile/posto, no physical delete, centralized audit, evidence immutability, MMS key/`removido`, dependency blockers and desktop-first UI in `specs/007-gestao-importacoes-mms/quickstart.md`
+- [X] T069 [P] Document the manual browser acceptance matrix for protected direct URLs, keyboard, focus, profiles, destructive dialogs and desktop layouts in `specs/007-gestao-importacoes-mms/quickstart.md`
+- [X] T070 [P] Add 10,000-line cursor/query mapping performance coverage in `tests/unit/importacoes-mms/management-performance.test.ts`
+- [X] T071 [P] Finalize RLS, RPC, grants, audit events and future occurrence/cost dependency notes in `supabase/policies/gestao_importacoes_mms.md`
+- [X] T072 [P] Finalize deterministic acceptance data and document cleanup order in `supabase/seed/gestao_importacoes_mms.sql`
+- [X] T073 Run all SQL files transactionally against the approved remote development project and record evidence in `specs/007-gestao-importacoes-mms/quickstart.md`
+- [X] T074 Run Supabase lint/advisors, inspect query plans for list/detail/undo and resolve findings in `supabase/migrations/*_gestao_importacoes_mms.sql`
+- [X] T075 Run `npm run typecheck`, `npm run lint`, `npm test` and `npm run build`, recording outcomes in `specs/007-gestao-importacoes-mms/quickstart.md`
+- [X] T076 Validate Constitution gates for RLS/profile/posto, no physical delete, centralized audit, evidence immutability, MMS key/`removido`, dependency blockers and desktop-first UI in `specs/007-gestao-importacoes-mms/quickstart.md`
 
 ---
 

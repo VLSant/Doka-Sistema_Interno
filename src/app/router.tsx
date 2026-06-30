@@ -38,6 +38,9 @@ import { AppShell } from "../components/layout/AppShell";
 import { ROUTE_DEFINITIONS } from "./routes";
 
 const NewImportPage = lazy(() => import("../modules/importacoes-mms/pages/NewImportPage"));
+const ImportListPage = lazy(() => import("../modules/importacoes-mms/pages/ImportListPage"));
+const ImportDetailPage = lazy(() => import("../modules/importacoes-mms/pages/ImportDetailPage"));
+const ImportTreatmentPage = lazy(() => import("../modules/importacoes-mms/pages/ImportTreatmentPage"));
 
 function RootLayout() {
   const navigation = useNavigation();
@@ -117,7 +120,8 @@ export const router = createBrowserRouter([
       {
         path: "app",
         element: <AppShell />,
-        children: ROUTE_DEFINITIONS.map((route) => ({
+        children: [
+          ...ROUTE_DEFINITIONS.map((route) => ({
           path: route.path.replace(/^\/app\//, ""),
           element: (
             <ProtectedRoute routeId={route.id}>
@@ -125,14 +129,27 @@ export const router = createBrowserRouter([
                 <DashboardPage />
               ) : route.id === "importacoes-mms" ? (
                 <Suspense fallback={<LoadingState message="Carregando importação..." />}>
-                  <NewImportPage />
+                  <ImportListPage />
                 </Suspense>
               ) : (
                 <ModuleUnavailablePage moduleLabel={route.label} />
               )}
             </ProtectedRoute>
           ),
-        })),
+          })),
+          {
+            path: "importacoes-mms/nova",
+            element: <ProtectedRoute routeId="importacoes-mms"><Suspense fallback={<LoadingState message="Carregando importação..." />}><NewImportPage /></Suspense></ProtectedRoute>,
+          },
+          {
+            path: "importacoes-mms/:loteId",
+            element: <ProtectedRoute routeId="importacoes-mms"><Suspense fallback={<LoadingState message="Carregando lote..." />}><ImportDetailPage /></Suspense></ProtectedRoute>,
+          },
+          {
+            path: "importacoes-mms/:loteId/tratamento",
+            element: <ProtectedRoute routeId="importacoes-mms"><Suspense fallback={<LoadingState message="Carregando tratamento..." />}><ImportTreatmentPage /></Suspense></ProtectedRoute>,
+          },
+        ],
       },
       {
         path: "*",
