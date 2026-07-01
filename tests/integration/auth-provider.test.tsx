@@ -5,7 +5,7 @@
  * `data-model.md` AuthState table.
  */
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   buildMockAuthUser,
@@ -121,6 +121,65 @@ describe("AuthProvider gating", () => {
     mock.auth.__emit("SIGNED_OUT", null);
 
     await waitFor(() => expect(screen.getByTestId("no-protected-content")).toBeInTheDocument());
+  });
+
+  it.each(["SIGNED_IN", "TOKEN_REFRESHED"] as const)(
+    "keeps protected content visible for a redundant %s event from the authorized user",
+    async (event) => {
+      const user = buildMockAuthUser();
+      const session = buildMockSession({ user });
+      const mock = createMockSupabaseClient({ initialUser: user, initialSession: session });
+      const resolveInitialContext = vi.fn().mockResolvedValue(operadorResult);
+
+      render(
+        <AuthProvider
+          supabase={asClient(mock)}
+          accessService={{ resolveInitialContext }}
+        >
+          <ProtectedProbe />
+        </AuthProvider>,
+      );
+
+      await waitFor(() => expect(screen.getByTestId("protected-content")).toBeInTheDocument());
+      expect(resolveInitialContext).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        mock.auth.__emit(event, session);
+        await Promise.resolve();
+      });
+
+      expect(screen.getByTestId("protected-content")).toBeInTheDocument();
+      expect(resolveInitialContext).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it("fully revalidates when SIGNED_IN carries a different user", async () => {
+    const initialUser = buildMockAuthUser();
+    const nextUser = buildMockAuthUser({
+      id: "10000000-0000-0000-0000-000000000002",
+      email: "supervisao@doka.test",
+    });
+    const mock = createMockSupabaseClient({
+      initialUser,
+      initialSession: buildMockSession({ user: initialUser }),
+    });
+    const resolveInitialContext = vi.fn().mockResolvedValue(operadorResult);
+
+    render(
+      <AuthProvider
+        supabase={asClient(mock)}
+        accessService={{ resolveInitialContext }}
+      >
+        <ProtectedProbe />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId("protected-content")).toBeInTheDocument());
+
+    mock.auth.__emit("SIGNED_IN", buildMockSession({ user: nextUser }));
+
+    await waitFor(() => expect(resolveInitialContext).toHaveBeenCalledTimes(2));
+    expect(resolveInitialContext).toHaveBeenLastCalledWith(nextUser.id);
   });
 
   it("reloads the operational context and removes stale protected content on revalidation", async () => {
