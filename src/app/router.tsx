@@ -41,6 +41,8 @@ const NewImportPage = lazy(() => import("../modules/importacoes-mms/pages/NewImp
 const ImportListPage = lazy(() => import("../modules/importacoes-mms/pages/ImportListPage"));
 const ImportDetailPage = lazy(() => import("../modules/importacoes-mms/pages/ImportDetailPage"));
 const ImportTreatmentPage = lazy(() => import("../modules/importacoes-mms/pages/ImportTreatmentPage"));
+const AssistanceListPage = lazy(() => import("../modules/assistencias-mms/pages/AssistanceListPage"));
+const AssistanceDetailPage = lazy(() => import("../modules/assistencias-mms/pages/AssistanceDetailPage"));
 
 function RootLayout() {
   const navigation = useNavigation();
@@ -127,6 +129,10 @@ export const router = createBrowserRouter([
             <ProtectedRoute routeId={route.id}>
               {route.id === "dashboard" ? (
                 <DashboardPage />
+              ) : route.id === "assistencias-mms" ? (
+                <Suspense fallback={<LoadingState message="Carregando assistências..." />}>
+                  <AssistanceListPage />
+                </Suspense>
               ) : route.id === "importacoes-mms" ? (
                 <Suspense fallback={<LoadingState message="Carregando importação..." />}>
                   <ImportListPage />
@@ -137,6 +143,10 @@ export const router = createBrowserRouter([
             </ProtectedRoute>
           ),
           })),
+          {
+            path: "assistencias-mms/:assistenciaId",
+            element: <ProtectedRoute routeId="assistencias-mms"><Suspense fallback={<LoadingState message="Carregando assistência..." />}><AssistanceDetailPage /></Suspense></ProtectedRoute>,
+          },
           {
             path: "importacoes-mms/nova",
             element: <ProtectedRoute routeId="importacoes-mms"><Suspense fallback={<LoadingState message="Carregando importação..." />}><NewImportPage /></Suspense></ProtectedRoute>,

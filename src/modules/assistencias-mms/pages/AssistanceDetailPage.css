@@ -1,0 +1,195 @@
+@import "./AssistanceListPage.css";
+
+.assistance-summary {
+  display: grid;
+  gap: 20px;
+}
+
+.assistance-summary__identity,
+.assistance-part__heading,
+.assistance-section-heading,
+.effective-value__heading,
+.assistance-history__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.assistance-summary__identity > div,
+.assistance-part__heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.assistance-summary__identity strong {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.assistance-summary__facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+
+.assistance-summary__facts div,
+.effective-value dl {
+  display: grid;
+  gap: 4px;
+}
+
+.assistance-summary__facts dt,
+.effective-value dt,
+.assistance-dialog dt {
+  color: #6c6c6c;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.assistance-summary__facts dd,
+.effective-value dd,
+.assistance-dialog dd {
+  margin: 0;
+}
+
+.assistance-summary__values,
+.assistance-part__values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.effective-value {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+}
+
+.effective-value__heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.effective-value__label {
+  color: #666;
+  font-size: 0.78rem;
+}
+
+.effective-value details summary {
+  cursor: pointer;
+  color: #602860;
+  font-weight: 600;
+}
+
+.effective-value dl {
+  margin-bottom: 0;
+}
+
+.assistance-section-heading {
+  margin-bottom: 14px;
+}
+
+.assistance-section-heading h2,
+.assistance-part__heading h3 {
+  margin: 2px 0 0;
+}
+
+.assistance-parts {
+  display: grid;
+  gap: 16px;
+}
+
+.assistance-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(48 19 48 / 55%);
+  backdrop-filter: blur(3px);
+}
+
+.assistance-dialog {
+  display: grid;
+  gap: 16px;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgb(48 19 48 / 25%);
+}
+
+.assistance-dialog h2,
+.assistance-dialog dl {
+  margin: 0;
+}
+
+.assistance-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.assistance-history {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.assistance-history li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 12px;
+  padding-bottom: 20px;
+}
+
+.assistance-history li::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  bottom: 0;
+  left: 6px;
+  width: 2px;
+  background: #e6e6e6;
+}
+
+.assistance-history li:last-child::before {
+  display: none;
+}
+
+.assistance-history__marker {
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  margin-top: 4px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #f09018;
+  box-shadow: 0 0 0 1px #f09018;
+}
+
+.assistance-history p {
+  margin: 5px 0;
+}
+
+.assistance-history time {
+  color: #666;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 900px) {
+  .assistance-summary__facts,
+  .assistance-summary__values,
+  .assistance-part__values {
+    grid-template-columns: 1fr 1fr;
+  }
+}
