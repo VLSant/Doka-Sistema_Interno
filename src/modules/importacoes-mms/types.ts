@@ -1,3 +1,5 @@
+import type { JsonSafeValue } from "./parser/types";
+
 export type {
   JsonSafeValue,
   MmsFileExtension,
@@ -124,3 +126,135 @@ export type ImportUiState =
   | { name: "session_expired" }
   | { name: "access_denied" }
   | { name: "failure"; error: ImportServiceError; loteId?: string };
+
+export type ManagementErrorCode =
+  | "acesso_negado"
+  | "analise_desatualizada"
+  | "chave_idempotencia_conflitante"
+  | "correcao_desatualizada"
+  | "correcao_invalida"
+  | "cursor_invalido"
+  | "filtros_invalidos"
+  | "operacao_em_andamento"
+  | "tratamento_incompleto"
+  | "falha_temporaria";
+
+export interface ManagementError extends Error {
+  code: ManagementErrorCode;
+  retryable: boolean;
+}
+
+export interface ManagementCursor {
+  created_at: string;
+  id: string;
+}
+
+export interface LotCapabilities {
+  abrir: boolean;
+  baixar_arquivo: boolean;
+  corrigir: boolean;
+  concluir_tratamento: boolean;
+  reprocessar: boolean;
+  analisar_desfazer: boolean;
+}
+
+export interface LotFilters {
+  posto_id?: string;
+  data_atividade?: string;
+  importado_de?: string;
+  importado_ate?: string;
+  status?: string;
+  com_erro?: boolean;
+  com_alerta?: boolean;
+  usuario_importador_id?: string;
+}
+
+export interface LotSummary {
+  lote_id: string;
+  importado_em: string;
+  data_atividade: string | null;
+  postos: Array<{ id: string; nome: string }>;
+  visibilidade_parcial: boolean;
+  usuario_importador: { id: string; nome: string } | null;
+  arquivo: string | null;
+  status: string | null;
+  estado_processamento: string;
+  total_linhas: number;
+  total_assistencias: number;
+  total_partes: number;
+  total_erros_pendentes: number;
+  total_alertas: number;
+  precisa_tratamento: boolean;
+  capacidades: LotCapabilities;
+}
+
+export interface LotDetail extends LotSummary {
+  versao_tratamento: number;
+  versao_processada: number | null;
+  resultado_processamento: Record<string, unknown> | null;
+  codigo_ultima_falha: string | null;
+  caminho_arquivo: string | null;
+  tipo_cancelamento: string | null;
+}
+
+export type LotCollection =
+  | "linhas"
+  | "erros"
+  | "alertas"
+  | "correcoes"
+  | "operacoes"
+  | "auditoria";
+
+export interface PaginatedResult<T> {
+  itens: T[];
+  proximo_cursor: ManagementCursor | null;
+}
+
+export interface LotItem {
+  id: string;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+export interface CorrectionInput {
+  lote_id: string;
+  linha_id: string;
+  campo: string;
+  valor: JsonSafeValue;
+  versao_esperada: number;
+  justificativa?: string;
+}
+
+export interface CorrectionResult {
+  correcao_id: string;
+  linha_id: string;
+  campo: string;
+  valor_efetivo: JsonSafeValue;
+  versao: number;
+  erros_pendentes: number;
+}
+
+export interface OperationResult {
+  operacao_id: string;
+  lote_id: string;
+  tipo: "reprocessamento" | "desfazer";
+  estado: "em_andamento" | "concluida" | "falha";
+  chave_idempotencia: string;
+  resultado: Record<string, unknown> | null;
+  codigo_falha: string | null;
+}
+
+export interface UndoAnalysis {
+  lote_id: string;
+  elegivel: boolean;
+  versao_tratamento: number;
+  assinatura_analise: string | null;
+  analisado_em: string;
+  escopos: Array<{
+    posto_id: string;
+    data_atividade: string;
+    lote_predecessor_id: string | null;
+  }>;
+  impacto: Record<string, number>;
+  motivos_bloqueio: string[];
+}
