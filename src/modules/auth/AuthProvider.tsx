@@ -108,6 +108,10 @@ export function AuthProvider({
   const initialSessionStartedRef = useRef(false);
   const signInInFlightRef = useRef(false);
   const logoutPromiseRef = useRef<Promise<void> | null>(null);
+  // Supabase emits SIGNED_IN again when an already-authenticated browser tab
+  // becomes visible. Remember the identity whose operational context is
+  // currently authorized so those duplicate events do not blank the UI.
+  const authorizedAuthUserIdRef = useRef<string | null>(null);
   // Remains true after an explicit logout until a new login/session starts.
   // This lets late Supabase callbacks and protected-route revalidation
   // distinguish a voluntary logout from an unexpected session expiration.
@@ -143,6 +147,7 @@ export function AuthProvider({
       }
 
       if (result.status === "autorizado") {
+        authorizedAuthUserIdRef.current = authUserId;
         setState((current) => transitionAuthState(current, { type: "CONTEXTO_RESOLVIDO", context: result.context }));
         try {
           await audit.registrarEvento("acesso_interno_concedido");
@@ -153,6 +158,7 @@ export function AuthProvider({
       }
 
       if (result.status === "bloqueado") {
+        authorizedAuthUserIdRef.current = null;
         setState((current) => transitionAuthState(current, { type: "CONTEXTO_BLOQUEADO", reason: result.reason }));
         try {
           await audit.registrarEvento("acesso_operacional_bloqueado");
@@ -162,6 +168,7 @@ export function AuthProvider({
         return;
       }
 
+      authorizedAuthUserIdRef.current = null;
       setState((current) => transitionAuthState(current, { type: "CONTEXTO_FALHOU" }));
     },
     [access, audit],
@@ -203,6 +210,7 @@ export function AuthProvider({
       const { event, session } = item;
 
       if (event === "SIGNED_OUT") {
+        authorizedAuthUserIdRef.current = null;
         voluntaryLogoutRef.current = true;
         setState((current) => transitionAuthState(current, { type: "LOGOUT" }));
         setRecoveryAuthorization("invalido");
@@ -221,6 +229,7 @@ export function AuthProvider({
       }
 
       if (!session?.user) {
+        authorizedAuthUserIdRef.current = null;
         if (
           event === "INITIAL_SESSION" ||
           voluntaryLogoutRef.current ||
@@ -246,6 +255,7 @@ export function AuthProvider({
         if (token !== revalidationTokenRef.current) return;
 
         if (error || !data.user) {
+          authorizedAuthUserIdRef.current = null;
           setState((current) => transitionAuthState(current, { type: "SESSAO_EXPIROU" }));
           try {
             await audit.registrarEvento("sessao_expirada_detectada");
@@ -296,6 +306,19 @@ export function AuthProvider({
       ) {
         return;
       }
+      // In browsers, Supabase recovers the persisted session whenever a tab
+      // returns to the foreground and emits SIGNED_IN even if the identity did
+      // not change. TOKEN_REFRESHED is likewise routine session maintenance.
+      // The refreshed token is already persisted by the client, so neither
+      // event requires clearing and rebuilding the same operational context.
+      // A different user id still takes the full blocking revalidation path.
+      if (
+        stateRef.current.name === "autorizado" &&
+        (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") &&
+        session?.user.id === authorizedAuthUserIdRef.current
+      ) {
+        return;
+      }
       if (stateRef.current.name === "autorizado") {
         setState((current) => transitionAuthState(current, { type: "REVALIDAR_CONTEXTO" }));
       }
@@ -334,6 +357,7 @@ export function AuthProvider({
 
   const signOut = useCallback(async () => {
     voluntaryLogoutRef.current = true;
+    authorizedAuthUserIdRef.current = null;
     // Hide protected content immediately, but keep the protected route in a
     // loading state until Supabase has actually removed the local session.
     // Redirecting to /login before that point would allow an immediate hard
@@ -372,6 +396,7 @@ export function AuthProvider({
     if (token !== revalidationTokenRef.current) return;
 
     if (error || !data.user) {
+      authorizedAuthUserIdRef.current = null;
       const event =
         voluntaryLogoutRef.current ||
         stateRef.current.name === "inicializando" ||
@@ -402,6 +427,7 @@ export function AuthProvider({
         try {
           await client.auth.signOut({ scope: "local" });
         } finally {
+          authorizedAuthUserIdRef.current = null;
           revalidationTokenRef.current += 1;
           setState((current) => transitionAuthState(current, { type: "LOGOUT" }));
         }

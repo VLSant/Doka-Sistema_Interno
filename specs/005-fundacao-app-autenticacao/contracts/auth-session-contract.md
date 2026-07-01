@@ -48,9 +48,9 @@ The UI must never:
 | Event | Required reaction |
 | --- | --- |
 | `INITIAL_SESSION` | Resolver identidade/contexto ou ficar não autenticado |
-| `SIGNED_IN` | Resolver novamente o contexto antes de liberar rotas |
+| `SIGNED_IN` | Resolver novamente o contexto antes de liberar rotas quando a identidade mudar; evento repetido do mesmo usuário já autorizado mantém a UI e revalida na próxima navegação protegida |
 | `SIGNED_OUT` | Limpar contexto e redirecionar para login |
-| `TOKEN_REFRESHED` | Manter sessão; revalidar contexto antes da próxima interação protegida |
+| `TOKEN_REFRESHED` | Manter sessão e contexto visível; revalidar contexto antes da próxima navegação protegida |
 | `USER_UPDATED` | Revalidar identidade/contexto |
 | `PASSWORD_RECOVERY` | Abrir fluxo de redefinição |
 
